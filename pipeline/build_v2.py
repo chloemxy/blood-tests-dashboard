@@ -90,17 +90,17 @@ V2CSS = r"""
 .v2honest h4{font-family:var(--font-serif);font-size:15px;color:var(--slate);margin:0 0 5px;}
 .v2covbar{display:flex;height:11px;border-radius:6px;overflow:hidden;margin:9px 0 8px;border:1px solid var(--line);}
 
-/* ---------- shared screen chrome for the two new modes ---------- */
-#cxAtlas,#cxGaps{position:fixed;inset:0;overflow-y:auto;background:var(--paper);z-index:40;display:none;}
-#cxAtlas.cx-on,#cxGaps.cx-on{display:block;}
-#cxAtlas .cxwrap,#cxGaps .cxwrap{max-width:1120px;margin:0 auto;padding:22px 24px 90px;}
-#cxAtlas .cxtop,#cxGaps .cxtop{display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--line);
+/* ---------- scrolling screen chrome (gap map) ---------- */
+#cxGaps{position:fixed;inset:0;overflow-y:auto;background:var(--paper);z-index:40;display:none;}
+#cxGaps.cx-on{display:block;}
+#cxGaps .cxwrap{max-width:1120px;margin:0 auto;padding:22px 24px 90px;}
+#cxGaps .cxtop{display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--line);
  padding:12px 24px;background:var(--panel);position:sticky;top:0;z-index:3;}
-#cxAtlas .cxtop .logo,#cxGaps .cxtop .logo{font-family:var(--font-serif);font-size:19px;color:var(--slate);font-weight:700;}
-#cxAtlas .cxtop .logo b,#cxGaps .cxtop .logo b{color:var(--teal);}
-#cxAtlas .cxtop .tag,#cxGaps .cxtop .tag{font-family:var(--font-mono);font-size:10.5px;color:var(--muted);letter-spacing:.04em;}
-#cxAtlas h1,#cxGaps h1{font-family:var(--font-serif);font-size:26px;color:var(--slate);margin:12px 0 4px;}
-#cxAtlas .lead,#cxGaps .lead{font-size:14px;color:var(--muted);margin:0 0 18px;max-width:720px;}
+#cxGaps .cxtop .logo{font-family:var(--font-serif);font-size:19px;color:var(--slate);font-weight:700;}
+#cxGaps .cxtop .logo b{color:var(--teal);}
+#cxGaps .cxtop .tag{font-family:var(--font-mono);font-size:10.5px;color:var(--muted);letter-spacing:.04em;}
+#cxGaps h1{font-family:var(--font-serif);font-size:26px;color:var(--slate);margin:12px 0 4px;}
+#cxGaps .lead{font-size:14px;color:var(--muted);margin:0 0 18px;max-width:720px;}
 .v2sec{margin:26px 0 0;}
 .v2sec h2{font-family:var(--font-serif);font-size:19px;color:var(--slate);margin:0 0 3px;}
 .v2sec .sub{font-size:12.5px;color:var(--muted);margin:0 0 12px;max-width:760px;}
@@ -111,20 +111,165 @@ V2CSS = r"""
 .v2tool.on{background:var(--teal);border-color:var(--teal);color:#fff;}
 .v2tools .lab{font-family:var(--font-mono);font-size:10px;letter-spacing:.05em;color:var(--dim);text-transform:uppercase;margin-right:2px;}
 
-/* ---------- atlas family cards ---------- */
-.v2fams{display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:12px;}
-.v2fc{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 15px 12px;
- display:flex;flex-direction:column;gap:6px;cursor:pointer;transition:.16s;text-align:left;font-family:inherit;}
-.v2fc:hover{border-color:var(--teal);box-shadow:0 9px 22px rgba(12,30,36,.10);transform:translateY(-2px);}
-.v2fc .fh{display:flex;align-items:baseline;justify-content:space-between;gap:8px;}
-.v2fc .fn{font-family:var(--font-serif);font-size:16px;color:var(--slate);font-weight:700;line-height:1.25;}
-.v2fc .fq{font-family:var(--font-mono);font-size:11px;color:var(--dim);white-space:nowrap;}
-.v2fc .fbar{display:flex;height:8px;border-radius:5px;overflow:hidden;border:1px solid var(--line);background:#fff;}
-.v2fc .fbar i{display:block;height:100%;}
-.v2fc .fmeta{font-size:11.5px;color:var(--muted);line-height:1.5;}
-.v2fc .fmeta b{color:var(--slate);}
-.v2fc .fzero{color:var(--accent);font-weight:600;}
-.v2fc .farr{font-size:11.5px;color:var(--teal);font-weight:700;margin-top:2px;}
+/* ==================== ATLAS COCKPIT — fixed, nothing reflows ====================
+   The stage never scrolls and no panel ever changes size. Panels are absolutely
+   positioned against the stage; anything that could overflow scrolls inside its
+   own box. The map packs once per stage size and only re-paints on shade change,
+   so circles never jump. */
+#cxAtlas{position:fixed;inset:0;background:var(--paper);z-index:40;display:none;overflow:hidden;}
+#cxAtlas.cx-on{display:block;}
+.atl-top{position:absolute;top:0;left:0;right:0;height:53px;display:flex;align-items:center;gap:14px;
+ padding:0 20px;background:var(--panel);border-bottom:1px solid var(--line);z-index:6;}
+.atl-top .logo{font-family:var(--font-serif);font-size:18px;color:var(--slate);font-weight:700;}
+.atl-top .logo b{color:var(--teal);}
+.atl-top .tag{font-family:var(--font-mono);font-size:10.5px;color:var(--muted);letter-spacing:.04em;}
+.atl-top .sp{flex:1;}
+.atl-hdrstat{font-family:var(--font-mono);font-size:10.5px;color:var(--dim);white-space:nowrap;}
+@media(max-width:820px){.atl-hdrstat{display:none;}}
+
+.atl-stage{position:absolute;top:53px;left:0;right:0;bottom:0;overflow:hidden;}
+.atl-map{position:absolute;inset:0;width:100%;height:100%;display:block;}
+.atl-map circle{transition:stroke-width .12s,filter .12s;cursor:pointer;}
+.atl-map .fam-t{font-family:var(--font-sans);font-size:10px;fill:var(--muted);pointer-events:none;}
+.atl-map .fam-n{font-family:var(--font-mono);font-size:9px;fill:var(--dim);pointer-events:none;}
+.atl-map g.lit .fam-t{fill:var(--slate);}
+.atl-map g.lit .fam-n{fill:var(--teal);}
+.atl-map g.hot circle{stroke-width:3.4;filter:drop-shadow(0 3px 9px rgba(12,30,36,.22));}
+.atl-map g.sel circle{stroke:var(--accent)!important;stroke-width:3.4;stroke-dasharray:none!important;}
+.atl-map g.sel .fam-t,.atl-map g.sel .fam-n{fill:var(--accent);}
+
+/* --- shared panel shell: glass, fixed, never resizes --- */
+.atl-panel{position:absolute;background:rgba(255,255,255,.9);border:1px solid var(--line);
+ border-radius:14px;box-shadow:0 12px 34px rgba(12,30,36,.11);z-index:3;
+ -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);display:flex;flex-direction:column;}
+.atl-panel header{flex:0 0 auto;padding:11px 15px 9px;border-bottom:1px solid var(--line);
+ font-family:var(--font-mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--dim);
+ display:flex;align-items:center;gap:8px;}
+.atl-panel header b{font-family:var(--font-mono);color:var(--slate);font-weight:600;}
+.atl-panel header .sp{flex:1;}
+
+/* --- left column: controls above, family index filling the rest --- */
+.atl-left{position:absolute;top:16px;left:16px;bottom:110px;width:302px;
+ display:flex;flex-direction:column;gap:12px;z-index:3;}
+.atl-ctl{position:relative;flex:0 0 auto;padding:15px 16px 14px;}
+.atl-ctl h1{font-family:var(--font-serif);font-size:20px;color:var(--slate);margin:0 0 4px;line-height:1.25;}
+.atl-ctl p{font-size:11.5px;color:var(--muted);margin:0 0 11px;line-height:1.5;}
+.atl-row{display:flex;align-items:center;gap:9px;margin-top:7px;}
+.atl-lab{font-family:var(--font-mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;
+ color:var(--dim);width:42px;flex:0 0 auto;}
+.atl-seg{display:flex;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;flex:1;}
+.atl-seg button{flex:1;border:none;background:none;font-family:var(--font-sans);font-size:10.5px;
+ font-weight:600;color:var(--muted);padding:5px 4px;white-space:nowrap;border-right:1px solid var(--line);}
+.atl-seg button:last-child{border-right:none;}
+.atl-seg button:hover{color:var(--teal);background:var(--aqua);}
+.atl-seg button.on{background:var(--teal);color:#fff;}
+
+.atl-index{position:relative;flex:1 1 auto;min-height:0;}
+.atl-idxscroll{flex:1 1 auto;min-height:0;overflow-y:auto;padding:5px;}
+.atl-idxscroll::-webkit-scrollbar{width:7px;}
+.atl-idxscroll::-webkit-scrollbar-thumb{background:var(--line);border-radius:7px;}
+.atl-ir{display:grid;grid-template-columns:1fr 54px;gap:7px;align-items:center;width:100%;
+ height:34px;padding:0 9px;border:1px solid transparent;border-radius:8px;background:none;
+ text-align:left;font-family:inherit;cursor:pointer;}
+.atl-ir:hover{background:var(--aqua);}
+.atl-ir.hot{background:var(--aqua);border-color:var(--teal);}
+.atl-ir.sel{background:#fdf1ea;border-color:var(--accent);}
+.atl-ir .n{font-size:12px;color:var(--slate);font-weight:600;white-space:nowrap;overflow:hidden;
+ text-overflow:ellipsis;}
+.atl-ir.sel .n{color:var(--accent);}
+.atl-ir .b{display:flex;height:7px;border-radius:4px;overflow:hidden;border:1px solid var(--line);background:#fff;}
+.atl-ir .b i{display:block;height:100%;}
+
+/* --- right column: detail, always mounted at a fixed size --- */
+.atl-detail{top:16px;right:16px;bottom:110px;width:330px;}
+.atl-dbody{flex:1 1 auto;min-height:0;overflow-y:auto;padding:15px 16px 14px;}
+.atl-dbody::-webkit-scrollbar{width:7px;}
+.atl-dbody::-webkit-scrollbar-thumb{background:var(--line);border-radius:7px;}
+.atl-dt{font-family:var(--font-serif);font-size:19px;color:var(--slate);margin:0 0 2px;line-height:1.24;}
+.atl-dsub{font-family:var(--font-mono);font-size:10.5px;color:var(--dim);margin:0 0 13px;}
+.atl-big{font-family:var(--font-serif);font-size:33px;font-weight:700;color:var(--teal);line-height:1;}
+.atl-big small{font-family:var(--font-sans);font-size:12px;color:var(--muted);font-weight:400;margin-left:5px;}
+.atl-cov{margin:15px 0 0;}
+.atl-cov .k{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;
+ color:var(--dim);display:flex;justify-content:space-between;gap:8px;margin-bottom:4px;}
+.atl-cov .k b{color:var(--slate);font-weight:600;}
+.atl-cov .k b.zero{color:var(--accent);}
+.atl-cov .bar{display:flex;height:9px;border-radius:5px;overflow:hidden;border:1px solid var(--line);background:#fff;}
+.atl-cov .bar i{display:block;height:100%;}
+.atl-samp{margin:16px 0 0;border-top:1px solid var(--line);padding-top:11px;}
+.atl-samp .h{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;
+ color:var(--dim);margin:0 0 7px;}
+.atl-samp li{font-size:11.5px;color:var(--muted);list-style:none;padding:2px 0;white-space:nowrap;
+ overflow:hidden;text-overflow:ellipsis;}
+.atl-samp ul{margin:0;padding:0;}
+.atl-acts{flex:0 0 auto;padding:11px 15px 13px;border-top:1px solid var(--line);display:flex;
+ flex-direction:column;gap:7px;}
+.atl-btn{border:1px solid var(--teal);background:var(--teal);color:#fff;font-family:inherit;font-size:12px;
+ font-weight:700;padding:8px 12px;border-radius:9px;width:100%;}
+.atl-btn:hover{background:#005e6d;}
+.atl-btn.ghost{background:#fff;color:var(--teal);}
+.atl-btn.ghost:hover{background:var(--aqua);}
+.atl-btn[disabled]{opacity:.4;cursor:default;background:#fff;color:var(--dim);border-color:var(--line);}
+.atl-empty{font-size:12.5px;color:var(--muted);line-height:1.6;}
+.atl-empty b{color:var(--slate);}
+
+/* --- bottom bar: legend + the honesty line --- */
+.atl-foot{left:16px;right:16px;bottom:16px;height:82px;flex-direction:row;align-items:center;
+ gap:18px;padding:0 18px;}
+.atl-leg{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);flex:0 0 auto;}
+.atl-leg i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;vertical-align:-1px;}
+.atl-note{font-size:11.5px;color:var(--muted);margin:0;line-height:1.5;border-left:1px solid var(--line);
+ padding-left:18px;flex:1;min-width:0;}
+.atl-note b{color:var(--accent);}
+@media(max-width:1180px){.atl-note{display:none;}}
+
+/* --- overlay sheet: fades in, never pushes anything --- */
+.atl-scrim{position:absolute;inset:0;background:rgba(24,44,50,.34);z-index:8;opacity:0;visibility:hidden;
+ transition:opacity .2s;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);}
+.atl-scrim.on{opacity:1;visibility:visible;}
+.atl-sheet{position:absolute;top:16px;bottom:16px;right:16px;width:min(660px,calc(100% - 360px));
+ background:var(--panel);border:1px solid var(--line);border-radius:14px;z-index:9;
+ box-shadow:0 24px 60px rgba(12,30,36,.24);display:flex;flex-direction:column;
+ opacity:0;visibility:hidden;transition:opacity .2s;}
+.atl-sheet.on{opacity:1;visibility:visible;}
+.atl-shhead{flex:0 0 auto;padding:15px 18px 12px;border-bottom:1px solid var(--line);}
+.atl-shhead h2{font-family:var(--font-serif);font-size:20px;color:var(--slate);margin:0 0 2px;}
+.atl-shhead p{font-family:var(--font-mono);font-size:10.5px;color:var(--dim);margin:0;}
+.atl-shclose{position:absolute;top:13px;right:14px;width:28px;height:28px;border-radius:50%;
+ border:1px solid var(--line);background:#fff;color:var(--muted);font-size:15px;line-height:1;}
+.atl-shclose:hover{border-color:var(--accent);color:var(--accent);}
+.atl-shtools{flex:0 0 auto;padding:11px 18px;border-bottom:1px solid var(--line);display:flex;gap:9px;align-items:center;}
+.atl-shtools input{flex:1;padding:7px 13px;border:1px solid var(--line);border-radius:18px;font-size:12.5px;
+ font-family:inherit;background:#fff;cursor:text;}
+.atl-shtools input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,115,133,.09);}
+.atl-shcount{font-family:var(--font-mono);font-size:10px;color:var(--dim);white-space:nowrap;}
+.atl-shlist{flex:1 1 auto;min-height:0;overflow-y:auto;padding:4px 0;}
+.atl-shlist::-webkit-scrollbar{width:9px;}
+.atl-shlist::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px;}
+.atl-mr{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:9px 18px;
+ border-bottom:1px solid #eef2f2;}
+.atl-mr .mn{font-size:12.5px;color:var(--slate);line-height:1.35;}
+.atl-mr .mn i{font-style:normal;font-family:var(--font-mono);font-size:10px;color:var(--dim);margin-left:6px;}
+.atl-mr .mt{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;}
+.atl-tg{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.04em;text-transform:uppercase;
+ padding:2px 7px;border-radius:9px;white-space:nowrap;}
+.atl-tg.panel{background:var(--aqua);color:var(--teal);}
+.atl-tg.q{background:#e3f2ea;color:var(--ok);}
+.atl-tg.g{background:#f0f3f3;color:var(--dim);}
+.atl-shfoot{flex:0 0 auto;padding:11px 18px;border-top:1px solid var(--line);display:flex;gap:9px;
+ align-items:center;justify-content:space-between;}
+.atl-shfoot span{font-size:11px;color:var(--dim);}
+.atl-shfoot button{border:1px solid var(--teal);background:#fff;color:var(--teal);font-family:inherit;
+ font-size:11.5px;font-weight:700;padding:6px 13px;border-radius:9px;white-space:nowrap;}
+.atl-shfoot button:hover{background:var(--aqua);}
+
+/* --- narrow fallback: the cockpit needs width; below this it stacks --- */
+@media(max-width:1000px){
+ .atl-left{width:250px;bottom:16px;}
+ .atl-detail{display:none;}
+ .atl-foot{display:none;}
+ .atl-sheet{width:calc(100% - 32px);left:16px;right:16px;}
+}
 
 /* ---------- gap map ---------- */
 .v2panels{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:11px;}
@@ -274,40 +419,73 @@ NEW_LANDING = """<!-- ===== Route landing (v2: atlas framing) ===== -->
  </div>
 </div>
 
-<!-- ===== Family atlas (R4) ===== -->
+<!-- ===== Family atlas (R4) — fixed cockpit, nothing reflows ===== -->
 <div id="cxAtlas">
- <div class="cxtop">
+ <div class="atl-top">
   <button class="cxmenu" id="cxAtlasMenu">&larr; Menu</button>
   <span class="logo">What is your blood telling you<b>?</b></span>
   <span class="tag">the atlas</span>
+  <span class="sp"></span>
+  <span class="atl-hdrstat" id="atlHdrStat"></span>
  </div>
- <div class="cxwrap">
-  <h1>The atlas of blood</h1>
-  <p class="lead" id="v2AtlasLead"></p>
 
-  <div class="v2mapwrap">
-   <div class="v2mapleg" id="v2AtlasLeg"></div>
-   <svg id="v2AtlasMap" viewBox="0 0 900 330" role="img" aria-label="Families of blood markers"></svg>
-   <div class="v2famleg" id="v2AtlasFamLeg"></div>
+ <div class="atl-stage" id="atlStage">
+  <svg class="atl-map" id="atlMap" role="img"
+       aria-label="Families of blood markers, sized by how many markers each contains"></svg>
+
+  <div class="atl-left">
+   <section class="atl-panel atl-ctl">
+    <h1>The atlas of blood</h1>
+    <p id="atlLead"></p>
+    <div class="atl-row"><span class="atl-lab">shade</span>
+     <div class="atl-seg" id="atlShade">
+      <button class="on" data-shade="panel">routine panel</button>
+      <button data-shade="quoted">sources</button>
+     </div>
+    </div>
+    <div class="atl-row"><span class="atl-lab">order</span>
+     <div class="atl-seg" id="atlSort">
+      <button class="on" data-sort="size">size</button>
+      <button data-sort="gap">least covered</button>
+      <button data-sort="name">A&ndash;Z</button>
+     </div>
+    </div>
+   </section>
+
+   <section class="atl-panel atl-index">
+    <header><b id="atlIdxN">17</b> families<span class="sp"></span><span id="atlIdxHint">click to inspect</span></header>
+    <div class="atl-idxscroll" id="atlIndex"></div>
+   </section>
   </div>
-  <p class="v2mapnote" id="v2AtlasNote"></p>
 
-  <div class="v2sec">
-   <h2>Seventeen families</h2>
-   <p class="sub">Each family is a region of the map. Open one to read every marker inside it in the table.</p>
-   <div class="v2tools" id="v2AtlasTools">
-    <span class="lab">shade by</span>
-    <button class="v2tool on" data-shade="panel">routine-panel coverage</button>
-    <button class="v2tool" data-shade="quoted">source coverage</button>
-    <span class="lab" style="margin-left:14px">sort</span>
-    <button class="v2tool on" data-sort="size">size</button>
-    <button class="v2tool" data-sort="gap">least covered</button>
-    <button class="v2tool" data-sort="name">A&ndash;Z</button>
+  <section class="atl-panel atl-detail">
+   <header id="atlDetHead">nothing selected</header>
+   <div class="atl-dbody" id="atlDetBody"></div>
+   <div class="atl-acts" id="atlDetActs"></div>
+  </section>
+
+  <section class="atl-panel atl-foot">
+   <div class="atl-leg" id="atlLeg"></div>
+   <p class="atl-note" id="atlNote"></p>
+  </section>
+
+  <div class="atl-scrim" id="atlScrim"></div>
+  <section class="atl-sheet" id="atlSheet" aria-hidden="true">
+   <div class="atl-shhead">
+    <h2 id="atlShTitle"></h2>
+    <p id="atlShSub"></p>
+    <button class="atl-shclose" id="atlShClose" aria-label="Close">&times;</button>
    </div>
-   <div class="v2fams" id="v2Fams"></div>
-  </div>
-
-  <div class="v2caveat" id="v2AtlasCaveat"></div>
+   <div class="atl-shtools">
+    <input type="search" id="atlShFilter" placeholder="Filter markers in this family&hellip;" autocomplete="off">
+    <span class="atl-shcount" id="atlShCount"></span>
+   </div>
+   <div class="atl-shlist" id="atlShList"></div>
+   <div class="atl-shfoot">
+    <span id="atlShNote"></span>
+    <button id="atlShTable">Open in the full table &rarr;</button>
+   </div>
+  </section>
  </div>
 </div>
 
@@ -552,77 +730,264 @@ $('cxGapsMenu').addEventListener('click',()=>setMode('landing'));
   if(sel) sel.dispatchEvent(new Event('change'));
  }
 
- /* ================= ATLAS SCREEN ================= */
- let atlasShade='panel', atlasSort='size', atlasDrawn=false;
+ /* ================= ATLAS COCKPIT =================
+    Layout is fixed: panels are absolutely positioned and never change size.
+    pack() runs once per stage size and caches positions; paint() only swaps
+    colours, so toggling shade never moves a circle. */
+ let atlShade='panel', atlSort='size', atlSel=null, atlHot=null;
+ let atlNodes=null, atlKey='';
 
- function drawFams(){
+ function atlBounds(W,H){
+  // keep circles clear of the floating panels; measured, not guessed
+  const st=$('atlStage');
+  const box=el=>{ const r=el.getBoundingClientRect(), s=st.getBoundingClientRect();
+                  return {l:r.left-s.left, r:r.right-s.left, t:r.top-s.top, b:r.bottom-s.top}; };
+  let L=18, R=W-18, T=18, B=H-18;
+  const left=st.querySelector('.atl-left'), det=st.querySelector('.atl-detail'), foot=st.querySelector('.atl-foot');
+  if(left && left.offsetParent) L=Math.max(L, box(left).r+18);
+  if(det  && det.offsetParent)  R=Math.min(R, box(det).l-18);
+  if(foot && foot.offsetParent) B=Math.min(B, box(foot).t-16);
+  if(R-L<220){ L=18; R=W-18; }          // very narrow: use the whole stage
+  return {L:L,R:R,T:T,B:B};
+ }
+
+ function atlPack(){
+  const st=$('atlStage'), W=st.clientWidth, H=st.clientHeight;
+  const key=W+'x'+H;
+  if(atlKey===key && atlNodes) return atlNodes;
+  const b=atlBounds(W,H);
+  const cx=(b.L+b.R)/2, cy=(b.T+b.B)/2;
+  const spanX=(b.R-b.L)/2, spanY=(b.B-b.T)/2;
+  const max=Math.max.apply(null,FAM.map(f=>f.n))||1;
+  // area-conserving scale: grow the circles until they fill ~46% of the region,
+  // so the map uses the space it is given at any window size
+  const base=n=>13+52*Math.sqrt(n/max);
+  const baseArea=FAM.reduce((a,f)=>a+Math.PI*base(f.n)*base(f.n),0);
+  const region=(b.R-b.L)*(b.B-b.T);
+  const scale=Math.max(.5,Math.min(2.4,Math.sqrt(0.46*region/baseArea)));
+  const rOf=n=>base(n)*scale;
+  const list=FAM.slice().sort((a,b2)=>b2.n-a.n);
+  const out=[];
+  list.forEach(f=>{
+   const r=rOf(f.n);
+   for(let k=0;k<30000;k++){
+    const ang=k*2.399963267, d=Math.sqrt(k/3000);
+    const x=cx+Math.cos(ang)*d*spanX*1.25, y=cy+Math.sin(ang)*d*spanY*1.25;
+    if(x-r<b.L||x+r>b.R||y-r<b.T||y+r>b.B) continue;
+    let ok=true;
+    for(let j=0;j<out.length;j++){
+     const p=out[j];
+     if(Math.hypot(x-p.x,y-p.y) < r+p.r+11){ ok=false; break; }
+    }
+    if(ok){ out.push({f:f,x:x,y:y,r:r}); return; }
+   }
+   out.push({f:f,x:cx,y:cy,r:r});
+  });
+  $('atlMap').setAttribute('viewBox','0 0 '+W+' '+H);
+  atlKey=key; atlNodes=out;
+  return out;
+ }
+
+ function atlPaint(){
+  const nodes=atlPack();
+  $('atlMap').innerHTML=nodes.map(nd=>{
+   const f=nd.f;
+   const lit   = atlShade==='quoted' ? f.quoted>0 : f.base>0;
+   const hit   = atlShade==='quoted' ? f.quoted   : f.base;
+   // deliberately no dimming of the unselected: the shape of what is unmeasured
+   // is the point of the map, and it should stay readable while you inspect one family
+   const cls   = ['fam', lit?'lit':'', atlSel===f.i?'sel':'', atlHot===f.i?'hot':''].filter(Boolean).join(' ');
+   const num   = nfmt(hit)+' / '+nfmt(f.n);
+   const words = f.label.replace(' / ','/').split(' ');
+   const short = words.length>2 ? words.slice(0,2).join(' ') : f.label;
+   const label = nd.r>=26
+     ? '<text class="fam-t" x="'+nd.x.toFixed(1)+'" y="'+(nd.y-1).toFixed(1)+'" text-anchor="middle">'+esc(short)+'</text>'
+       +'<text class="fam-n" x="'+nd.x.toFixed(1)+'" y="'+(nd.y+12).toFixed(1)+'" text-anchor="middle">'+num+'</text>'
+     : '';
+   return '<g class="'+cls+'" data-fam="'+f.i+'">'
+    +'<title>'+esc(f.label)+' — '+nfmt(f.n)+' markers, '+num+' '
+      +(atlShade==='quoted'?'source-quoted':'in a routine annual panel')+'</title>'
+    +'<circle cx="'+nd.x.toFixed(1)+'" cy="'+nd.y.toFixed(1)+'" r="'+nd.r.toFixed(1)+'" '
+      +'fill="'+(lit?'var(--aqua)':'#fff')+'" stroke="'+(lit?'var(--teal)':'#c3ced0')+'" '
+      +'stroke-width="'+(lit?2:1.3)+'"'+(lit?'':' stroke-dasharray="3 3"')+'/>'
+    +label+'</g>';
+  }).join('');
+ }
+
+ function atlDrawIndex(){
   const list=FAM.slice();
-  if(atlasSort==='size') list.sort((a,b)=>b.n-a.n);
-  else if(atlasSort==='name') list.sort((a,b)=>a.label.localeCompare(b.label));
+  if(atlSort==='size') list.sort((a,b)=>b.n-a.n);
+  else if(atlSort==='name') list.sort((a,b)=>a.label.localeCompare(b.label));
   else list.sort((a,b)=>{
-   const ca=atlasShade==='quoted'?a.quoted/a.n:a.base/a.n;
-   const cb=atlasShade==='quoted'?b.quoted/b.n:b.base/b.n;
+   const ca=atlShade==='quoted'?a.quoted/a.n:a.base/a.n;
+   const cb=atlShade==='quoted'?b.quoted/b.n:b.base/b.n;
    return ca-cb || b.n-a.n;
   });
-  $('v2Fams').innerHTML=list.map(f=>{
-   const bp=Math.max(f.base?1.5:0,100*f.base/f.n);
-   const qp=Math.max(f.quoted?1.5:0,100*f.quoted/f.n);
-   const lead=atlasShade==='quoted'?qp:bp;
-   const leadCol=atlasShade==='quoted'?'var(--ok)':'var(--teal)';
-   return '<button class="v2fc" data-fam="'+f.i+'">'
-    +'<span class="fh"><span class="fn">'+esc(f.label)+'</span><span class="fq">'+nfmt(f.n)+'</span></span>'
-    +'<span class="fbar"><i style="background:'+leadCol+';width:'+lead+'%"></i><i class="v2blocked" style="flex:1"></i></span>'
-    +'<span class="fmeta">'
-      +(f.base?'<b>'+f.base+'</b> reached by a routine annual panel':'<span class="fzero">Nothing here is in a routine panel</span>')
-      +' &middot; '
-      +(f.quoted?'<b>'+f.quoted+'</b> source-quoted':'<span class="fzero">no source-quoted entry yet</span>')
-    +'</span>'
-    +'<span class="farr">Open '+nfmt(f.n)+' markers in the table &rarr;</span>'
+  $('atlIndex').innerHTML=list.map(f=>{
+   const hit=atlShade==='quoted'?f.quoted:f.base;
+   const pct=hit?Math.max(4,100*hit/f.n):0;
+   const col=atlShade==='quoted'?'var(--ok)':'var(--teal)';
+   return '<button class="atl-ir'+(atlSel===f.i?' sel':'')+'" data-fam="'+f.i+'">'
+    +'<span class="n" title="'+esc(f.label)+'">'+esc(f.label)+'</span>'
+    +'<span class="b">'+(pct?'<i style="background:'+col+';width:'+pct+'%"></i>':'')
+      +'<i class="v2blocked" style="flex:1"></i></span>'
     +'</button>';
   }).join('');
  }
 
- window.__v2DrawAtlas=function(){
-  if(!atlasDrawn){
-   $('v2AtlasLead').innerHTML='Everything science can currently measure in blood, grouped into '+GROUPS.length
-    +' families. '+nfmt(N_TOTAL)+' markers in total; '+nfmt(N_BASE)+' of them show up in a standard annual checkup. '
-    +'Start anywhere &mdash; the full table sits one level inside each family.';
-   $('v2AtlasLeg').innerHTML=$('v2Map').parentNode.querySelector('.v2mapleg').innerHTML;
-   $('v2AtlasCaveat').innerHTML='<b>What this map cannot show yet.</b> Only '+N_CROSS+' of '+nfmt(N_TOTAL)
-    +' markers carry a recorded link to another family, and the only curated &ldquo;these belong together&rdquo; sets are the '
-    +PANELS.length+' routine panels. So the atlas can show you regions and their sizes, but not yet how an abnormal result in one '
-    +'ripples into another. That relationship layer &mdash; marker sets and reflex edges, each carrying its own source &mdash; is the next thing to build.';
-   drawMap($('v2AtlasMap'),atlasShade);
-   famLegend($('v2AtlasFamLeg'),atlasShade);
-   $('v2AtlasNote').innerHTML=$('v2MapNote').innerHTML;
-   drawFams();
-   atlasDrawn=true;
+ function atlDrawDetail(){
+  const head=$('atlDetHead'), body=$('atlDetBody'), acts=$('atlDetActs');
+  if(atlSel===null){
+   head.textContent='the whole atlas';
+   body.innerHTML='<p class="atl-dt" style="margin-bottom:8px">'+nfmt(N_TOTAL)+' markers</p>'
+    +'<p class="atl-dsub">across '+GROUPS.length+' families</p>'
+    +'<div class="atl-cov"><div class="k"><span>in a routine annual panel</span><b>'+nfmt(N_BASE)+' / '+nfmt(N_TOTAL)+'</b></div>'
+    +'<div class="bar"><i style="background:var(--teal);width:'+Math.max(1,100*N_BASE/N_TOTAL)+'%"></i><i class="v2blocked" style="flex:1"></i></div></div>'
+    +'<div class="atl-cov"><div class="k"><span>quoted from a named source</span><b>'+nfmt(N_QUOTED)+' / '+nfmt(N_TOTAL)+'</b></div>'
+    +'<div class="bar"><i style="background:var(--ok);width:'+Math.max(1,100*N_QUOTED/N_TOTAL)+'%"></i><i class="v2blocked" style="flex:1"></i></div></div>'
+    +'<div class="atl-samp"><p class="h">reading this map</p><p class="atl-empty">'
+    +'Each circle is a family, sized by how many markers sit inside it. '
+    +'<b>'+(GROUPS.length-FAM_BASE0.length)+' of '+GROUPS.length+'</b> are reached by a standard annual panel; the rest are regions '
+    +'routine bloodwork never enters.<br><br>Pick a family on the left, or click a circle.</p></div>';
+   acts.innerHTML='<button class="atl-btn" disabled>Select a family to browse it</button>';
+   return;
   }
+  const f=FAM[atlSel];
+  const sample=[];
+  for(let i=0;i<TESTS.length && sample.length<6;i++){
+   if(TESTS[i].g===f.i && (TESTS[i].v || TESTS[i].b)) sample.push(TESTS[i]);
+  }
+  if(sample.length<6) for(let i=0;i<TESTS.length && sample.length<6;i++){
+   if(TESTS[i].g===f.i && sample.indexOf(TESTS[i])<0) sample.push(TESTS[i]);
+  }
+  head.innerHTML='family <b>'+(FAM.slice().sort((a,b)=>b.n-a.n).findIndex(x=>x.i===f.i)+1)+'</b> of '+GROUPS.length;
+  body.innerHTML='<h2 class="atl-dt">'+esc(f.label)+'</h2>'
+   +'<p class="atl-dsub">'+nfmt(f.n)+' markers in this family</p>'
+   +'<div class="atl-big">'+nfmt(f.base)+'<small>reached by a routine annual panel</small></div>'
+   +'<div class="atl-cov"><div class="k"><span>routine panel</span><b'+(f.base?'':' class="zero"')+'>'+nfmt(f.base)+' / '+nfmt(f.n)+'</b></div>'
+   +'<div class="bar">'+(f.base?'<i style="background:var(--teal);width:'+Math.max(3,100*f.base/f.n)+'%"></i>':'')+'<i class="v2blocked" style="flex:1"></i></div></div>'
+   +'<div class="atl-cov"><div class="k"><span>source-quoted</span><b'+(f.quoted?'':' class="zero"')+'>'+nfmt(f.quoted)+' / '+nfmt(f.n)+'</b></div>'
+   +'<div class="bar">'+(f.quoted?'<i style="background:var(--ok);width:'+Math.max(3,100*f.quoted/f.n)+'%"></i>':'')+'<i class="v2blocked" style="flex:1"></i></div></div>'
+   +(f.base?'':'<p class="atl-empty" style="margin:13px 0 0;color:var(--accent);font-size:11.5px">Routine bloodwork does not enter this family at all.</p>')
+   +'<div class="atl-samp"><p class="h">what sits inside</p><ul>'
+   +sample.map(t=>'<li>'+esc(t.n.split('[')[0].trim())+(t.a?' <i>'+esc(t.a)+'</i>':'')+'</li>').join('')
+   +'</ul></div>';
+  acts.innerHTML='<button class="atl-btn" data-sheet="'+f.i+'">Browse '+nfmt(f.n)+' markers</button>'
+   +'<button class="atl-btn ghost" data-table="'+f.i+'">Open in the full table &rarr;</button>';
+ }
+
+ function atlDrawChrome(){
+  $('atlHdrStat').textContent=nfmt(N_TOTAL)+' markers · '+GROUPS.length+' families · '
+   +nfmt(N_BASE)+' in a routine panel';
+  $('atlLead').innerHTML='Everything science can currently measure in blood, grouped into '
+   +GROUPS.length+' families.';
+  $('atlIdxN').textContent=GROUPS.length;
+  $('atlLeg').innerHTML= atlShade==='quoted'
+   ? '<span><i style="background:var(--aqua);border:1.5px solid var(--teal)"></i>has a source-quoted entry</span>'
+     +'<span><i style="background:#fff;border:1.5px dashed #c3ced0"></i>nothing quoted yet</span>'
+   : '<span><i style="background:var(--aqua);border:1.5px solid var(--teal)"></i>reached by a routine annual panel</span>'
+     +'<span><i style="background:#fff;border:1.5px dashed #c3ced0"></i>never reached by routine bloodwork</span>';
+  $('atlNote').innerHTML='Circle area is proportional to the markers inside. '
+   +'<b>No lines are drawn between families</b>, and that is deliberate — only '+N_CROSS+' of '
+   +nfmt(N_TOTAL)+' markers carry a link to any other, so this shows regions, not roads.';
+ }
+
+ function atlSelect(i){
+  atlSel = (i===atlSel) ? null : i;
+  atlDrawIndex(); atlDrawDetail(); atlPaint();
+ }
+
+ window.__v2DrawAtlas=function(){
+  atlDrawChrome(); atlDrawIndex(); atlDrawDetail();
+  // stage has zero size until the screen is shown, so pack on the next frame
+  requestAnimationFrame(()=>{ atlKey=''; atlPaint(); });
  };
 
- $('v2AtlasTools').addEventListener('click',function(e){
-  const b=e.target.closest('button'); if(!b) return;
-  if(b.dataset.shade){
-   atlasShade=b.dataset.shade;
-   [].forEach.call(this.querySelectorAll('[data-shade]'),x=>x.classList.toggle('on',x===b));
-   drawMap($('v2AtlasMap'),atlasShade);
-   famLegend($('v2AtlasFamLeg'),atlasShade);
-   $('v2AtlasLeg').innerHTML= atlasShade==='quoted'
-    ? '<span><i style="background:var(--teal)"></i>has at least one source-quoted entry</span>'
-      +'<span><i style="background:#fff;border:1.5px dashed #c3ced0"></i>nothing quoted from a named source yet</span>'
-      +'<span style="margin-left:auto;font-family:var(--font-mono);font-size:10px">circle area &prop; markers in family</span>'
-    : '<span><i style="background:var(--teal)"></i>reached by a standard annual panel</span>'
-      +'<span><i style="background:#fff;border:1.5px dashed #c3ced0"></i>never reached by routine bloodwork</span>'
-      +'<span style="margin-left:auto;font-family:var(--font-mono);font-size:10px">circle area &prop; markers in family</span>';
-  }
-  if(b.dataset.sort){
-   atlasSort=b.dataset.sort;
-   [].forEach.call(this.querySelectorAll('[data-sort]'),x=>x.classList.toggle('on',x===b));
-  }
-  drawFams();
+ /* ---- controls ---- */
+ $('atlShade').addEventListener('click',function(e){
+  const b=e.target.closest('[data-shade]'); if(!b) return;
+  atlShade=b.dataset.shade;
+  [].forEach.call(this.children,x=>x.classList.toggle('on',x===b));
+  atlDrawChrome(); atlDrawIndex(); atlDrawDetail(); atlPaint();   // positions unchanged
  });
- $('v2Fams').addEventListener('click',function(e){
-  const b=e.target.closest('[data-fam]'); if(b) openFamily(+b.dataset.fam);
+ $('atlSort').addEventListener('click',function(e){
+  const b=e.target.closest('[data-sort]'); if(!b) return;
+  atlSort=b.dataset.sort;
+  [].forEach.call(this.children,x=>x.classList.toggle('on',x===b));
+  atlDrawIndex();
+ });
+
+ /* ---- index <-> map cross-highlight ---- */
+ $('atlIndex').addEventListener('click',e=>{ const b=e.target.closest('[data-fam]'); if(b) atlSelect(+b.dataset.fam); });
+ $('atlIndex').addEventListener('mouseover',e=>{ const b=e.target.closest('[data-fam]'); if(!b) return;
+  if(atlHot!==+b.dataset.fam){ atlHot=+b.dataset.fam; atlPaint(); } });
+ $('atlIndex').addEventListener('mouseleave',()=>{ if(atlHot!==null){ atlHot=null; atlPaint(); } });
+ $('atlMap').addEventListener('click',e=>{ const g=e.target.closest('[data-fam]'); if(g) atlSelect(+g.dataset.fam); });
+ $('atlMap').addEventListener('mouseover',e=>{ const g=e.target.closest('[data-fam]'); const v=g?+g.dataset.fam:null;
+  if(v!==atlHot){ atlHot=v; atlPaint(); const row=$('atlIndex').querySelector('[data-fam="'+v+'"]');
+   [].forEach.call($('atlIndex').children,x=>x.classList.remove('hot')); if(row) row.classList.add('hot'); } });
+ $('atlDetActs').addEventListener('click',e=>{
+  const s2=e.target.closest('[data-sheet]'); if(s2){ atlOpenSheet(+s2.dataset.sheet); return; }
+  const t=e.target.closest('[data-table]'); if(t) openFamily(+t.dataset.table);
+ });
+ window.addEventListener('resize',function(){
+  clearTimeout(window.__atlRT);
+  window.__atlRT=setTimeout(function(){ if($('cxAtlas').classList.contains('cx-on')){ atlKey=''; atlPaint(); } },160);
+ });
+
+ /* ---- overlay sheet: markers inside one family ---- */
+ const SHEET_CAP=300;
+ let shFam=null;
+ function atlOpenSheet(i){
+  shFam=i; const f=FAM[i];
+  $('atlShTitle').textContent=f.label;
+  $('atlShSub').textContent=nfmt(f.n)+' markers · '+nfmt(f.base)+' in a routine annual panel · '
+   +nfmt(f.quoted)+' source-quoted';
+  $('atlShFilter').value='';
+  atlSheetList('');
+  $('atlScrim').classList.add('on');
+  $('atlSheet').classList.add('on');
+  $('atlSheet').setAttribute('aria-hidden','false');
+ }
+ function atlCloseSheet(){
+  $('atlScrim').classList.remove('on');
+  $('atlSheet').classList.remove('on');
+  $('atlSheet').setAttribute('aria-hidden','true');
+ }
+ function atlSheetList(q){
+  q=(q||'').trim().toLowerCase();
+  const rows=[]; let total=0;
+  for(let i=0;i<TESTS.length;i++){
+   const t=TESTS[i];
+   if(t.g!==shFam) continue;
+   if(q && t.n.toLowerCase().indexOf(q)<0 && !(t.a&&t.a.toLowerCase().indexOf(q)>=0)) continue;
+   total++;
+   if(rows.length>=SHEET_CAP) continue;
+   const url=(t.r&&t.r.length)?t.r[t.r.length-1][0]:null;
+   rows.push('<div class="atl-mr"><span class="mn">'
+    +(url?'<a href="'+url+'" target="_blank" rel="noopener">'+esc(t.n.split('[')[0].trim())+'</a>'
+         :esc(t.n.split('[')[0].trim()))
+    +(t.a?'<i>'+esc(t.a)+'</i>':'')+'</span><span class="mt">'
+    +(t.b?'<span class="atl-tg panel">annual panel</span>':'')
+    +(t.v?'<span class="atl-tg q">quoted</span>':'<span class="atl-tg g">ai-generated</span>')
+    +'</span></div>');
+  }
+  $('atlShList').innerHTML=rows.join('') ||
+   '<div style="padding:26px;text-align:center;color:var(--dim);font-size:12.5px">No marker matches that.</div>';
+  $('atlShCount').textContent=nfmt(total)+' shown';
+  $('atlShNote').textContent = total>SHEET_CAP
+   ? 'Showing the first '+SHEET_CAP+' of '+nfmt(total)+' — filter to narrow.'
+   : 'Every row links to its LOINC record.';
+ }
+ $('atlShClose').addEventListener('click',atlCloseSheet);
+ $('atlScrim').addEventListener('click',atlCloseSheet);
+ $('atlShTable').addEventListener('click',()=>{ atlCloseSheet(); openFamily(shFam); });
+ let shT=null;
+ $('atlShFilter').addEventListener('input',function(){
+  clearTimeout(shT); const v=this.value; shT=setTimeout(()=>atlSheetList(v),120);
+ });
+ document.addEventListener('keydown',function(e){
+  if(e.key==='Escape' && $('atlSheet').classList.contains('on')) atlCloseSheet();
  });
 
  /* ================= GAP MAP ================= */

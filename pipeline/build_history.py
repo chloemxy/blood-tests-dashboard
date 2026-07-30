@@ -18,13 +18,36 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # ---------------------------------------------------------------------------
 VERSIONS = [
  {
+  "id": "v1.1",
+  "file": "v1.1-atlas-cockpit.html",
+  "title": "Atlas cockpit \u2014 fixed panels",
+  "date": "2026-07-30",
+  "ref": None,
+  "source": "index-v2.html",
+  "status": "candidate",
+  "tag": "v1.1-atlas-cockpit",
+  "gitpath": "index-v2.html",
+  "summary": "The atlas stops being a scrolling page and becomes a fixed cockpit: the map fills the viewport, everything else floats above it, nothing ever reflows.",
+  "changes": [
+   "<b>Nothing scrolls or resizes.</b> The stage is fixed; panels are absolutely positioned and hold their dimensions. Anything that could overflow scrolls inside its own box instead of growing.",
+   "<b>Map is the ground plane.</b> It fills the viewport behind four floating glass panels \u2014 controls and family index on the left, detail on the right, legend and the honesty line along the bottom.",
+   "<b>Circles never jump.</b> Positions are packed once per stage size and cached; toggling shade or re-ordering the index only re-paints colour. Verified by diffing circle coordinates across a shade toggle.",
+   "<b>Packing is area-conserving</b> \u2014 circles scale to fill ~46% of whatever space the panels leave, so the map uses the room it has at any window size. Panel footprints are measured, not guessed, so no circle hides under a panel.",
+   "<b>Detail panel is always mounted</b> at a fixed size. With nothing selected it shows the whole-atlas summary; selecting a family swaps the content without changing the box.",
+   "<b>Drill-in is an overlay sheet</b> that fades over the map \u2014 every marker in the family, filterable, each linking to its LOINC record. Esc or the scrim closes it. The layout underneath never moves.",
+   "Index and map cross-highlight on hover; clicking either selects, clicking again deselects.",
+   "<b>No dimming of unselected families.</b> The shape of what is unmeasured is the point of the map, so it stays fully readable while you inspect one family."
+  ],
+  "note": "The family-card grid from v1.0 is gone \u2014 the index rail and detail panel replace it. The landing page and gap map are unchanged; the gap map still scrolls."
+ },
+ {
   "id": "v1.0",
   "file": "v1.0-atlas-rebuild.html",
   "title": "Atlas rebuild",
   "date": "2026-07-30",
   "ref": None,
   "source": "index-v2.html",
-  "status": "candidate",
+  "status": "superseded",
   "tag": "v1.0-atlas",
   "gitpath": "index-v2.html",
   "summary": "Landing reframed from a navigation question into a claim, plus two new screens: a gap map and a family atlas.",
@@ -209,11 +232,11 @@ header.top .home:hover{border-color:var(--teal);color:var(--teal)}
 .vitem.on{background:var(--aqua);border-color:var(--teal)}
 .vitem.on::before{border-color:var(--teal);background:var(--teal)}
 .vitem.st-live::before{border-color:var(--ok);background:var(--ok)}
-.vitem.st-candidate::before{border-color:var(--accent);background:#fff}
+.vitem.st-candidate::before{border-color:var(--accent);background:#fff}\n.vitem.st-superseded::before{border-color:var(--dim);background:#fff}
 .vitem .vt{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
 .vitem .vid{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--teal)}
 .vitem.st-live .vid{color:var(--ok)}
-.vitem.st-candidate .vid{color:var(--accent)}
+.vitem.st-candidate .vid{color:var(--accent)}\n.vitem.st-superseded .vid{color:var(--dim)}
 .vitem .vd{font-family:var(--font-mono);font-size:9.5px;color:var(--dim);margin-left:auto}
 .vitem .vn{font-family:var(--font-serif);font-size:14.5px;color:var(--slate);font-weight:700;
  display:block;margin:1px 0 2px;line-height:1.3}
@@ -221,7 +244,7 @@ header.top .home:hover{border-color:var(--teal);color:var(--teal)}
 .livechip{display:inline-block;font-family:var(--font-mono);font-size:8.5px;letter-spacing:.05em;
  text-transform:uppercase;padding:1px 6px;border-radius:8px;color:#fff}
 .livechip.live{background:var(--ok)}
-.livechip.candidate{background:var(--accent)}
+.livechip.candidate{background:var(--accent)}\n.livechip.superseded{background:var(--dim)}
 
 /* ---------- main pane ---------- */
 #pane{grid-row:2;overflow-y:auto;padding:0 0 60px}
