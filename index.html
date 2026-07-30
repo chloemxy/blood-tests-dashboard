@@ -88,6 +88,7 @@ header.top .discbtn{background:none;border:1px solid var(--line);color:var(--mut
 .chip.sm{font-size:11.5px;padding:5px 10px;}
 .hint{font-family:var(--font-mono);font-size:10px;color:var(--dim);margin:7px 0 0;line-height:1.5;}
 .resetlink{background:none;border:none;color:var(--teal);font-size:12px;font-weight:600;padding:0;text-decoration:underline;}
+.fblink{color:var(--teal);font-size:12px;font-weight:600;text-decoration:underline;white-space:nowrap;}
 
 #main{grid-row:2;overflow-y:auto;padding:0 0 60px;}
 #main::-webkit-scrollbar{width:10px;}#main::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px;}
@@ -424,7 +425,7 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
 .cxfig .grnd{fill:none;stroke:var(--slate);stroke-width:4;stroke-linecap:round;opacity:.8;}
 .cxfig .rise{animation:cxrise 3.8s cubic-bezier(.3,.7,.3,1) .5s both;}
 .cxfig .slosh{animation:cxslosh 1.8s ease-in-out infinite alternate;}
-@keyframes cxrise{from{transform:translateY(120px)}to{transform:translateY(0)}}
+@keyframes cxrise{from{transform:translateY(185px)}to{transform:translateY(0)}}
 @keyframes cxslosh{from{transform:translateX(-30px)}to{transform:translateX(30px)}}
 @keyframes cxmarch{to{stroke-dashoffset:-18}}
 @keyframes cxldpulse{0%,100%{opacity:1}50%{opacity:.35}}
@@ -464,6 +465,14 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
 .cxor{display:flex;align-items:center;gap:12px;color:var(--dim);font-size:12px;margin:4px 0;text-transform:uppercase;letter-spacing:.08em;}
 .cxor::before,.cxor::after{content:'';flex:1;height:1px;background:var(--line);}
 .cxbrowselink{border:1px solid var(--teal);background:#fff;color:var(--teal);font-weight:600;font-size:13.5px;padding:9px 18px;border-radius:20px;cursor:pointer;font-family:var(--font-sans);}
+.cxsearch{width:100%;max-width:430px;font-family:inherit;font-size:14px;padding:10px 16px;border:1px solid var(--line);border-radius:22px;background:#fff;color:var(--ink);margin:0 0 10px;display:block;}
+.cxsearch:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,115,133,.12);}
+#cxSearchOut{margin:0 0 8px;}
+#cxSearchOut .cxchips{margin-bottom:4px;}
+.cxsuggl{font-size:12.5px;color:var(--muted);margin:0 0 6px;}
+.cx-chip.dim{opacity:.35;}
+.cxactrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;}
+.cxbrowselink.sm{font-size:12.5px;padding:6px 12px;}
 .cxbrowselink:hover{background:var(--aqua);}
 
 .cx-ccard{display:block;width:100%;text-align:left;border:1px solid var(--line);background:#fff;border-radius:11px;padding:15px 17px;margin-bottom:11px;cursor:pointer;transition:.15s;font-family:var(--font-sans);}
@@ -570,18 +579,27 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
      <path d="M13 23 h7 l3 -6 4 12 3 -6 h7"/>
     </svg>
     <h3>Start with how you feel</h3>
-    <svg class="vizmap" viewBox="0 0 268 124" aria-hidden="true">
+    <svg class="vizmap" viewBox="0 0 264 132" aria-hidden="true">
      <g class="lnk">
-      <path d="M88 21 C112 24 120 44 134 52"/>
-      <path d="M82 59 C102 59 114 58 130 58"/>
-      <path d="M86 97 C110 95 120 74 134 64"/>
-      <path d="M192 58 C198 58 202 58 208 58"/>
+      <path d="M86 18 C96 22 98 26 106 30"/>
+      <path d="M86 18 C98 34 96 50 106 62"/>
+      <path d="M80 64 C92 52 94 42 106 34"/>
+      <path d="M80 64 C92 65 96 66 106 66"/>
+      <path d="M82 110 C92 108 96 104 106 101"/>
+      <path d="M162 32 C176 31 186 29 200 28"/>
+      <path d="M166 64 C182 54 186 38 200 30"/>
+      <path d="M166 66 C178 66 188 66 200 66"/>
+      <path d="M170 100 C182 101 190 103 200 104"/>
      </g>
-     <rect x="6" y="8" rx="13" width="82" height="26" fill="#fdf1ea" stroke="#f0cdb6"/><text class="tAcc" x="47" y="25" text-anchor="middle">always tired</text>
-     <rect x="6" y="46" rx="13" width="76" height="26" fill="#fdf1ea" stroke="#f0cdb6"/><text class="tAcc" x="44" y="63" text-anchor="middle">cold hands</text>
-     <rect x="6" y="84" rx="13" width="80" height="26" fill="#fdf1ea" stroke="#f0cdb6"/><text class="tAcc" x="46" y="101" text-anchor="middle">so thirsty</text>
-     <rect x="134" y="45" rx="13" width="58" height="26" fill="#EAF7F8"/><text class="tTeal" x="163" y="62" text-anchor="middle">condition</text>
-     <rect x="208" y="45" rx="13" width="58" height="26" fill="#fff" stroke="#D7E1E2"/><text class="tSla" x="237" y="62" text-anchor="middle">blood test</text>
+     <rect x="4" y="6" rx="12" width="80" height="24" fill="#fdf1ea" stroke="#f0cdb6"/><text class="tAcc" x="44" y="22" text-anchor="middle">always tired</text>
+     <rect x="4" y="52" rx="12" width="74" height="24" fill="#fdf1ea" stroke="#f0cdb6"/><text class="tAcc" x="41" y="68" text-anchor="middle">cold hands</text>
+     <rect x="4" y="98" rx="12" width="76" height="24" fill="#fdf1ea" stroke="#f0cdb6"/><text class="tAcc" x="42" y="114" text-anchor="middle">so thirsty</text>
+     <rect x="108" y="20" rx="12" width="52" height="24" fill="#EAF7F8"/><text class="tTeal" x="134" y="36" text-anchor="middle">anemia</text>
+     <rect x="108" y="54" rx="12" width="56" height="24" fill="#EAF7F8"/><text class="tTeal" x="136" y="70" text-anchor="middle">thyroid</text>
+     <rect x="108" y="88" rx="12" width="60" height="24" fill="#EAF7F8"/><text class="tTeal" x="138" y="104" text-anchor="middle">diabetes</text>
+     <rect x="202" y="16" rx="12" width="44" height="24" fill="#fff" stroke="#D7E1E2"/><text class="tSla" x="224" y="32" text-anchor="middle">CBC</text>
+     <rect x="202" y="54" rx="12" width="44" height="24" fill="#fff" stroke="#D7E1E2"/><text class="tSla" x="224" y="70" text-anchor="middle">TSH</text>
+     <rect x="202" y="92" rx="12" width="54" height="24" fill="#fff" stroke="#D7E1E2"/><text class="tSla" x="229" y="108" text-anchor="middle">HbA1c</text>
     </svg>
     <span class="arr">Guided by symptom &rarr;</span>
    </button>
@@ -630,9 +648,9 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
      <g mask="url(#cxFigMask)">
       <g class="rise">
        <g class="slosh">
-        <path d="M-60 130 q15 -7 30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 v20 h-270 z" fill="#B0453A"/>
+        <path d="M-60 62 q15 -7 30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 v20 h-270 z" fill="#B0453A"/>
        </g>
-       <rect x="-30" y="146" width="290" height="130" fill="#B0453A"/>
+       <rect x="-30" y="78" width="290" height="210" fill="#B0453A"/>
       </g>
      </g>
      <path class="fc" d="M110 42 q9 7 17 0"/>
@@ -664,7 +682,7 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
     <span class="arr">Open the dashboard &rarr;</span>
    </button>
   </div>
-  <p class="cxfootnote">Educational only — not medical advice or a diagnosis. Everything links back to a named source (MedlinePlus, NHLBI) so you can verify it.</p>
+  <p class="cxfootnote">Educational only — not medical advice or a diagnosis. Everything links back to a named source (MedlinePlus, NHLBI) so you can verify it. Feedback: <a href="mailto:blood@goinvo.com">blood@goinvo.com</a></p>
  </div>
 </div>
 
@@ -684,7 +702,9 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
    <p class="cxbigsub">You rarely arrive knowing the diagnosis — you arrive with a feeling. Pick what's on your mind and we'll show the conditions worth understanding.</p>
    <div class="cxblock">
     <h2>What are you feeling?</h2>
-    <p class="sub">Pick one or more.</p>
+    <p class="sub">Pick one or more, or type it in your own words.</p>
+    <input id="cxFeelSearch" class="cxsearch" type="search" autocomplete="off" placeholder="e.g. exhausted, pins and needles, itchy&hellip;">
+    <div id="cxSearchOut"></div>
     <div class="cxchips" id="cxConcernChips"></div>
     <div class="cxcta">
      <button class="cxgo" id="cxGoCand" disabled>See conditions to explore &rarr;</button>
@@ -782,6 +802,7 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
    </div>
   </div>
   <button class="resetlink" id="resetBtn">Clear all answers</button>
+  <a class="fblink" href="mailto:blood@goinvo.com" title="Send feedback to blood@goinvo.com">feedback</a>
   <button class="discbtn" id="discBtn" title="About this guide">i</button>
  </header>
 
@@ -895,6 +916,7 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
  <p>The ranked list is labelled <b>&ldquo;worth asking your doctor about&rdquo;</b> deliberately. It reflects topical relevance between your answers and each test's stated purpose &mdash; not a clinical recommendation, and not data about who actually gets tested.</p>
  <p id="modalSrc"></p>
  <div class="pv" id="modalProv"></div>
+ <p style="font-size:12.5px;color:var(--muted)">Feedback or corrections: <a href="mailto:blood@goinvo.com">blood@goinvo.com</a></p>
  <button id="modalClose">Got it</button>
 </div></div>
 
@@ -1745,6 +1767,110 @@ function matchedConds(){
  return Object.keys(score).sort((a,b)=>score[b]-score[a]).map(id=>({id:id,n:score[id]}));
 }
 
+/* ---------- feeling search: fuzzy match, never a dead end ---------- */
+const CXSYN={
+ fatigue:['tired','exhausted','exhaustion','sleepy','drained','weak','weary','lethargic','low energy','no energy','burnt out','fatigue'],
+ cold:['cold','freezing','chilly','shivering'],
+ pale:['pale','pallor','washed out'],
+ breath:['breath','breathless','short of breath','winded','puffed'],
+ tingling:['tingling','numb','numbness','pins and needles','prickling'],
+ memory:['memory','brain fog','forgetful','foggy','concentration','focus'],
+ mood:['mood','irritable','depressed','sad','anxious','low mood','grumpy'],
+ weightg:['weight gain','gaining weight','heavier'],
+ weightl:['weight loss','losing weight','thinner'],
+ dryhair:['dry skin','hair loss','thinning hair','brittle hair','flaky'],
+ heat:['heat','overheating','sweaty','sweating','hot all the time'],
+ palp:['palpitations','racing heart','heartbeat','pounding','flutter','irregular heart'],
+ thirst:['thirsty','thirst','dry mouth','parched'],
+ pee:['urinating','urine','peeing','toilet','bathroom'],
+ blurry:['blurry','blurred','vision','eyesight'],
+ swelling:['swollen','swelling','ankles','edema','puffy'],
+ jaundice:['yellow','jaundice'],
+ itch:['itchy','itching','itch','scratching'],
+ jointsw:['swollen joint','hot joint','big toe','gout'],
+ bonepain:['bone pain','bones ache','aching bones'],
+ muscle:['muscle','weakness','cramps','sore','aching'],
+ fever:['fever','temperature','chills'],
+ stiff:['stiff','stiffness','joint pain','achy','arthritis','creaky']
+};
+function cxLev(a,b){
+ if(Math.abs(a.length-b.length)>2) return 9;
+ const m=[];
+ for(let i=0;i<=a.length;i++){ m[i]=[i];
+  for(let j=1;j<=b.length;j++){
+   m[i][j]=i===0?j:Math.min(m[i-1][j]+1,m[i][j-1]+1,m[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
+  }
+ }
+ return m[a.length][b.length];
+}
+function cxFeelMatch(q){
+ q=q.toLowerCase().trim();
+ if(!q) return [];
+ const qw=q.split(/[^a-z]+/).filter(w=>w.length>1);
+ return CONCERNS.map(c=>{
+  const hay=[c.label.toLowerCase()].concat(CXSYN[c.id]||[]);
+  let s=0;
+  hay.forEach(h=>{
+   if(h.indexOf(q)>=0||(h.length>3&&q.indexOf(h)>=0)) s=Math.max(s,3);
+   const hw=h.split(/[^a-z]+/);
+   qw.forEach(w=>{ hw.forEach(x=>{
+    if(!x) return;
+    if(x===w) s=Math.max(s,3);
+    else if((x.indexOf(w)===0||w.indexOf(x)===0)&&Math.min(x.length,w.length)>=3) s=Math.max(s,2);
+    else if(w.length>3&&x.length>3&&cxLev(w,x)<=2) s=Math.max(s,1);
+   });});
+  });
+  return {c:c,s:s};
+ }).filter(o=>o.s>0).sort((a,b)=>b.s-a.s);
+}
+function cxChipHTML(c){
+ return '<button class="cx-chip'+(state.picked.has(c.id)?' on':'')+'" data-concern="'+c.id+'">'+esc(c.label)+'</button>';
+}
+function drawFeelSearch(){
+ const q=($('cxFeelSearch').value||'').trim(), out=$('cxSearchOut');
+ [].slice.call($('cxConcernChips').children).forEach(b=>b.classList.remove('dim'));
+ if(!q){ out.innerHTML=''; return; }
+ const m=cxFeelMatch(q), strong=m.filter(o=>o.s>=2);
+ const hits=(strong.length?strong:m).slice(0,6);
+ const ids={}; hits.forEach(o=>{ids[o.c.id]=1;});
+ [].slice.call($('cxConcernChips').children).forEach(b=>{ if(!ids[b.dataset.concern]) b.classList.add('dim'); });
+ const act='<div class="cxactrow">'+
+  '<button class="cxbrowselink sm" id="cxSearchBrowse">Browse all conditions &rarr;</button>'+
+  '<button class="cxbrowselink sm" id="cxSearchTests">Search all 6,192 tests for &ldquo;'+esc(q)+'&rdquo; &rarr;</button></div>';
+ if(hits.length){
+  out.innerHTML='<p class="cxsuggl">'+(strong.length?'Tap to add:':'No exact match &mdash; closest feelings:')+'</p>'+
+   '<div class="cxchips">'+hits.map(o=>cxChipHTML(o.c)).join('')+'</div>'+(strong.length?'':act);
+ }else{
+  out.innerHTML='<p class="cxsuggl">Nothing close by that name &mdash; but two good routes from here:</p>'+act;
+ }
+}
+const _origDrawConcerns=drawConcerns;
+drawConcerns=function(){ _origDrawConcerns(); if(($('cxFeelSearch').value||'').trim()) drawFeelSearch(); };
+$('cxFeelSearch').addEventListener('input',drawFeelSearch);
+$('cxFeelSearch').addEventListener('keydown',e=>{
+ if(e.key!=='Enter') return;
+ e.preventDefault();
+ const first=$('cxSearchOut').querySelector('[data-concern]');
+ if(first){ const id=first.dataset.concern;
+  state.picked.has(id)?state.picked.delete(id):state.picked.add(id); drawConcerns(); }
+});
+$('cxSearchOut').addEventListener('click',e=>{
+ if(e.target.closest('#cxSearchBrowse')){ $('cxGoBrowse').click(); return; }
+ if(e.target.closest('#cxSearchTests')){
+  const q=($('cxFeelSearch').value||'').trim();
+  if(window.__cxEnsureTests) window.__cxEnsureTests();
+  setMode('tests');
+  const f=document.getElementById('tblFilter');
+  if(f){ f.value=q; f.dispatchEvent(new Event('input')); }
+  const tv=document.querySelector('#viewTog [data-view="table"]');
+  if(tv) tv.click();
+  return;
+ }
+ const b=e.target.closest('[data-concern]'); if(!b) return;
+ const id=b.dataset.concern;
+ state.picked.has(id)?state.picked.delete(id):state.picked.add(id); drawConcerns();
+});
+
 /* ---------- candidates ---------- */
 function drawCandidates(){
  const m=matchedConds(), picks=CONCERNS.filter(c=>state.picked.has(c.id)).map(c=>c.label);
@@ -1777,7 +1903,7 @@ function openLens(id,from){
  state.cond=id; state.from=from||'cand';
  const c=byId(id);
  $('cxTitle').textContent=c.label; $('cxOne').textContent=c.one; $('cxGrp').textContent=c.grp;
- $('cxDisc').innerHTML='Educational only. Not a diagnosis, not medical advice, and not a recommendation to get tested. A “miniDx” here is a plain-language pattern read of results <em>you</em> enter — always talk it through with a clinician. Diagnostic thresholds vary between guidelines; this build quotes named sources and notes where cut-offs differ.';
+ $('cxDisc').innerHTML='Educational only. Not a diagnosis, not medical advice, and not a recommendation to get tested. A “miniDx” here is a plain-language pattern read of results <em>you</em> enter — always talk it through with a clinician. Diagnostic thresholds vary between guidelines; this build quotes named sources and notes where cut-offs differ. Feedback: <a href="mailto:blood@goinvo.com">blood@goinvo.com</a>';
  drawSources(c); renderLens(); show('lens');
 }
 function renderLens(){ drawRipple(); drawMarkers(); drawPath(); drawMiniDx(); }
@@ -1932,8 +2058,60 @@ $('cxMenuBtn').addEventListener('click',()=>setMode('landing'));
  }
 })();
 
+/* ---------- browser / mouse back-button support ----------
+   Every top-level navigation (landing, feel screens, tests dashboard)
+   pushes a history entry, so the browser back button and mouse back
+   button step backwards through the app instead of leaving the page. */
+const cxRouteState={m:'landing',s:'home'};
+let cxNavSilent=false,cxPushT=null,cxLastKey='';
+function cxKey(){
+ const c=(cxRouteState.m==='feel'&&cxRouteState.s==='lens')?state.cond:'';
+ return cxRouteState.m+(cxRouteState.m==='feel'?'/'+cxRouteState.s+(c?'/'+c:''):'');
+}
+function cxQueuePush(){
+ if(cxNavSilent) return;
+ clearTimeout(cxPushT);
+ cxPushT=setTimeout(function(){
+  const k=cxKey(); if(k===cxLastKey) return; cxLastKey=k;
+  try{ history.pushState({cx:{m:cxRouteState.m,s:cxRouteState.s,c:state.cond,f:state.from}},'','#'+k); }catch(err){}
+ },0);
+}
+const _cxSetMode=setMode;
+setMode=function(m){ _cxSetMode(m); cxRouteState.m=m; if(m!=='feel') cxRouteState.s='home'; cxQueuePush(); };
+window.__cxSetMode=setMode;
+const _cxShow=show;
+show=function(n){ _cxShow(n); cxRouteState.m='feel'; cxRouteState.s=n; cxQueuePush(); };
+window.addEventListener('popstate',function(e){
+ const r=(e.state&&e.state.cx)||{m:'landing',s:'home',c:null};
+ cxNavSilent=true;
+ try{
+  cxLastKey=r.m+(r.m==='feel'?'/'+r.s+(r.s==='lens'&&r.c?'/'+r.c:''):'');
+  if(r.m==='tests'){ if(window.__cxEnsureTests)window.__cxEnsureTests(); _cxSetMode('tests'); cxRouteState.m='tests'; }
+  else if(r.m==='landing'){ _cxSetMode('landing'); cxRouteState.m='landing'; cxRouteState.s='home'; }
+  else{
+   _cxSetMode('feel'); cxRouteState.m='feel'; cxRouteState.s=r.s||'home';
+   if(r.s==='lens'&&r.c&&byId(r.c)) openLens(r.c,r.f||'cand');
+   else if(r.s==='cand'){ drawCandidates(); _cxShow('cand'); }
+   else if(r.s==='browse'){ drawBrowse(); _cxShow('browse'); }
+   else _cxShow('home');
+  }
+ }finally{ cxNavSilent=false; }
+});
+
 drawConcerns();
-setMode('landing');
+(function(){
+ const h=(location.hash||'').replace(/^#/,'').split('/');
+ try{ history.replaceState({cx:{m:'landing',s:'home',c:null}},'','#landing'); }catch(err){}
+ cxLastKey='landing';
+ if(h[0]==='tests'){ if(window.__cxEnsureTests)window.__cxEnsureTests(); setMode('tests'); }
+ else if(h[0]==='feel'){
+  setMode('feel');
+  if(h[1]==='lens'&&h[2]&&byId(h[2])) openLens(h[2],'browse');
+  else if(h[1]==='browse'){ drawBrowse(); show('browse'); }
+  else show('home');
+ }
+ else setMode('landing');
+})();
 })();
 
 </script>
