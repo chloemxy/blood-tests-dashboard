@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Condition lens — reference build</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+ --font-serif:Georgia,"Times New Roman",serif;
+ --font-sans:"Open Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+ --font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Consolas,monospace;
+ --teal:#007385;--slate:#24434D;--accent:#B84A0E;--warm:#F09A57;
+ --aqua:#EAF7F8;--paper:#F7F9F9;--ink:#1D1B1A;--muted:#5A6B70;
+ --line:#D7E1E2;--panel:#fff;--dim:#8B9799;
+ --ok:#2E7D5B;--warn:#B8860B;--info:#0E8496;
+ --had:#2E7D5B;--gap:#B84A0E;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{background:var(--paper);color:var(--ink);font-family:var(--font-sans);font-size:15px;line-height:1.5;}
+a{color:var(--teal);}
+.wrap{max-width:1080px;margin:0 auto;padding:26px 26px 90px;}
+
+header.top{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:22px;}
+header.top .logo{font-family:var(--font-serif);font-size:22px;color:var(--slate);font-weight:700;}
+header.top .logo b{color:var(--teal);}
+header.top .tag{font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:.04em;}
+.refnote{font-family:var(--font-mono);font-size:10.5px;color:var(--accent);border:1px solid #f0cdb6;background:#fdf1ea;padding:3px 9px;border-radius:12px;}
+
+/* breadcrumb / nav */
+.crumb{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin-bottom:16px;flex-wrap:wrap;}
+.crumb a{color:var(--teal);cursor:pointer;text-decoration:none;}
+.crumb a:hover{text-decoration:underline;}
+.crumb .sep{color:var(--dim);}
+.crumb b{color:var(--slate);}
+.backbtn{border:1px solid var(--line);background:#fff;color:var(--slate);font-weight:600;font-size:12.5px;padding:6px 13px;border-radius:16px;cursor:pointer;}
+.backbtn:hover{border-color:var(--teal);color:var(--teal);}
+
+.screen{display:none;}
+.screen.on{display:block;}
+
+/* HOME */
+.hero{font-family:var(--font-serif);font-size:26px;color:var(--slate);margin:0 0 4px;}
+.herosub{font-size:14px;color:var(--muted);margin:0 0 20px;max-width:640px;}
+.block{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin:16px 0;}
+.block h2{font-family:var(--font-serif);font-size:18px;color:var(--slate);margin:0 0 3px;}
+.block .sub{font-size:13px;color:var(--muted);margin:0 0 14px;}
+.chips{display:flex;flex-wrap:wrap;gap:8px;}
+.chip{border:1px solid var(--line);background:#fff;color:var(--slate);font-size:13px;font-weight:600;padding:7px 14px;border-radius:20px;cursor:pointer;transition:.15s;}
+.chip:hover{border-color:var(--teal);}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff;}
+.cta{margin-top:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.cta .go{border:none;background:var(--teal);color:#fff;font-weight:700;font-size:14px;padding:10px 20px;border-radius:22px;cursor:pointer;}
+.cta .go:disabled{background:#c4d2d4;cursor:default;}
+.cta .cnt{font-size:13px;color:var(--muted);}
+.orline{display:flex;align-items:center;gap:12px;color:var(--dim);font-size:12px;margin:6px 0;text-transform:uppercase;letter-spacing:.08em;}
+.orline::before,.orline::after{content:'';flex:1;height:1px;background:var(--line);}
+.browselink{border:1px solid var(--teal);background:#fff;color:var(--teal);font-weight:600;font-size:13.5px;padding:9px 18px;border-radius:20px;cursor:pointer;}
+.browselink:hover{background:var(--aqua);}
+
+/* candidate + browse cards */
+.ccard{display:block;width:100%;text-align:left;border:1px solid var(--line);background:#fff;border-radius:11px;padding:15px 17px;margin-bottom:11px;cursor:pointer;transition:.15s;}
+.ccard:hover{border-color:var(--teal);box-shadow:0 3px 14px rgba(12,30,36,.07);}
+.ccard .cn{font-family:var(--font-serif);font-size:17px;color:var(--slate);font-weight:700;}
+.ccard .co{font-size:13px;color:var(--muted);margin-top:2px;}
+.ccard .cm{margin-top:9px;display:flex;flex-wrap:wrap;gap:5px;align-items:center;}
+.matchtag{font-size:11px;font-weight:600;color:var(--accent);background:#fdf1ea;border:1px solid #f0cdb6;padding:2px 8px;border-radius:11px;}
+.grptag{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;color:#fff;background:var(--teal);padding:2px 8px;border-radius:10px;margin-left:auto;}
+.browsegrp{margin-bottom:22px;}
+.browsegrp > h3{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);border-bottom:1px solid var(--line);padding-bottom:6px;margin:0 0 12px;}
+
+/* ===== lens ===== */
+.chead{display:flex;align-items:flex-start;gap:16px;margin-bottom:8px;}
+.chead .ttl{font-family:var(--font-serif);font-size:26px;color:var(--slate);font-weight:700;margin:0;}
+.chead .one{font-size:15px;color:var(--muted);margin:4px 0 0;}
+.grpchip{font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:var(--teal);padding:4px 9px;border-radius:11px;white-space:nowrap;margin-top:6px;}
+
+.section{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin:18px 0;}
+.section > h2{font-family:var(--font-serif);font-size:19px;color:var(--slate);margin:0 0 3px;}
+.section > .sub{font-size:13px;color:var(--muted);margin:0 0 16px;}
+.stepno{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);font-weight:600;}
+
+#ripple{width:100%;height:auto;display:block;}
+.legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--muted);}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;vertical-align:-1px;}
+
+.mtable{width:100%;border-collapse:collapse;}
+.mtable th{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);text-align:left;font-weight:600;padding:0 8px 7px;border-bottom:1px solid var(--line);}
+.mtable td{padding:11px 8px;border-bottom:1px solid var(--line);vertical-align:top;}
+.mtable tr:last-child td{border-bottom:none;}
+.mname{font-weight:600;color:var(--slate);}
+.mabbr{font-family:var(--font-mono);font-size:11px;color:var(--muted);}
+.msig{font-size:12.5px;color:var(--muted);margin-top:2px;max-width:360px;}
+.reasoned-i{font-family:var(--font-mono);font-size:9px;color:#9A6A2E;background:#f3eee7;padding:1px 5px;border-radius:8px;margin-left:5px;vertical-align:1px;}
+.pill{display:inline-block;font-family:var(--font-mono);font-size:9.5px;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:10px;font-weight:600;}
+.pill.panel{background:var(--aqua);color:var(--info);}
+.pill.out{background:#fdf1ea;color:var(--accent);}
+.pill.confirm{background:#efe7f4;color:#7E5F94;}
+.pill.screen{background:#eef3ef;color:var(--ok);}
+.pill.cause{background:#eef1f4;color:#6E8095;}
+
+.hadtog{display:inline-flex;border:1px solid var(--line);border-radius:16px;overflow:hidden;}
+.hadtog button{border:none;background:#fff;color:var(--muted);font-family:var(--font-sans);font-size:12px;font-weight:600;padding:5px 12px;cursor:pointer;}
+.hadtog button.on{background:var(--teal);color:#fff;}
+.resrow{margin-top:7px;display:flex;gap:5px;align-items:center;flex-wrap:wrap;}
+.resrow .rl{font-size:11px;color:var(--dim);margin-right:2px;}
+.res{border:1px solid var(--line);background:#fff;color:var(--muted);font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:12px;cursor:pointer;}
+.res.on.low{background:var(--accent);border-color:var(--accent);color:#fff;}
+.res.on.normal{background:var(--ok);border-color:var(--ok);color:#fff;}
+.res.on.high{background:var(--warn);border-color:var(--warn);color:#fff;}
+.gapflag{display:inline-block;font-family:var(--font-mono);font-size:9.5px;color:var(--gap);font-weight:600;margin-left:8px;}
+
+.seed{display:flex;align-items:center;gap:10px;background:var(--aqua);border:1px solid #bfe1e4;border-radius:10px;padding:11px 14px;margin-bottom:16px;font-size:13px;color:var(--slate);}
+.seed button{margin-left:auto;border:1px solid var(--teal);background:#fff;color:var(--teal);font-weight:600;font-size:12.5px;padding:6px 13px;border-radius:16px;cursor:pointer;white-space:nowrap;}
+.seed button.done{background:var(--teal);color:#fff;}
+
+.path{display:grid;gap:14px;}
+.pstep{border:1px solid var(--line);border-radius:11px;padding:15px 16px;position:relative;}
+.pstep.next{border-color:var(--accent);box-shadow:0 0 0 3px rgba(184,74,14,.09);}
+.pstep h4{margin:0 0 3px;font-size:15px;color:var(--slate);}
+.pstep .role{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;font-weight:600;}
+.pstep.screen .role{color:var(--ok);}
+.pstep.confirm .role{color:#7E5F94;}
+.pstep.cause .role{color:#6E8095;}
+.pstep .psig{font-size:12.5px;color:var(--muted);margin:7px 0 9px;}
+.pstep .ptests{display:flex;flex-wrap:wrap;gap:5px;}
+.ptok{font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:12px;border:1px solid var(--line);}
+.ptok.had{background:#e9f3ee;border-color:#bfe0cd;color:var(--had);}
+.ptok.gap{background:#fdf1ea;border-color:#f0cdb6;color:var(--gap);}
+.pstatus{margin-top:10px;font-size:12px;font-weight:600;}
+.pstatus.ok{color:var(--had);}
+.pstatus.todo{color:var(--gap);}
+
+#minidx{border:2px solid var(--line);border-radius:12px;padding:20px 22px;transition:.2s;}
+#minidx.locked{background:repeating-linear-gradient(135deg,#fbfcfc,#fbfcfc 12px,#f3f6f6 12px,#f3f6f6 24px);}
+#minidx.consistent{border-color:var(--accent);background:#fffaf6;}
+#minidx.against{border-color:var(--ok);background:#f6faf7;}
+#minidx.partial{border-color:var(--warn);background:#fdfaf2;}
+.mdx-lab{font-family:var(--font-mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--dim);font-weight:600;}
+.mdx-head{font-family:var(--font-serif);font-size:20px;color:var(--slate);margin:4px 0 8px;}
+.mdx-body{font-size:14px;}
+.mdx-lockmsg{display:flex;align-items:center;gap:11px;color:var(--muted);font-size:14px;}
+.mdx-lockmsg .lk{font-size:22px;}
+.mdx-need{margin-top:9px;font-size:13px;}
+.mdx-need b{color:var(--accent);}
+
+.badge{display:inline-block;font-family:var(--font-mono);font-size:9.5px;letter-spacing:.04em;padding:2px 7px;border-radius:10px;font-weight:600;vertical-align:1px;}
+.badge.q{background:#e7f0ea;color:var(--ok);}
+.badge.inf{background:#f3eee7;color:#9A6A2E;}
+.srcbox h5{font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin:0 0 8px;font-weight:600;}
+.srcitem{font-size:12.5px;color:var(--slate);margin:0 0 10px;padding-left:12px;border-left:2px solid var(--line);}
+.srcitem.inf{border-left-color:#d8c9b3;}
+.srcitem q{font-style:italic;color:var(--ink);}
+.srcitem .cite{display:block;color:var(--muted);font-size:11.5px;margin-top:3px;}
+.disc{margin-top:16px;font-size:12px;color:var(--muted);background:var(--aqua);border-radius:9px;padding:11px 14px;}
+
+.foot{margin-top:30px;font-size:12px;color:var(--dim);border-top:1px solid var(--line);padding-top:14px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+ <header class="top">
+  <span class="logo">What is your blood telling you<b>?</b></span>
+  <span class="tag">condition lens</span>
+  <span class="refnote">reference build · 3 conditions · react before scaling</span>
+ </header>
+
+ <div class="crumb" id="crumb"></div>
+
+ <!-- ============ HOME ============ -->
+ <section class="screen on" id="scHome">
+  <h1 class="hero">Start with how you feel.</h1>
+  <p class="herosub">You rarely arrive knowing the diagnosis — you arrive with a feeling. Pick what's on your mind and we'll show the conditions worth understanding, then walk each one from symptom to a provisional read.</p>
+
+  <div class="block">
+   <h2>What are you feeling?</h2>
+   <p class="sub">Pick one or more. (Route 1 — the spine: symptom &rarr; candidate conditions.)</p>
+   <div class="chips" id="concernChips"></div>
+   <div class="cta">
+    <button class="go" id="goCandidates" disabled>See conditions to explore &rarr;</button>
+    <span class="cnt" id="candCount"></span>
+   </div>
+  </div>
+
+  <div class="orline">or</div>
+
+  <div class="block">
+   <h2>Already have something in mind?</h2>
+   <p class="sub">Browse every condition by body system. (Route 3 — so nobody's stuck.)</p>
+   <button class="browselink" id="goBrowse">Browse all conditions &rarr;</button>
+  </div>
+ </section>
+
+ <!-- ============ CANDIDATES ============ -->
+ <section class="screen" id="scCand">
+  <button class="backbtn" id="backHome1">&larr; Back to feelings</button>
+  <h1 class="hero" style="margin-top:14px">Conditions to explore</h1>
+  <p class="herosub" id="candBecause"></p>
+  <div id="candList"></div>
+ </section>
+
+ <!-- ============ BROWSE ============ -->
+ <section class="screen" id="scBrowse">
+  <button class="backbtn" id="backHome2">&larr; Back</button>
+  <h1 class="hero" style="margin-top:14px">All conditions</h1>
+  <p class="herosub">Grouped by body system. This reference build ships three, fully sourced.</p>
+  <div id="browseList"></div>
+ </section>
+
+ <!-- ============ LENS ============ -->
+ <section class="screen" id="scLens">
+  <button class="backbtn" id="backLens">&larr; Back</button>
+
+  <div class="chead" style="margin-top:14px">
+   <div>
+    <h1 class="ttl" id="cTitle"></h1>
+    <p class="one" id="cOne"></p>
+   </div>
+   <span class="grpchip" id="cGrp"></span>
+  </div>
+
+  <div class="section">
+   <h2><span class="stepno">Connections</span> &nbsp;The ripple of this condition</h2>
+   <p class="sub">One condition radiates outward — into how you feel (left) and into the blood markers that carry its signal (right). Markers are coloured by whether you've had them.</p>
+   <svg id="ripple" viewBox="0 0 900 460" role="img" aria-label="Ripple diagram"></svg>
+   <div class="legend">
+    <span><i style="background:var(--slate)"></i>condition</span>
+    <span><i style="background:var(--muted)"></i>symptom you might feel</span>
+    <span><i style="background:var(--had)"></i>marker you've had tested</span>
+    <span><i style="background:var(--gap)"></i>marker you haven't — a missing signal</span>
+   </div>
+  </div>
+
+  <div class="section">
+   <h2><span class="stepno">Coverage</span> &nbsp;What you've had, and the signal you're missing</h2>
+   <p class="sub">Mark what you've already had drawn. The confirming test for this condition sits <b>outside</b> the standard annual panel — so if you've only had routine bloodwork, it shows up here as a gap.</p>
+   <div class="seed" id="seed">
+    <span>Most people have had a standard annual checkup (CBC, CMP, lipid panel) but nothing beyond it.</span>
+    <button id="seedBtn">I've had a standard annual panel</button>
+   </div>
+   <table class="mtable">
+    <thead><tr><th>Marker</th><th>Where it sits</th><th style="width:150px">Have you had it?</th></tr></thead>
+    <tbody id="mBody"></tbody>
+   </table>
+  </div>
+
+  <div class="section">
+   <h2><span class="stepno">Path to Dx</span> &nbsp;Screen first, then confirm</h2>
+   <p class="sub">A common route from suspicion to answer. The next thing you're missing is highlighted.</p>
+   <div class="path" id="pathWrap"></div>
+  </div>
+
+  <div class="section" style="padding:0;border:none;background:none;margin-top:18px;">
+   <div id="minidx"></div>
+  </div>
+
+  <div class="section">
+   <h2>Where every claim comes from</h2>
+   <p class="sub"><span class="badge q">quoted</span> means verbatim from a named authority, with a link to verify. <span class="badge inf">reasoned</span> means connective clinical logic with no single quotable source — shown so you can tell curated fact from the glue between facts.</p>
+   <div class="srcbox" id="srcBox"></div>
+   <div class="disc" id="lensDisc"></div>
+  </div>
+ </section>
+
+ <div class="foot">
+  Reference implementation of the <b>symptom &rarr; candidate conditions &rarr; ripple &rarr; missing-signal &rarr; path &rarr; miniDx</b> model in <b>IMPROVEMENT-PLAN.md</b>. Route 1 (symptom spine) and Route 3 (browse) are wired; Route 2 (from a test) is the noted nice-to-have. Built to fold into the main dashboard as a third view.
+ </div>
+</div>
+
+<script>
+"use strict";
+
+/* ================= DATA ================= */
+/* concern chips → which conditions they point to (each mapping is backed by a
+   sourced symptom in the condition's src list). This is the Route-1 spine. */
+const CONCERNS=[
+ {id:"fatigue", label:"Tired / low energy",       conds:["ida","b12","hypo"]},
+ {id:"cold",    label:"Always cold",              conds:["ida","hypo"]},
+ {id:"pale",    label:"Pale skin",                conds:["ida","b12"]},
+ {id:"breath",  label:"Short of breath",          conds:["ida","b12"]},
+ {id:"dizzy",   label:"Dizzy / lightheaded",      conds:["ida","b12"]},
+ {id:"tingling",label:"Tingling or numbness",     conds:["b12"]},
+ {id:"memory",  label:"Brain fog / forgetful",    conds:["b12"]},
+ {id:"mood",    label:"Low mood / depression",    conds:["b12","hypo"]},
+ {id:"weight",  label:"Weight gain",              conds:["hypo"]},
+ {id:"dryhair", label:"Dry skin / thinning hair", conds:["hypo"]},
+ {id:"aches",   label:"Joint or muscle aches",    conds:["hypo"]},
+ {id:"constip", label:"Constipation",             conds:["hypo"]}
+];
+
+const CONDITIONS=[
+{
+ id:"ida", label:"Iron-deficiency anemia", grp:"Energy & blood",
+ one:"Not enough iron to build healthy red blood cells — the most common type of anemia.",
+ symptoms:["Fatigue","Dizziness or lightheadedness","Cold hands and feet","Pale skin","Shortness of breath","Restless legs (if untreated)"],
+ markers:[
+  {slug:"hemoglobin",name:"Hemoglobin",abbr:"Hgb",panel:true,step:"screen",abn:"low",
+   sig:"Low hemoglobin is the core sign of anemia — too little oxygen-carrying protein."},
+  {slug:"hematocrit",name:"Hematocrit",abbr:"Hct",panel:true,step:"screen",abn:"low",
+   sig:"The share of blood made of red cells; falls alongside hemoglobin."},
+  {slug:"mcv",name:"Mean corpuscular volume",abbr:"MCV",panel:true,step:"screen",abn:"low",reasoned:true,
+   sig:"Red-cell size. In iron deficiency the cells typically run small (low MCV)."},
+  {slug:"ferritin",name:"Ferritin",abbr:"serum ferritin",panel:false,step:"confirm",abn:"low",
+   sig:"Stored iron. Low ferritin is the most specific confirmation of depleted iron stores."},
+  {slug:"iron",name:"Serum iron",abbr:"Fe",panel:false,step:"confirm",abn:"low",
+   sig:"Iron circulating right now; low in iron deficiency."},
+  {slug:"tibc",name:"Total iron-binding capacity",abbr:"TIBC",panel:false,step:"confirm",abn:"high",
+   sig:"How much the blood can carry; rises as stores empty, so saturation drops."}
+ ],
+ confirm:"ferritin", support:["hemoglobin"],
+ reads:{
+  strong:"This pattern — low iron stores (low ferritin) together with low hemoglobin — is the classic picture of iron-deficiency anemia. Worth taking to a clinician, who can look for <em>why</em> iron is low.",
+  supportive:"Low ferritin points to depleted iron stores, which fits iron deficiency even before anemia is obvious. A clinician can confirm and look for a cause.",
+  partial:"The signals are mixed — some fit iron deficiency and some don't. Exactly the kind of pattern that needs a clinician, not an app.",
+  against:"These results don't fit an iron-deficiency pattern (iron stores look adequate). If you still feel tired, the cause is likely elsewhere and worth exploring."
+ },
+ src:[
+  {k:"q",quote:"To help diagnose iron-deficiency anemia, your doctor will order a blood test to check your complete blood count (CBC), hemoglobin levels, blood iron levels, and ferritin levels.",who:"NHLBI — Iron-Deficiency Anemia",url:"https://www.nhlbi.nih.gov/health/anemia/iron-deficiency-anemia"},
+  {k:"q",quote:"More serious iron-deficiency anemia may cause common symptoms of anemia, such as tiredness, shortness of breath, or chest pain. Other symptoms include: Fatigue; Dizziness or lightheadedness; Cold hands and feet; Pale skin.",who:"NHLBI — Iron-Deficiency Anemia",url:"https://www.nhlbi.nih.gov/health/anemia/iron-deficiency-anemia"},
+  {k:"q",quote:"In iron-deficiency anemia, blood levels of iron will be low … Levels of ferritin will also be low … Normal levels are 40 to 300 for men and 20 to 200 for women. (figure)",who:"NHLBI — Iron-Deficiency Anemia (diagnosis figure)",url:"https://www.nhlbi.nih.gov/health/anemia/iron-deficiency-anemia"},
+  {k:"q",quote:"Lower than normal ferritin levels may mean you have iron deficiency anemia, or another condition related to low iron levels.",who:"MedlinePlus (NIH/NLM) — Ferritin Blood Test",url:"https://medlineplus.gov/lab-tests/ferritin-blood-test/"},
+  {k:"inf",quote:"The CBC is treated as the screening step and ferritin as the confirming step, and MCV is read as 'small cells.' That ordering and the cell-size reading are standard clinical practice, not single quoted sentences — so they are flagged reasoned.",who:"Reasoned from the sourced facts above",url:""}
+ ]
+},
+{
+ id:"b12", label:"Vitamin B12–deficiency anemia", grp:"Energy & blood",
+ one:"Too little vitamin B12 to make healthy red blood cells — and, untreated, a nerve problem too.",
+ symptoms:["Fatigue","Paleness","Shortness of breath","Dizziness","Tingling feelings or pain","Confusion / forgetfulness","Glossitis (sore, smooth tongue)"],
+ markers:[
+  {slug:"hemoglobin",name:"Hemoglobin",abbr:"Hgb",panel:true,step:"screen",abn:"low",
+   sig:"A complete blood count measures hemoglobin; low hemoglobin signals anemia."},
+  {slug:"mcv",name:"Mean corpuscular volume",abbr:"MCV",panel:true,step:"screen",abn:"high",reasoned:true,
+   sig:"Red-cell size. In B12 deficiency the cells typically run large (high MCV) — the opposite of iron deficiency."},
+  {slug:"b12",name:"Vitamin B12 level",abbr:"cobalamin",panel:false,step:"confirm",abn:"low",
+   sig:"Measures B12 in the blood. Low confirms deficiency — though a normal level doesn't fully rule it out."},
+  {slug:"mma",name:"Methylmalonic acid",abbr:"MMA",panel:false,step:"cause",abn:"high",reasoned:true,
+   sig:"Rises when B12 is functionally low; sometimes used when the B12 level is borderline."}
+ ],
+ confirm:"b12", support:["hemoglobin"],
+ reads:{
+  strong:"Low hemoglobin with a low vitamin B12 level fits B12-deficiency anemia. A clinician can confirm and, importantly, find the cause — often a problem absorbing B12, not diet.",
+  supportive:"A low vitamin B12 level points to deficiency even before anemia is obvious. Worth confirming with a clinician.",
+  partial:"Mixed signals. NHLBI notes B12 can read normal even when the deficiency is real, so a normal level doesn't fully rule it out — a clinician's call.",
+  against:"These results don't fit a B12-deficiency pattern. If symptoms persist, the cause is likely elsewhere."
+ },
+ src:[
+  {k:"q",quote:"Vitamin B12–deficiency anemia … develops when your body can't make enough healthy red blood cells because it doesn't have enough vitamin B12.",who:"NHLBI — Vitamin B12–Deficiency Anemia",url:"https://www.nhlbi.nih.gov/health/anemia/vitamin-b12-deficiency-anemia"},
+  {k:"q",quote:"You may have the typical symptoms of anemia at first, such as fatigue, paleness, shortness of breath, headaches, or dizziness. If left untreated, you may start to notice brain and nervous system symptoms … Tingling feelings or pain … Confusion, slower thinking, forgetfulness, and memory loss … Glossitis, which is a painful, smooth, red tongue.",who:"NHLBI — Vitamin B12–Deficiency Anemia",url:"https://www.nhlbi.nih.gov/health/anemia/vitamin-b12-deficiency-anemia"},
+  {k:"q",quote:"To screen for vitamin B12–deficiency anemia, your healthcare provider may order blood tests to see whether you have low hemoglobin or vitamin B12 levels … A complete blood count measures hemoglobin. Another blood test measures vitamin B12 levels in the blood. You may still have the condition even if your vitamin B12 levels are normal.",who:"NHLBI — Vitamin B12–Deficiency Anemia",url:"https://www.nhlbi.nih.gov/health/anemia/vitamin-b12-deficiency-anemia"},
+  {k:"q",quote:"Vitamin B12–deficiency may cause serious complications, such as bleeding, infections, and problems with your brain or nerves that may be permanent.",who:"NHLBI — Vitamin B12–Deficiency Anemia",url:"https://www.nhlbi.nih.gov/health/anemia/vitamin-b12-deficiency-anemia"},
+  {k:"inf",quote:"That B12-deficiency red cells run large (high MCV) and that methylmalonic acid rises when B12 is functionally low are standard clinical readings not stated in the quoted NHLBI text — so both are flagged reasoned.",who:"Reasoned from the sourced facts above",url:""}
+ ]
+},
+{
+ id:"hypo", label:"Hypothyroidism (underactive thyroid)", grp:"Hormones & metabolism",
+ one:"A thyroid making too little hormone, so many body functions slow down.",
+ symptoms:["Fatigue","Weight gain","Very sensitive to cold","Joint and muscle pain","Dry skin","Dry, thinning hair","Depression","Constipation"],
+ markers:[
+  {slug:"tsh",name:"Thyroid-stimulating hormone",abbr:"TSH",panel:false,step:"screen",abn:"high",
+   sig:"When thyroid hormone is low, the pituitary makes more TSH to push the thyroid — so a high TSH is the first flag."},
+  {slug:"ft4",name:"Free thyroxine",abbr:"Free T4",panel:false,step:"confirm",abn:"low",
+   sig:"The thyroid hormone itself. Low free T4 with a high TSH confirms an underactive thyroid."},
+  {slug:"tpo",name:"Thyroid antibodies",abbr:"TPO / anti-thyroid",panel:false,step:"cause",abn:"high",
+   sig:"Points to the cause — Hashimoto's disease, the most common cause of hypothyroidism."}
+ ],
+ confirm:"ft4", support:["tsh"],
+ reads:{
+  strong:"A high TSH with a low free T4 is the pattern of an underactive thyroid. A clinician can confirm and check antibodies to see if it's Hashimoto's, the most common cause.",
+  supportive:"A low free T4 fits an underactive thyroid; pairing it with TSH sharpens the picture. Worth a clinician's review.",
+  partial:"A raised TSH with a still-normal free T4 can mean an early or 'subclinical' underactive thyroid — exactly the borderline a clinician should interpret.",
+  against:"Thyroid levels look in range here; hypothyroidism is unlikely to be the explanation for how you feel."
+ },
+ src:[
+  {k:"q",quote:"A TSH test is used to find out how well your thyroid is working. It can tell if you have hyperthyroidism (too much thyroid hormone) or hypothyroidism (too little thyroid hormone) in your blood. But a TSH test can't show what is causing a thyroid problem.",who:"MedlinePlus (NIH/NLM) — TSH Test",url:"https://medlineplus.gov/lab-tests/tsh-thyroid-stimulating-hormone-test/"},
+  {k:"q",quote:"If the thyroid hormone level in your blood is too low, your pituitary gland makes larger amounts of TSH to tell your thyroid to work harder.",who:"MedlinePlus (NIH/NLM) — TSH Test",url:"https://medlineplus.gov/lab-tests/tsh-thyroid-stimulating-hormone-test/"},
+  {k:"q",quote:"Hypothyroidism … The symptoms may include: Fatigue; Weight gain; Being very sensitive to cold; Joint and muscle pain; Dry skin; Dry, thinning hair; Heavy or irregular menstrual periods … Depression; Constipation. Because hypothyroidism develops slowly, many people don't notice symptoms of the disease for months or even years.",who:"MedlinePlus (NIH/NLM) — TSH Test",url:"https://medlineplus.gov/lab-tests/tsh-thyroid-stimulating-hormone-test/"},
+  {k:"q",quote:"If your test results aren't normal, your provider will probably order other thyroid blood tests … T4 thyroid hormone test … Thyroid antibodies test to help diagnose an autoimmune thyroid disorder, such as … Hashimoto's disease, that the most common cause of hypothyroidism.",who:"MedlinePlus (NIH/NLM) — TSH Test",url:"https://medlineplus.gov/lab-tests/tsh-thyroid-stimulating-hormone-test/"},
+  {k:"inf",quote:"Ordering TSH as the screen, free T4 as the confirm, and antibodies as the cause-finder is standard practice assembled from the sourced facts above — a sequence, not a single quote — so it is flagged reasoned.",who:"Reasoned from the sourced facts above",url:""}
+ ]
+}
+];
+
+const CGROUPS=["Energy & blood","Hormones & metabolism"]; // order for browse
+const PANEL_SLUGS=["hemoglobin","hematocrit","mcv"]; // routine CBC components present here
+const byId=id=>CONDITIONS.find(c=>c.id===id);
+
+/* ================= STATE ================= */
+const state={ picked:new Set(), had:new Set(), result:{}, cond:null };
+function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+/* ================= ROUTER ================= */
+const screens={home:"scHome",cand:"scCand",browse:"scBrowse",lens:"scLens"};
+function show(name){
+ Object.values(screens).forEach(id=>document.getElementById(id).classList.remove('on'));
+ document.getElementById(screens[name]).classList.add('on');
+ drawCrumb(name);
+ window.scrollTo(0,0);
+}
+function drawCrumb(name){
+ const c=document.getElementById('crumb');
+ const home='<a data-nav="home">Feelings</a>';
+ if(name==='home'){ c.innerHTML=''; return; }
+ if(name==='cand'){ c.innerHTML=home+'<span class="sep">/</span><b>Candidate conditions</b>'; }
+ else if(name==='browse'){ c.innerHTML=home+'<span class="sep">/</span><b>All conditions</b>'; }
+ else if(name==='lens'){
+  const back = state.from==='browse'
+    ? '<a data-nav="browse">All conditions</a>'
+    : '<a data-nav="cand">Candidate conditions</a>';
+  c.innerHTML=home+'<span class="sep">/</span>'+back+'<span class="sep">/</span><b>'+esc(byId(state.cond).label)+'</b>';
+ }
+}
+
+/* ================= HOME: concern picker ================= */
+function drawConcerns(){
+ document.getElementById('concernChips').innerHTML=CONCERNS.map(function(c){
+  return '<button class="chip'+(state.picked.has(c.id)?' on':'')+'" data-concern="'+c.id+'">'+esc(c.label)+'</button>';
+ }).join('');
+ updateCandCount();
+}
+function matchedConds(){
+ if(!state.picked.size) return [];
+ const score={};
+ CONCERNS.forEach(function(c){ if(state.picked.has(c.id)) c.conds.forEach(function(id){ score[id]=(score[id]||0)+1; }); });
+ return Object.keys(score).sort(function(a,b){return score[b]-score[a];}).map(function(id){return {id:id,n:score[id]};});
+}
+function updateCandCount(){
+ const m=matchedConds(); const btn=document.getElementById('goCandidates'), cc=document.getElementById('candCount');
+ btn.disabled=!m.length;
+ cc.textContent=state.picked.size? (m.length+' condition'+(m.length===1?'':'s')+' match') : 'Pick at least one.';
+}
+
+/* ================= CANDIDATES ================= */
+function drawCandidates(){
+ const m=matchedConds();
+ const picks=CONCERNS.filter(c=>state.picked.has(c.id)).map(c=>c.label);
+ document.getElementById('candBecause').innerHTML='Because you chose: '+picks.map(p=>'<b style="color:var(--slate)">'+esc(p)+'</b>').join(', ')+'. Conditions that share the most of your feelings come first.';
+ document.getElementById('candList').innerHTML=m.map(function(o){
+  const c=byId(o.id);
+  const shared=CONCERNS.filter(x=>state.picked.has(x.id)&&x.conds.indexOf(o.id)>=0).map(x=>x.label);
+  return '<button class="ccard" data-open="'+c.id+'" data-from="cand">'+
+    '<div class="cn">'+esc(c.label)+'</div>'+
+    '<div class="co">'+esc(c.one)+'</div>'+
+    '<div class="cm">'+shared.map(s=>'<span class="matchtag">'+esc(s)+'</span>').join('')+
+      '<span class="grptag">'+esc(c.grp)+'</span></div></button>';
+ }).join('');
+}
+
+/* ================= BROWSE ================= */
+function drawBrowse(){
+ document.getElementById('browseList').innerHTML=CGROUPS.map(function(g){
+  const items=CONDITIONS.filter(c=>c.grp===g);
+  if(!items.length) return '';
+  return '<div class="browsegrp"><h3>'+esc(g)+'</h3>'+items.map(function(c){
+   return '<button class="ccard" data-open="'+c.id+'" data-from="browse">'+
+     '<div class="cn">'+esc(c.label)+'</div><div class="co">'+esc(c.one)+'</div></button>';
+  }).join('')+'</div>';
+ }).join('');
+}
+
+/* ================= LENS ================= */
+function openLens(id,from){
+ state.cond=id; state.from=from||'cand';
+ const c=byId(id);
+ document.getElementById('cTitle').textContent=c.label;
+ document.getElementById('cOne').textContent=c.one;
+ document.getElementById('cGrp').textContent=c.grp;
+ document.getElementById('lensDisc').innerHTML='Educational only. Not a diagnosis, not medical advice, and not a recommendation to get tested. A "miniDx" here is a plain-language pattern read of results <em>you</em> enter — always talk it through with a clinician. Diagnostic thresholds vary between guidelines; this build quotes named sources and notes where cut-offs differ.';
+ drawSources(c);
+ renderLens();
+ show('lens');
+}
+function renderLens(){ drawRipple(); drawMarkers(); drawPath(); drawMiniDx(); }
+
+function drawRipple(){
+ const c=byId(state.cond), W=900,H=460,cx=W/2,cy=H/2, parts=[];
+ const sy=c.symptoms, mk=c.markers;
+ function edge(x1,y1,x2,y2,col,w){parts.push('<path d="M'+x1+' '+y1+' C '+((x1+x2)/2)+' '+y1+', '+((x1+x2)/2)+' '+y2+', '+x2+' '+y2+'" fill="none" stroke="'+col+'" stroke-width="'+w+'" opacity=".45"/>');}
+ const leftX=150, sN=sy.length;
+ sy.forEach((s,i)=>{ const y=52+i*((H-104)/Math.max(1,sN-1)); edge(leftX,y,cx,cy,'#9aa7ab',1.4); });
+ const rightX=748, mN=mk.length;
+ mk.forEach((m,i)=>{ const y=52+i*((H-104)/Math.max(1,mN-1)); const had=state.had.has(m.slug);
+   edge(cx,cy,rightX,y,had?'#2E7D5B':'#B84A0E',had?1.6:2.2); });
+ parts.push('<circle cx="'+cx+'" cy="'+cy+'" r="66" fill="#24434D"/>');
+ wrapText(c.label,cx,cy,'#fff',12.5,parts,15);
+ sy.forEach((s,i)=>{ const y=52+i*((H-104)/Math.max(1,sN-1));
+  parts.push('<circle cx="'+leftX+'" cy="'+y+'" r="6" fill="#5A6B70"/>');
+  parts.push('<text x="'+(leftX-14)+'" y="'+(y+4)+'" text-anchor="end" font-size="12.5" fill="#24434D">'+esc(s)+'</text>');
+ });
+ mk.forEach((m,i)=>{ const y=52+i*((H-104)/Math.max(1,mN-1)); const had=state.had.has(m.slug); const col=had?'#2E7D5B':'#B84A0E';
+  parts.push('<circle cx="'+rightX+'" cy="'+y+'" r="7" fill="'+col+'"/>');
+  parts.push('<text x="'+(rightX+15)+'" y="'+(y-1)+'" font-size="12.5" font-weight="600" fill="#24434D">'+esc(m.name)+'</text>');
+  parts.push('<text x="'+(rightX+15)+'" y="'+(y+14)+'" font-size="10.5" fill="'+col+'">'+(had?'tested':'not tested — missing signal')+(m.panel?'':' · outside annual panel')+'</text>');
+ });
+ parts.push('<text x="'+leftX+'" y="24" text-anchor="middle" font-size="10.5" letter-spacing="1" fill="#8B9799">HOW YOU FEEL</text>');
+ parts.push('<text x="'+rightX+'" y="24" text-anchor="middle" font-size="10.5" letter-spacing="1" fill="#8B9799">BLOOD MARKERS</text>');
+ document.getElementById('ripple').innerHTML=parts.join('');
+}
+function wrapText(t,x,y,fill,size,parts,lh){
+ const words=t.replace('–','- ').split(' '); const lines=[]; let cur='';
+ words.forEach(w=>{ if((cur+' '+w).trim().length>13){lines.push(cur.trim());cur=w;} else cur+=' '+w; });
+ if(cur.trim())lines.push(cur.trim());
+ const start=y-(lines.length-1)*lh/2;
+ lines.forEach((l,i)=>parts.push('<text x="'+x+'" y="'+(start+i*lh+4)+'" text-anchor="middle" font-size="'+size+'" font-weight="700" fill="'+fill+'">'+esc(l)+'</text>'));
+}
+
+function drawMarkers(){
+ const c=byId(state.cond);
+ document.getElementById('mBody').innerHTML=c.markers.map(function(m){
+  const had=state.had.has(m.slug);
+  const where=m.panel
+   ? '<span class="pill panel">in annual panel</span> <span class="pill '+m.step+'">'+m.step+'</span>'
+   : '<span class="pill out">outside panel</span> <span class="pill '+m.step+'">'+m.step+'</span>';
+  const gapflag=(!had&&!m.panel)?'<span class="gapflag">← signal you haven’t tested for</span>':'';
+  const reasoned=m.reasoned?'<span class="reasoned-i">reasoned</span>':'';
+  const resrow=had?'<div class="resrow"><span class="rl">result:</span>'+
+   ['low','normal','high'].map(function(r){return '<button class="res '+r+(state.result[m.slug]===r?' on':'')+'" data-res="'+m.slug+'" data-val="'+r+'">'+r+'</button>';}).join('')+'</div>':'';
+  return '<tr>'+
+   '<td><span class="mname">'+esc(m.name)+'</span> <span class="mabbr">'+esc(m.abbr)+'</span>'+reasoned+gapflag+
+     '<div class="msig">'+esc(m.sig)+'</div></td>'+
+   '<td>'+where+'</td>'+
+   '<td><div class="hadtog"><button data-had="'+m.slug+'" data-v="1" class="'+(had?'on':'')+'">had it</button>'+
+     '<button data-had="'+m.slug+'" data-v="0" class="'+(!had?'on':'')+'">not yet</button></div>'+resrow+'</td>'+
+   '</tr>';
+ }).join('');
+}
+
+function drawPath(){
+ const c=byId(state.cond);
+ const order=[['screen','Screen'],['confirm','Confirm'],['cause','Find the cause']];
+ const steps=order.map(function(o){ const ms=c.markers.filter(m=>m.step===o[0]); return ms.length?{role:o[0],label:o[1],markers:ms}:null; }).filter(Boolean);
+ let nextIdx=steps.findIndex(s=>s.markers.some(m=>!state.had.has(m.slug)));
+ document.getElementById('pathWrap').style.gridTemplateColumns='repeat('+steps.length+',1fr)';
+ document.getElementById('pathWrap').innerHTML=steps.map(function(s,i){
+  const toks=s.markers.map(function(m){ const had=state.had.has(m.slug); return '<span class="ptok '+(had?'had':'gap')+'">'+esc(m.abbr)+(had?' ✓':'')+'</span>'; }).join('');
+  const done=s.markers.filter(m=>state.had.has(m.slug)).length, all=done===s.markers.length;
+  const stat=all?'<div class="pstatus ok">✓ you’ve had this step</div>':'<div class="pstatus todo">'+(s.markers.length-done)+' of these still to do</div>';
+  const sig=s.role==='screen'?'The first flag — often a test you already get, or a quick add-on.'
+    :s.role==='confirm'?'Pins down the diagnosis. Usually requested on purpose.'
+    :'Explains why, once the diagnosis is made.';
+  return '<div class="pstep '+s.role+(i===nextIdx?' next':'')+'">'+
+   '<div class="role">'+esc(s.label)+(i===nextIdx?' · next step':'')+'</div>'+
+   '<h4>Step '+(i+1)+'</h4><div class="psig">'+sig+'</div>'+
+   '<div class="ptests">'+toks+'</div>'+stat+'</div>';
+ }).join('');
+}
+
+function readMiniDx(){
+ const c=byId(state.cond);
+ const cm=c.markers.find(m=>m.slug===c.confirm);
+ const cr=state.result[c.confirm];
+ if(!state.had.has(c.confirm)||!cr) return {status:'locked'};
+ const supAbn=c.support.some(function(sl){ const sm=c.markers.find(m=>m.slug===sl); return sm && state.result[sl]===sm.abn; });
+ if(cr===cm.abn){ return supAbn?{status:'consistent',read:c.reads.strong}:{status:'consistent',read:c.reads.supportive}; }
+ if(cr==='normal'){ return supAbn?{status:'partial',read:c.reads.partial}:{status:'against',read:c.reads.against}; }
+ return {status:'partial',read:c.reads.partial};
+}
+function drawMiniDx(){
+ const c=byId(state.cond), el=document.getElementById('minidx'), r=readMiniDx();
+ const cm=c.markers.find(m=>m.slug===c.confirm);
+ if(r.status==='locked'){
+  const need = !state.had.has(c.confirm)
+    ? 'mark <b>'+esc(cm.name)+'</b> as had'
+    : 'add a <b>'+esc(cm.name)+'</b> result (low / normal / high)';
+  el.className='locked';
+  el.innerHTML='<div class="mdx-lab">MiniDx · locked</div>'+
+   '<div class="mdx-lockmsg"><span class="lk">\u{1F512}</span><div>A provisional read appears once the confirming test exists. Right now the pattern can’t be completed.</div></div>'+
+   '<div class="mdx-need">To unlock: '+need+'.'+(cm.panel?'':' '+esc(cm.name)+' is the piece the annual panel leaves out.')+'</div>';
+  return;
+ }
+ const titles={consistent:'Pattern consistent with '+c.label.toLowerCase(),partial:'Mixed pattern — needs a clinician’s eye',against:'Not a '+c.label.toLowerCase()+' pattern'};
+ el.className=r.status;
+ const chip=function(sl){ const m=c.markers.find(x=>x.slug===sl); const v=state.result[sl]; return (m&&v)?('<span class="badge '+(v==='normal'?'q':'inf')+'">'+esc(m.abbr)+': '+v+'</span> '):''; };
+ const shown=[c.confirm].concat(c.support).filter((v,i,a)=>a.indexOf(v)===i);
+ el.innerHTML='<div class="mdx-lab">MiniDx · provisional pattern read</div>'+
+  '<div class="mdx-head">'+esc(titles[r.status])+'</div>'+
+  '<div class="mdx-body">'+r.read+'</div>'+
+  '<div style="margin-top:11px">'+shown.map(chip).join('')+'</div>'+
+  '<div class="mdx-need" style="margin-top:12px;color:var(--muted)">Based on results you entered, read against the sourced thresholds. '+
+   '<span class="badge inf">reasoned</span> combining these into one pattern is clinical reasoning, not a single quoted rule.</div>';
+}
+
+function drawSources(c){
+ document.getElementById('srcBox').innerHTML=c.src.map(function(s){
+  const badge=s.k==='q'?'<span class="badge q">quoted</span>':'<span class="badge inf">reasoned</span>';
+  const cite=s.url?esc(s.who)+' · <a href="'+s.url+'" target="_blank" rel="noopener">verify</a>':esc(s.who);
+  return '<div class="srcitem '+(s.k==='inf'?'inf':'')+'">'+badge+' <q>'+esc(s.quote)+'</q><span class="cite">— '+cite+'</span></div>';
+ }).join('');
+}
+
+/* ================= EVENTS ================= */
+document.getElementById('concernChips').addEventListener('click',function(e){
+ const b=e.target.closest('[data-concern]'); if(!b) return;
+ const id=b.dataset.concern; state.picked.has(id)?state.picked.delete(id):state.picked.add(id); drawConcerns();
+});
+document.getElementById('goCandidates').addEventListener('click',function(){ drawCandidates(); show('cand'); });
+document.getElementById('goBrowse').addEventListener('click',function(){ drawBrowse(); show('browse'); });
+document.getElementById('backHome1').addEventListener('click',function(){ show('home'); });
+document.getElementById('backHome2').addEventListener('click',function(){ show('home'); });
+document.getElementById('backLens').addEventListener('click',function(){ show(state.from==='browse'?'browse':'cand'); });
+document.getElementById('crumb').addEventListener('click',function(e){
+ const a=e.target.closest('[data-nav]'); if(!a) return;
+ const nav=a.dataset.nav;
+ if(nav==='home') show('home');
+ else if(nav==='cand'){ drawCandidates(); show('cand'); }
+ else if(nav==='browse'){ drawBrowse(); show('browse'); }
+});
+document.body.addEventListener('click',function(e){
+ const o=e.target.closest('[data-open]'); if(o){ openLens(o.dataset.open,o.dataset.from); }
+});
+document.getElementById('mBody').addEventListener('click',function(e){
+ const h=e.target.closest('[data-had]');
+ if(h){ const sl=h.dataset.had; if(h.dataset.v==='1') state.had.add(sl); else { state.had.delete(sl); delete state.result[sl]; } renderLens(); return; }
+ const r=e.target.closest('[data-res]');
+ if(r){ const sl=r.dataset.res; state.result[sl]=(state.result[sl]===r.dataset.val)?null:r.dataset.val; renderLens(); }
+});
+document.getElementById('seedBtn').addEventListener('click',function(){
+ const on=PANEL_SLUGS.every(sl=>state.had.has(sl));
+ if(on){ PANEL_SLUGS.forEach(sl=>{state.had.delete(sl);delete state.result[sl];}); this.classList.remove('done'); this.textContent="I've had a standard annual panel"; }
+ else { PANEL_SLUGS.forEach(sl=>state.had.add(sl)); this.classList.add('done'); this.textContent="✓ annual panel marked as done"; }
+ renderLens();
+});
+
+/* ================= INIT ================= */
+drawConcerns();
+show('home');
+</script>
+</body>
+</html>

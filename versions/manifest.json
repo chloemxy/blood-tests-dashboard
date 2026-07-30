@@ -1,0 +1,124 @@
+{
+ "generated": "2026-07-30T19:53:27Z",
+ "live": "index.html",
+ "versions": [
+  {
+   "id": "v1.0",
+   "file": "v1.0-atlas-rebuild.html",
+   "title": "Atlas rebuild",
+   "date": "2026-07-30",
+   "ref": null,
+   "source": "index-v2.html",
+   "status": "candidate",
+   "tag": "v1.0-atlas",
+   "gitpath": "index-v2.html",
+   "summary": "Landing reframed from a navigation question into a claim, plus two new screens: a gap map and a family atlas.",
+   "changes": [
+    "<b>Hero states the thesis.</b> “Where do you want to start?” becomes “There are 6,192 things that can be measured in your blood. A routine annual checkup measures 26.”",
+    "<b>Stat strip shows gaps, not totals.</b> The volume pair (6,192 tests · 17 body systems) is replaced by 26 of 6,192 in a routine panel, 1,602 markers no symptom reaches, and 4 of 17 families with no quoted source.",
+    "<b>New gap map</b> (<code>#cxGaps</code>) — mark the panels you’ve had, search in individual markers, and see per-family coverage. Persists to <code>localStorage</code>.",
+    "<b>New family atlas</b> (<code>#cxAtlas</code>) — 17 family cards, shade by routine-panel or source coverage, sort by size / least covered / A–Z. Each opens that family in the existing table.",
+    "<b>Six-question spine</b> on the landing, each labelled built / prototype / partial / not built.",
+    "<b>Family map generated from the payload</b> by deterministic circle packing. No edges are drawn, because only 6 of 6,192 markers carry a link to another family.",
+    "<b>Honesty band</b> — 216 quoted entries vs 5,976 AI-written, with source names read out of the data.",
+    "Fixed two bugs found in testing: <code>[].slice.call()</code> on a <code>Set</code> returns empty, which had silently broken the added-markers list and localStorage persistence."
+   ],
+   "note": "Every figure on this version is computed from the payload at load, so the copy cannot drift from the dataset. Regenerate with <code>pipeline/build_v2.py</code>.",
+   "mb": 2.91
+  },
+  {
+   "id": "v0.4",
+   "file": "v0.4-symptom-search.html",
+   "title": "Free-text symptom search",
+   "date": "2026-07-30",
+   "ref": null,
+   "source": "index.html (working tree)",
+   "status": "live",
+   "tag": "v0.4-symptom-search",
+   "diff": "196 added, 18 removed",
+   "summary": "The last state of the original dashboard before the atlas rebuild. This is the roll-back target if v1.0 goes wrong.",
+   "changes": [
+    "Free-text search on the condition explorer home (<code>cxFeelSearch</code>) with fuzzy matching into concern chips.",
+    "“Search all tests” escape hatch from the search results into the table view.",
+    "Feedback link added to the dashboard header.",
+    "Blood-fill animation on the landing figure retuned (<code>cxrise</code> 120px → 185px)."
+   ],
+   "note": "These edits were uncommitted when the atlas work began; they are committed as their own milestone so this exact state is recoverable.",
+   "mb": 2.87
+  },
+  {
+   "id": "v0.3",
+   "file": "v0.3-polished-landing.html",
+   "title": "Polished landing and table toolbar",
+   "date": "2026-07-29",
+   "ref": "2f8f5ec",
+   "source": "commit 2f8f5ec",
+   "tag": "v0.3-polish",
+   "diff": "250 added, 25 removed",
+   "summary": "Visual pass on the two-door landing and usability work on the all-tests table.",
+   "changes": [
+    "Landing figure with the blood-fill mask, animated leader lines to each route card, and live card stats read from the dataset.",
+    "Per-system mini bar chart on the “Explore all tests” card.",
+    "Table toolbar: expand all, collapse all, back to top, and a sticky toolbar dock.",
+    "Rollup system bar with legend in the dashboard header."
+   ],
+   "mb": 2.86
+  },
+  {
+   "id": "v0.2",
+   "file": "v0.2-condition-explorer.html",
+   "title": "Condition explorer prototype",
+   "date": "2026-07-23",
+   "ref": "1f7acac",
+   "source": "commit 1f7acac",
+   "tag": "v0.2-condition-explorer",
+   "diff": "3,595 added, 81 removed",
+   "summary": "The biggest single change in the project's history: conditions become a first-class object sitting between symptoms and tests.",
+   "changes": [
+    "Route landing (<code>#cxRoute</code>) with two doors — start from how you feel, or explore all tests.",
+    "Condition explorer (<code>#cxApp</code>): symptom → candidate conditions → condition lens.",
+    "Condition lens with ripple diagram, “have you had this?” checklist, path-to-diagnosis track and a locked miniDx card.",
+    "All-tests table view with name / system / source filters.",
+    "Added <code>condition-lens.html</code>, <code>IMPROVEMENT-PLAN.md</code> and the <code>pipeline/</code> source files."
+   ],
+   "note": "This is the version <code>IMPROVEMENT-PLAN.md</code> was written against.",
+   "mb": 2.85
+  },
+  {
+   "id": "v0.1",
+   "file": "v0.1-initial-dashboard.html",
+   "title": "Initial dashboard",
+   "date": "2026-07-22",
+   "ref": "786bfc5",
+   "source": "commit 786bfc5",
+   "tag": "v0.1-initial",
+   "diff": "1,024 added",
+   "summary": "The original concern-in, test-list-out tool. No conditions, no landing page, no table view.",
+   "changes": [
+    "6,192-test catalogue with the concern picker and age / sex / life-stage / medication filters.",
+    "Rollup stat strip and callouts.",
+    "“Worth asking your doctor about” ranking, and annual-panel coverage against what sits outside it.",
+    "Source-quoted vs AI-generated badges throughout."
+   ],
+   "mb": 2.69
+  }
+ ],
+ "references": [
+  {
+   "id": "ref-wireframe",
+   "file": "ref-atlas-wireframe.html",
+   "title": "Atlas landing wireframe (annotated)",
+   "date": "2026-07-29",
+   "summary": "The annotated mockup that v1.0 was built from. Each block carries a margin note explaining what changed and why. Read alongside INDEX-REFINEMENT.md.",
+   "mb": 0.02
+  },
+  {
+   "id": "ref-lens",
+   "file": "ref-condition-lens.html",
+   "title": "Condition lens — iron-deficiency anemia",
+   "date": "2026-07-23",
+   "summary": "Standalone, hand-authored prototype of one condition worked end to end: ripple, coverage, path to diagnosis, miniDx. The reference build the explorer was modelled on.",
+   "mb": 0.04
+  }
+ ]
+}

@@ -1,0 +1,464 @@
+#!/usr/bin/env python3
+"""
+Builds versions/manifest.json and history.html from the version list below.
+
+Snapshots themselves are produced by snapshot.sh (or by hand); this script only
+records what they are and renders the panel. Re-run after adding a version.
+
+    python3 pipeline/build_history.py
+"""
+import io, json, os, subprocess
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# ---------------------------------------------------------------------------
+# The version list. `ref` is the git commit a snapshot came from, or None for
+# snapshots taken from the working tree. `diff` is the git numstat for that
+# commit, quoted rather than recomputed so the panel is readable offline.
+# ---------------------------------------------------------------------------
+VERSIONS = [
+ {
+  "id": "v1.0",
+  "file": "v1.0-atlas-rebuild.html",
+  "title": "Atlas rebuild",
+  "date": "2026-07-30",
+  "ref": None,
+  "source": "index-v2.html",
+  "status": "candidate",
+  "tag": "v1.0-atlas",
+  "gitpath": "index-v2.html",
+  "summary": "Landing reframed from a navigation question into a claim, plus two new screens: a gap map and a family atlas.",
+  "changes": [
+   "<b>Hero states the thesis.</b> “Where do you want to start?” becomes “There are 6,192 things that can be measured in your blood. A routine annual checkup measures 26.”",
+   "<b>Stat strip shows gaps, not totals.</b> The volume pair (6,192 tests · 17 body systems) is replaced by 26 of 6,192 in a routine panel, 1,602 markers no symptom reaches, and 4 of 17 families with no quoted source.",
+   "<b>New gap map</b> (<code>#cxGaps</code>) — mark the panels you’ve had, search in individual markers, and see per-family coverage. Persists to <code>localStorage</code>.",
+   "<b>New family atlas</b> (<code>#cxAtlas</code>) — 17 family cards, shade by routine-panel or source coverage, sort by size / least covered / A–Z. Each opens that family in the existing table.",
+   "<b>Six-question spine</b> on the landing, each labelled built / prototype / partial / not built.",
+   "<b>Family map generated from the payload</b> by deterministic circle packing. No edges are drawn, because only 6 of 6,192 markers carry a link to another family.",
+   "<b>Honesty band</b> — 216 quoted entries vs 5,976 AI-written, with source names read out of the data.",
+   "Fixed two bugs found in testing: <code>[].slice.call()</code> on a <code>Set</code> returns empty, which had silently broken the added-markers list and localStorage persistence."
+  ],
+  "note": "Every figure on this version is computed from the payload at load, so the copy cannot drift from the dataset. Regenerate with <code>pipeline/build_v2.py</code>."
+ },
+ {
+  "id": "v0.4",
+  "file": "v0.4-symptom-search.html",
+  "title": "Free-text symptom search",
+  "date": "2026-07-30",
+  "ref": None,
+  "source": "index.html (working tree)",
+  "status": "live",
+  "tag": "v0.4-symptom-search",
+  "diff": "196 added, 18 removed",
+  "summary": "The last state of the original dashboard before the atlas rebuild. This is the roll-back target if v1.0 goes wrong.",
+  "changes": [
+   "Free-text search on the condition explorer home (<code>cxFeelSearch</code>) with fuzzy matching into concern chips.",
+   "“Search all tests” escape hatch from the search results into the table view.",
+   "Feedback link added to the dashboard header.",
+   "Blood-fill animation on the landing figure retuned (<code>cxrise</code> 120px → 185px)."
+  ],
+  "note": "These edits were uncommitted when the atlas work began; they are committed as their own milestone so this exact state is recoverable."
+ },
+ {
+  "id": "v0.3",
+  "file": "v0.3-polished-landing.html",
+  "title": "Polished landing and table toolbar",
+  "date": "2026-07-29",
+  "ref": "2f8f5ec",
+  "source": "commit 2f8f5ec",
+  "tag": "v0.3-polish",
+  "diff": "250 added, 25 removed",
+  "summary": "Visual pass on the two-door landing and usability work on the all-tests table.",
+  "changes": [
+   "Landing figure with the blood-fill mask, animated leader lines to each route card, and live card stats read from the dataset.",
+   "Per-system mini bar chart on the “Explore all tests” card.",
+   "Table toolbar: expand all, collapse all, back to top, and a sticky toolbar dock.",
+   "Rollup system bar with legend in the dashboard header."
+  ]
+ },
+ {
+  "id": "v0.2",
+  "file": "v0.2-condition-explorer.html",
+  "title": "Condition explorer prototype",
+  "date": "2026-07-23",
+  "ref": "1f7acac",
+  "source": "commit 1f7acac",
+  "tag": "v0.2-condition-explorer",
+  "diff": "3,595 added, 81 removed",
+  "summary": "The biggest single change in the project's history: conditions become a first-class object sitting between symptoms and tests.",
+  "changes": [
+   "Route landing (<code>#cxRoute</code>) with two doors — start from how you feel, or explore all tests.",
+   "Condition explorer (<code>#cxApp</code>): symptom → candidate conditions → condition lens.",
+   "Condition lens with ripple diagram, “have you had this?” checklist, path-to-diagnosis track and a locked miniDx card.",
+   "All-tests table view with name / system / source filters.",
+   "Added <code>condition-lens.html</code>, <code>IMPROVEMENT-PLAN.md</code> and the <code>pipeline/</code> source files."
+  ],
+  "note": "This is the version <code>IMPROVEMENT-PLAN.md</code> was written against."
+ },
+ {
+  "id": "v0.1",
+  "file": "v0.1-initial-dashboard.html",
+  "title": "Initial dashboard",
+  "date": "2026-07-22",
+  "ref": "786bfc5",
+  "source": "commit 786bfc5",
+  "tag": "v0.1-initial",
+  "diff": "1,024 added",
+  "summary": "The original concern-in, test-list-out tool. No conditions, no landing page, no table view.",
+  "changes": [
+   "6,192-test catalogue with the concern picker and age / sex / life-stage / medication filters.",
+   "Rollup stat strip and callouts.",
+   "“Worth asking your doctor about” ranking, and annual-panel coverage against what sits outside it.",
+   "Source-quoted vs AI-generated badges throughout."
+  ]
+ },
+]
+
+REFS = [
+ {
+  "id": "ref-wireframe",
+  "file": "ref-atlas-wireframe.html",
+  "title": "Atlas landing wireframe (annotated)",
+  "date": "2026-07-29",
+  "summary": "The annotated mockup that v1.0 was built from. Each block carries a margin note explaining what changed and why. Read alongside INDEX-REFINEMENT.md.",
+ },
+ {
+  "id": "ref-lens",
+  "file": "ref-condition-lens.html",
+  "title": "Condition lens — iron-deficiency anemia",
+  "date": "2026-07-23",
+  "summary": "Standalone, hand-authored prototype of one condition worked end to end: ripple, coverage, path to diagnosis, miniDx. The reference build the explorer was modelled on.",
+ },
+]
+
+# ---------------------------------------------------------------------------
+def fsize(p):
+    try:
+        n = os.path.getsize(p)
+    except OSError:
+        return None
+    return round(n / 1048576.0, 2)
+
+for v in VERSIONS + REFS:
+    v["mb"] = fsize(os.path.join(ROOT, "versions", v["file"]))
+    if v["mb"] is None:
+        raise SystemExit("missing snapshot: versions/" + v["file"])
+
+manifest = {
+    "generated": subprocess.run(["date", "-u", "+%Y-%m-%dT%H:%M:%SZ"],
+                                capture_output=True, text=True).stdout.strip(),
+    "live": "index.html",
+    "versions": VERSIONS,
+    "references": REFS,
+}
+io.open(os.path.join(ROOT, "versions", "manifest.json"), "w", encoding="utf8").write(
+    json.dumps(manifest, indent=1, ensure_ascii=False))
+
+TOTAL_MB = round(sum(v["mb"] for v in VERSIONS + REFS), 1)
+
+# ---------------------------------------------------------------------------
+HTML = """<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Version history — What is your blood telling you?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+ --font-serif:Georgia,"Times New Roman",serif;
+ --font-sans:"Open Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+ --font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Consolas,monospace;
+ --teal:#007385;--slate:#24434D;--accent:#B84A0E;--warm:#F09A57;
+ --aqua:#EAF7F8;--paper:#F7F9F9;--ink:#1D1B1A;--muted:#5A6B70;
+ --line:#D7E1E2;--panel:#fff;--dim:#8B9799;--ok:#2E7D5B;--warn:#B8860B;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--font-sans);font-size:15px;line-height:1.5;overflow:hidden}
+a{color:var(--teal)}
+button{font-family:inherit;cursor:pointer}
+
+#shell{position:fixed;inset:0;display:grid;grid-template-columns:322px 1fr;grid-template-rows:auto 1fr}
+header.top{grid-column:1/3;display:flex;align-items:center;gap:14px;padding:12px 22px;
+ border-bottom:1px solid var(--line);background:var(--panel);z-index:5;flex-wrap:wrap}
+header.top .logo{font-family:var(--font-serif);font-size:18px;color:var(--slate);font-weight:700}
+header.top .logo b{color:var(--teal)}
+header.top .tag{font-family:var(--font-mono);font-size:10.5px;color:var(--muted);letter-spacing:.04em}
+header.top .spacer{flex:1}
+header.top .meta{font-family:var(--font-mono);font-size:10.5px;color:var(--dim)}
+header.top .home{border:1px solid var(--line);background:#fff;color:var(--slate);font-size:12px;
+ font-weight:600;padding:5px 12px;border-radius:16px;text-decoration:none}
+header.top .home:hover{border-color:var(--teal);color:var(--teal)}
+
+/* ---------- timeline rail ---------- */
+#rail{grid-row:2;overflow-y:auto;background:var(--panel);border-right:1px solid var(--line);padding:18px 16px 60px}
+#rail::-webkit-scrollbar{width:8px}#rail::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+.railhead{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+ color:var(--dim);margin:0 0 10px;padding-left:2px}
+.railhead.two{margin-top:26px;border-top:1px solid var(--line);padding-top:16px}
+.vlist{position:relative;padding-left:20px}
+.vlist::before{content:'';position:absolute;left:5px;top:9px;bottom:9px;width:1.5px;background:var(--line)}
+.vitem{position:relative;display:block;width:100%;text-align:left;background:none;border:1px solid transparent;
+ border-radius:10px;padding:9px 11px;margin:0 0 3px;transition:.14s}
+.vitem::before{content:'';position:absolute;left:-19px;top:15px;width:9px;height:9px;border-radius:50%;
+ background:#fff;border:2px solid var(--line)}
+.vitem:hover{background:var(--paper);border-color:var(--line)}
+.vitem.on{background:var(--aqua);border-color:var(--teal)}
+.vitem.on::before{border-color:var(--teal);background:var(--teal)}
+.vitem.st-live::before{border-color:var(--ok);background:var(--ok)}
+.vitem.st-candidate::before{border-color:var(--accent);background:#fff}
+.vitem .vt{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
+.vitem .vid{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--teal)}
+.vitem.st-live .vid{color:var(--ok)}
+.vitem.st-candidate .vid{color:var(--accent)}
+.vitem .vd{font-family:var(--font-mono);font-size:9.5px;color:var(--dim);margin-left:auto}
+.vitem .vn{font-family:var(--font-serif);font-size:14.5px;color:var(--slate);font-weight:700;
+ display:block;margin:1px 0 2px;line-height:1.3}
+.vitem .vs{font-size:11.5px;color:var(--muted);line-height:1.45;display:block}
+.livechip{display:inline-block;font-family:var(--font-mono);font-size:8.5px;letter-spacing:.05em;
+ text-transform:uppercase;padding:1px 6px;border-radius:8px;color:#fff}
+.livechip.live{background:var(--ok)}
+.livechip.candidate{background:var(--accent)}
+
+/* ---------- main pane ---------- */
+#pane{grid-row:2;overflow-y:auto;padding:0 0 60px}
+#pane::-webkit-scrollbar{width:10px}#pane::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+.pwrap{max-width:1000px;margin:0 auto;padding:22px 26px 0}
+.phead{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:4px}
+.phead h1{font-family:var(--font-serif);font-size:25px;color:var(--slate);margin:0}
+.phead .pid{font-family:var(--font-mono);font-size:12px;color:var(--accent);font-weight:600;
+ border:1px solid #f0cdb6;background:#fdf1ea;padding:2px 9px;border-radius:12px;white-space:nowrap}
+.phead .pid.live{color:var(--ok);border-color:#b9ddc9;background:#e9f5ee}
+.pmeta{font-family:var(--font-mono);font-size:11px;color:var(--dim);margin:2px 0 10px;
+ display:flex;gap:14px;flex-wrap:wrap}
+.psum{font-size:14px;color:var(--muted);margin:0 0 16px;max-width:760px}
+
+.ptools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 10px}
+.ptool{border:1px solid var(--line);background:#fff;color:var(--slate);font-size:12px;font-weight:600;
+ padding:5px 12px;border-radius:16px}
+.ptool:hover{border-color:var(--teal);color:var(--teal)}
+.ptool.on{background:var(--teal);border-color:var(--teal);color:#fff}
+.ptools .lab{font-family:var(--font-mono);font-size:10px;letter-spacing:.05em;color:var(--dim);
+ text-transform:uppercase;margin-right:1px}
+.ptools .spacer{flex:1}
+.popen{border:1px solid var(--teal);background:var(--teal);color:#fff;font-size:12px;font-weight:700;
+ padding:6px 14px;border-radius:16px;text-decoration:none;display:inline-block}
+.popen:hover{background:#005e6d}
+
+.frame{background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px;
+ display:flex;justify-content:center;position:relative;min-height:200px}
+.frame .vp{width:100%;transition:width .22s ease}
+.frame iframe{width:100%;height:600px;border:1px solid var(--line);border-radius:7px;background:#fff;display:block}
+.frame .load{position:absolute;inset:9px;display:flex;align-items:center;justify-content:center;
+ background:var(--paper);border-radius:7px;font-family:var(--font-mono);font-size:11.5px;color:var(--dim);
+ z-index:2;text-align:center;padding:20px}
+.frame .load.gone{display:none}
+.fnote{font-family:var(--font-mono);font-size:10px;color:var(--dim);margin:7px 0 0;text-align:center}
+
+.sec{margin:26px 0 0}
+.sec h2{font-family:var(--font-serif);font-size:18px;color:var(--slate);margin:0 0 8px}
+.chg{list-style:none;padding:0;margin:0}
+.chg li{position:relative;padding:0 0 0 20px;margin:0 0 8px;font-size:13.5px;color:var(--muted);line-height:1.55;max-width:820px}
+.chg li::before{content:'';position:absolute;left:4px;top:8px;width:6px;height:6px;border-radius:50%;background:var(--warm)}
+.chg li b{color:var(--slate)}
+code{font-family:var(--font-mono);font-size:.88em;background:var(--aqua);color:var(--slate);
+ padding:1px 5px;border-radius:4px}
+.note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:9px;
+ padding:12px 15px;font-size:12.5px;color:var(--muted);margin:14px 0 0;max-width:820px}
+
+.roll{background:var(--slate);border-radius:12px;padding:17px 19px;margin:14px 0 0;max-width:820px}
+.roll h3{font-family:var(--font-serif);font-size:16px;color:#fff;margin:0 0 4px}
+.roll p{font-size:12.5px;color:#c8d5d7;margin:0 0 11px;line-height:1.55}
+.cmd{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);
+ border-radius:8px;padding:8px 10px;margin:0 0 7px}
+.cmd code{flex:1;background:none;color:#eaf3f4;font-size:11.5px;padding:0;white-space:pre-wrap;word-break:break-all}
+.cmd button{border:1px solid rgba(255,255,255,.25);background:none;color:#c8d5d7;font-family:var(--font-mono);
+ font-size:10px;padding:3px 9px;border-radius:12px;white-space:nowrap}
+.cmd button:hover{border-color:var(--warm);color:var(--warm)}
+.cmd button.done{color:var(--warm);border-color:var(--warm)}
+.rolllab{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;
+ color:#8fa6ab;margin:11px 0 4px}
+.rolllab:first-of-type{margin-top:0}
+
+.foot{font-size:11.5px;color:var(--dim);margin:30px 0 0;max-width:820px;line-height:1.6}
+.foot code{background:#eef2f2}
+@media(max-width:900px){
+ #shell{grid-template-columns:1fr;grid-template-rows:auto auto 1fr}
+ #rail{grid-row:2;border-right:none;border-bottom:1px solid var(--line);max-height:230px}
+ #pane{grid-row:3}
+}
+</style>
+</head>
+<body>
+<div id="shell">
+ <header class="top">
+  <span class="logo">What is your blood telling you<b>?</b></span>
+  <span class="tag">version history</span>
+  <span class="spacer"></span>
+  <span class="meta" id="hdrMeta"></span>
+  <a class="home" href="index.html">Open live site &rarr;</a>
+ </header>
+
+ <aside id="rail">
+  <p class="railhead">Versions &mdash; newest first</p>
+  <div class="vlist" id="vList"></div>
+  <p class="railhead two">Reference artifacts</p>
+  <div class="vlist" id="rList"></div>
+ </aside>
+
+ <main id="pane"><div class="pwrap" id="pwrap"></div></main>
+</div>
+
+<script>
+"use strict";
+const MANIFEST = __MANIFEST__;
+const TOTAL_MB = __TOTAL__;
+const $ = id => document.getElementById(id);
+const esc = s => (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+const ALL = MANIFEST.versions.concat(MANIFEST.references);
+const byId = id => ALL.find(v => v.id === id);
+let current = MANIFEST.versions[0].id;
+let vpWidth = 0;                    // 0 = full width
+
+$('hdrMeta').textContent = MANIFEST.versions.length + ' versions \\u00b7 '
+  + MANIFEST.references.length + ' reference artifacts \\u00b7 ' + TOTAL_MB + ' MB on disk';
+
+/* ---------------- rail ---------------- */
+function railItem(v, isRef){
+ return '<button class="vitem' + (v.id===current?' on':'') + (v.status?' st-'+v.status:'') + '" data-v="' + v.id + '">'
+  + '<span class="vt"><span class="vid">' + esc(isRef ? 'ref' : v.id) + '</span>'
+  + (v.status ? '<span class="livechip ' + v.status + '">' + v.status + '</span>' : '')
+  + '<span class="vd">' + esc(v.date) + '</span></span>'
+  + '<span class="vn">' + esc(v.title) + '</span>'
+  + '<span class="vs">' + esc(v.summary.length > 96 ? v.summary.slice(0,93) + '\\u2026' : v.summary) + '</span>'
+  + '</button>';
+}
+function drawRail(){
+ $('vList').innerHTML = MANIFEST.versions.map(v => railItem(v,false)).join('');
+ $('rList').innerHTML = MANIFEST.references.map(v => railItem(v,true)).join('');
+}
+
+/* ---------------- detail ---------------- */
+const VPS = [['Full','0'],['Tablet','834'],['Phone','390']];
+
+function draw(){
+ const v = byId(current);
+ const isRef = MANIFEST.references.indexOf(v) >= 0;
+ const path = 'versions/' + v.file;
+
+ let html = '<div class="phead">'
+  + '<h1>' + esc(v.title) + '</h1>'
+  + '<span class="pid' + (v.status==='live'?' live':'') + '">' + esc(isRef ? 'reference' : v.id)
+     + (v.status ? ' \\u00b7 ' + v.status : '') + '</span>'
+  + '</div>'
+  + '<div class="pmeta">'
+  + '<span>' + esc(v.date) + '</span>'
+  + (v.source ? '<span>from ' + esc(v.source) + '</span>' : '')
+  + (v.diff ? '<span>' + esc(v.diff) + '</span>' : '')
+  + '<span>' + v.mb + ' MB</span>'
+  + '<span>versions/' + esc(v.file) + '</span>'
+  + '</div>'
+  + '<p class="psum">' + esc(v.summary) + '</p>';
+
+ html += '<div class="ptools"><span class="lab">viewport</span>'
+  + VPS.map(p => '<button class="ptool' + (String(vpWidth)===p[1]?' on':'') + '" data-vp="' + p[1] + '">' + p[0] + '</button>').join('')
+  + '<span class="spacer"></span>'
+  + '<a class="popen" href="' + path + '" target="_blank" rel="noopener">Open full &nearr;</a>'
+  + '</div>';
+
+ html += '<div class="frame"><div class="load" id="ld">loading ' + v.mb + ' MB\\u2026<br>large single-file build, give it a moment</div>'
+  + '<div class="vp" id="vp"' + (vpWidth ? ' style="width:' + vpWidth + 'px"' : '') + '>'
+  + '<iframe id="fr" title="Preview of ' + esc(v.title) + '" src="' + path + '"></iframe>'
+  + '</div></div>'
+  + '<p class="fnote">Live preview \\u2014 this is the real build, fully interactive. Click around inside it.</p>';
+
+ if(v.changes && v.changes.length){
+  html += '<div class="sec"><h2>What changed</h2><ul class="chg">'
+   + v.changes.map(c => '<li>' + c + '</li>').join('') + '</ul></div>';
+ }
+ if(v.note) html += '<div class="note">' + v.note + '</div>';
+
+ if(!isRef){
+  const gp     = v.gitpath || 'index.html';
+  const promote= v.status === 'candidate';
+  const cpCmd  = 'cp versions/' + v.file + ' index.html';
+  const gitCmd = v.tag ? 'git checkout ' + v.tag + ' -- ' + gp : null;
+  html += '<div class="sec"><h2>' + (promote ? 'Promote this version to live' : 'Roll back to this version') + '</h2><div class="roll">'
+   + '<h3>' + (promote ? 'Not live yet' : 'Two ways, same result') + '</h3>'
+   + '<p>' + (promote
+      ? 'This build sits alongside the live site as <code style="background:rgba(255,255,255,.12);color:#eaf3f4">' + esc(gp) + '</code> so you can review it first. Copying the snapshot over <code style="background:rgba(255,255,255,.12);color:#eaf3f4">index.html</code> is what makes it live \\u2014 and every earlier version stays in this panel, so the move is reversible.'
+      : 'The snapshot is a complete standalone build, so copying it over <code style="background:rgba(255,255,255,.12);color:#eaf3f4">index.html</code> is enough. The git route is equivalent and keeps the move in your history.')
+   + '</p>'
+   + '<p class="rolllab">' + (promote ? 'Swap it in' : 'Copy the snapshot') + '</p>'
+   + cmd(cpCmd)
+   + (gitCmd ? '<p class="rolllab">Or take it from the tag</p>' + cmd(gitCmd) : '')
+   + '<p class="rolllab">See exactly what would change first</p>'
+   + cmd('diff <(git show ' + (v.tag||'HEAD') + ':' + gp + ') index.html | head')
+   + '</div></div>';
+ }
+
+ html += '<p class="foot">Snapshots live in <code>versions/</code> and are byte-for-byte copies \\u2014 nothing is reconstructed, '
+  + 'so what you preview is exactly what you would roll back to. '
+  + 'Regenerate this panel after adding a version with <code>python3 pipeline/build_history.py</code>; '
+  + 'the version list lives at the top of that file. '
+  + 'Machine-readable index: <code>versions/manifest.json</code>.</p>';
+
+ $('pwrap').innerHTML = html;
+ const fr = $('fr'), ld = $('ld');
+ if(fr) fr.addEventListener('load', () => ld && ld.classList.add('gone'));
+ $('pane').scrollTop = 0;
+}
+function cmd(text){
+ return '<div class="cmd"><code>' + esc(text) + '</code><button data-copy="' + esc(text) + '">copy</button></div>';
+}
+
+/* ---------------- events ---------------- */
+document.addEventListener('click', function(e){
+ const v = e.target.closest('[data-v]');
+ if(v){ current = v.dataset.v; drawRail(); draw(); return; }
+ const p = e.target.closest('[data-vp]');
+ if(p){ vpWidth = +p.dataset.vp; draw(); return; }
+ const c = e.target.closest('[data-copy]');
+ if(c){
+  const txt = c.dataset.copy;
+  const done = () => { c.textContent = 'copied'; c.classList.add('done');
+                       setTimeout(() => { c.textContent = 'copy'; c.classList.remove('done'); }, 1400); };
+  if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done, fallback); }
+  else fallback();
+  function fallback(){
+   const ta = document.createElement('textarea');
+   ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+   document.body.appendChild(ta); ta.select();
+   try{ document.execCommand('copy'); done(); }catch(err){}
+   document.body.removeChild(ta);
+  }
+ }
+});
+/* arrow keys step through versions */
+document.addEventListener('keydown', function(e){
+ if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+ if(e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+ const i = ALL.findIndex(v => v.id === current);
+ const n = e.key === 'ArrowDown' ? i + 1 : i - 1;
+ if(n < 0 || n >= ALL.length) return;
+ e.preventDefault(); current = ALL[n].id; drawRail(); draw();
+});
+
+drawRail(); draw();
+</script>
+</body>
+</html>
+"""
+
+HTML = HTML.replace("__MANIFEST__", json.dumps(manifest, ensure_ascii=False))
+HTML = HTML.replace("__TOTAL__", str(TOTAL_MB))
+io.open(os.path.join(ROOT, "history.html"), "w", encoding="utf8").write(HTML)
+
+print("versions/manifest.json  %d versions, %d references" % (len(VERSIONS), len(REFS)))
+print("history.html            %.1f KB, %.1f MB of snapshots indexed" % (len(HTML)/1024.0, TOTAL_MB))
+for v in VERSIONS + REFS:
+    print("   %-14s %5.2f MB  %s" % (v["id"], v["mb"], v["file"]))
