@@ -144,50 +144,45 @@ button{font-family:inherit;cursor:pointer}
 @media(max-width:1240px){.fnote{display:none}}
 
 /* ---------------- map ----------------
-   Positions come from the force simulation, so nothing here animates position.
-   Only colour, radius and opacity transition. */
-.map{contain:strict}
-.map .edge{fill:none;stroke:var(--line);stroke-width:1;opacity:.16;transition:opacity .25s,stroke .25s}
-.map .edge.on{opacity:.6;stroke:var(--teal);stroke-width:1.4}
+   Three fixed columns. Nothing animates position; nothing moves on its own. */
+.map .edge{fill:none;stroke:#e3eaeb;stroke-width:1;transition:stroke .15s,stroke-width .15s}
+.map .edge.on{stroke:var(--teal);stroke-width:1.6}
 .map .edge.lo{stroke:var(--low)}
 .map .edge.hi{stroke:var(--high)}
-.map .edge.hot{opacity:.95;stroke-width:2.2}
-.map .edge.pulse{stroke-dasharray:5 9;animation:flow 1.5s linear infinite}
-@keyframes flow{to{stroke-dashoffset:-14}}
-.map .e3{fill:none;stroke:var(--warm);stroke-width:1.1;opacity:.55}
+.map .edge.hot{stroke-width:2.6}
+.map .e3{fill:none;stroke:var(--warm);stroke-width:1.4}
 
-.map .hub circle{fill:#fff;stroke:var(--slate);stroke-width:1.6;opacity:.55}
-.map .hub text{font-family:var(--font-mono);font-size:8px;fill:var(--dim);text-anchor:middle;letter-spacing:.07em}
+.map .colhd{font-family:var(--font-mono);font-size:9px;fill:var(--dim);letter-spacing:.09em}
+.map .grphd{font-family:var(--font-mono);font-size:8.5px;fill:#a9b6b8;letter-spacing:.07em}
+.map .rule{stroke:var(--line);stroke-width:1}
+.map .rule.dash{stroke-dasharray:3 3}
+.map .divlab{font-family:var(--font-mono);font-size:8.5px;fill:var(--accent);letter-spacing:.05em}
 
-.map .nd circle{transition:fill .25s,stroke .25s,stroke-width .25s,r .35s cubic-bezier(.3,1.2,.4,1)}
-.map .nd{cursor:pointer}
-/* markers */
-.map .m circle{fill:#fff;stroke:#c3ced0;stroke-width:1.4}
-.map .m.lo circle{fill:#dff0f3;stroke:var(--low);stroke-width:2.6}
-.map .m.hi circle{fill:#fbe6da;stroke:var(--high);stroke-width:2.6}
-.map .m.sel circle,.map .m.hot circle{stroke-width:3.4}
-.map .m .dot{font-family:var(--font-mono);font-size:8px;fill:var(--dim);text-anchor:middle;pointer-events:none}
-.map .m.lo .dot{fill:var(--low)}.map .m.hi .dot{fill:var(--high)}
-/* concerns */
-.map .c circle{fill:#fff;stroke:#dde5e6;stroke-width:1.2}
-.map .c.on circle{fill:var(--aqua);stroke:var(--teal);stroke-width:2.2}
-.map .c.added circle{fill:#fdf1ea;stroke:var(--accent);stroke-width:2.2;stroke-dasharray:3.5 2.5}
-.map .c.sel circle,.map .c.hot circle{stroke-width:3.4}
-/* follow-up tests */
-.map .t circle{fill:#fff;stroke:var(--warm);stroke-width:1.5}
+.map .row{cursor:pointer}
+.map .row .hitbox{fill:transparent}
+.map .row:hover .hitbox{fill:rgba(0,115,133,.055)}
+.map .row.sel .hitbox{fill:rgba(184,74,14,.09)}
 
-.map .lbl{font-family:var(--font-sans);font-size:10.5px;fill:var(--slate);pointer-events:none;
- paint-order:stroke;stroke:var(--paper);stroke-width:3.5px;stroke-linejoin:round}
-.map .lbl.dim{fill:var(--muted);font-size:9.5px}
-.map .lbl.strong{font-weight:700}
-.map .lbl.acc{fill:var(--accent)}
-.map .lbl.tl{fill:var(--muted);font-size:9.5px}
-.map .lbl.mk{font-family:var(--font-mono);font-size:9.5px;fill:var(--muted)}
-.map .lbl.mk.lo{fill:var(--low)}.map .lbl.mk.hi{fill:var(--high)}
+.map .dot{fill:#fff;stroke:#c6d0d1;stroke-width:1.4;transition:fill .15s,stroke .15s,stroke-width .15s}
+.map .row.lo .dot{fill:#dff0f3;stroke:var(--low);stroke-width:2.6}
+.map .row.hi .dot{fill:#fbe6da;stroke:var(--high);stroke-width:2.6}
+.map .row.on  .dot{fill:var(--aqua);stroke:var(--teal);stroke-width:2.4}
+.map .row.added .dot{fill:#fdf1ea;stroke:var(--accent);stroke-width:2.4;stroke-dasharray:3 2}
+.map .row.tst .dot{fill:#fff;stroke:var(--warm);stroke-width:1.8}
+.map .row.sel .dot,.map .row.hot .dot{stroke-width:3.4}
 
-.mapnote{position:absolute;left:50%;transform:translateX(-50%);bottom:8px;font-family:var(--font-mono);
- font-size:9.5px;color:#b4c0c2;letter-spacing:.06em;pointer-events:none;z-index:2;white-space:nowrap}
-@media(prefers-reduced-motion:reduce){.map .edge.pulse{animation:none}}
+.map .lb{font-family:var(--font-sans);font-size:11px;fill:var(--slate)}
+.map .lb.mut{fill:#93a2a4;font-size:10px}
+.map .lb.on{font-weight:700;fill:var(--slate)}
+.map .lb.acc{fill:var(--accent);font-weight:700}
+.map .lb.lo{fill:var(--low);font-weight:700}
+.map .lb.hi{fill:var(--high);font-weight:700}
+.map .cnt{font-family:var(--font-mono);font-size:8.5px;fill:#a9b6b8}
+.map .hint{font-family:var(--font-sans);font-size:11px;fill:#a9b6b8;font-style:italic}
+.map .cnt.on{fill:var(--teal)}
+
+.mapnote{position:absolute;left:50%;transform:translateX(-50%);bottom:6px;font-family:var(--font-mono);
+ font-size:9px;color:#b4c0c2;letter-spacing:.06em;pointer-events:none;z-index:2;white-space:nowrap}
 
 @media(max-width:1080px){
  .det{display:none}
@@ -268,268 +263,192 @@ function activeConcerns(){
  return out;                    // cid -> [slugs implicating it]  ([] = added by hand)
 }
 
-/* ---------- organic force layout ----------------------------------------
-   Nodes float freely and settle where there is room, instead of sitting on a
-   fixed ring. Three soft rules do the work:
-     1. a radial band per role — markers inward, live concerns mid, dormant
-        concerns pushed out to the edge, follow-up tests furthest out
-     2. concerns are pulled toward the markers that implicate them
-     3. everything repels everything, and nothing may enter a panel
-   A little ambient noise keeps it breathing at rest. Because layout is a
-   simulation rather than a lookup, adding a concern does not renumber a ring —
-   the system just makes room.                                                */
-const REDUCED = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches);
-let BOX = null, NODES = [], NBY = {}, tickN = 0;
+/* ---------- layout: three fixed columns -----------------------------------
+   Panel markers on the left, every concern in the middle, follow-up tests on
+   the right. Deterministic — same inputs, same pixels. Nothing drifts, nothing
+   animates position, and the columns are sized from the actual free rectangle
+   so the full width and height are used.
+
+   Concerns are ordered by the average row of the markers that point at them
+   (barycentre ordering), which is the standard way to keep edges from crossing.
+   The ones no panel marker can reach sit below a divider — that split is the
+   missing-data story, drawn rather than described.                            */
+let BOX = null, LAYOUT = null;
 
 function box(){
  const stg = $('stage'), W = stg.clientWidth, H = stg.clientHeight;
  const g = 14, railW = 306, detW = 344, footH = 74, wide = W > 1080;
- const L = (wide ? g + railW + g : g) + 6;
- const R = W - (wide ? g + detW + g : g) - 6;
- const T = g + 6, B = H - (wide ? footH + g*2 : g) - 6;
- // bands are elliptical, not circular: the free area is far wider than it is
- // tall, and a circle would leave a third of the screen empty
- return { W:W, H:H, L:L, R:R, T:T, B:B, cx:(L+R)/2, cy:(T+B)/2,
-          hw: Math.max(90, (R-L)/2), hh: Math.max(80, (B-T)/2),
-          maxR: Math.max(110, Math.min((R-L)/2, (B-T)/2)) };
+ const L = (wide ? g + railW + g : g) + 10;
+ const R = W - (wide ? g + detW + g : g) - 10;
+ const T = 30, B = H - (wide ? footH + g*2 : g) - 22;
+ return { W:W, H:H, L:L, R:R, T:T, B:B, w:R-L, h:B-T };
 }
 
-function ensureNodes(){
- const b = BOX;
- // markers: seeded on a loose arc per panel so the first frame already reads
- if(!NODES.length){
-  const tot = SLUGS.length; let a0 = -90, gapDeg = 12;
-  const span = 360 - gapDeg * D.panels.length;
-  D.panels.forEach(p => {
-   const arc = span * p.slugs.length / tot;
-   p.slugs.forEach((sl, j) => {
-    const a = (a0 + arc * (j + 0.5) / p.slugs.length) * Math.PI/180;
-    NODES.push({ id:'m:'+sl, kind:'m', ref:sl, lobe:a,
-                 x: b.cx + Math.cos(a)*b.hw*0.34, y: b.cy + Math.sin(a)*b.hh*0.34,
-                 vx:0, vy:0, r:9, ph: Math.random()*6.283 });
-   });
-   a0 += arc + gapDeg;
-  });
-  CIDS.forEach((ci, i) => {
-   const a = (i / CIDS.length) * 6.283;
-   NODES.push({ id:'c:'+ci, kind:'c', ref:ci, lobe:a,
-                x: b.cx + Math.cos(a)*b.hw*0.82, y: b.cy + Math.sin(a)*b.hh*0.82,
-                vx:0, vy:0, r:4, ph: Math.random()*6.283 });
-  });
-  NODES.forEach(n => NBY[n.id] = n);
- }
- // follow-up test nodes exist only while a concern is open; they emanate from it
- const selC = st.sel && st.sel.t === 'c' ? +st.sel.v : null;
- const want = {};
- if(selC !== null) (C[selC].next || []).forEach((t, j) => want['t:'+selC+':'+j] = t);
- NODES = NODES.filter(n => n.kind !== 't' || want[n.id]);
- NODES.forEach(n => { if(n.kind === 't') delete want[n.id]; });
- Object.keys(want).forEach(id => {
-  const src = NBY['c:'+selC];
-  const n = { id:id, kind:'t', ref:want[id], from:selC, lobe:0,
-              x: src.x + (Math.random()-.5)*12, y: src.y + (Math.random()-.5)*12,
-              vx:0, vy:0, r:4.5, ph: Math.random()*6.283 };
-  NODES.push(n); NBY[id] = n;
- });
- NODES.forEach(n => NBY[n.id] = n);
-}
-
-/* target radius and size per node, from what is live right now */
-function targets(){
+function buildLayout(){
  const b = BOX, act = activeConcerns();
- const selM = st.sel && st.sel.t === 'm' ? st.sel.v : null;
  const selC = st.sel && st.sel.t === 'c' ? +st.sel.v : null;
- NODES.forEach(n => {
-  if(n.kind === 'm'){
-   const v = st.val[n.ref];
-   n.live = v !== 0 || selM === n.ref;
-   n.rT = v !== 0 ? 15 : selM === n.ref ? 14 : 10.5;
-   n.bandN = v !== 0 ? 0.28 : 0.36;
-  } else if(n.kind === 'c'){
-   const from = act[n.ref];
-   n.live = !!from;
-   const k = from ? from.length : 0;
-   n.rT = from ? Math.min(15, 7.5 + k * 2) : (selC === n.ref ? 8 : 3.6);
-   // live concerns come inward where there is room to label them; dormant ones drift out
-   n.bandN = from ? 0.64 : 0.95;
-   if(selC === n.ref){ n.rT = Math.max(n.rT, 13); n.bandN = 0.58; }
-  } else {
-   n.live = true; n.rT = 5.5; n.bandN = 0.93;
-  }
- });
-}
+ const open = selC !== null && (C[selC].next || []).length ? selC : null;
 
-function step(){
- const b = BOX, act = activeConcerns();
- tickN++;
- const t = tickN * 0.006;
+ // column x positions as fractions of the free width
+ // column positions are constants — they do not move when a concern opens,
+ // so nothing on screen shifts under the cursor
+ const xM = b.L + b.w * 0.215;   // marker dots
+ const xC = b.L + b.w * 0.395;   // concern dots
+ const xT = b.L + b.w * 0.775;   // follow-up dots
+ const xCend = xT - 26;          // right edge of the concern column
 
- NODES.forEach(n => {
-  n.r += (n.rT - n.r) * 0.12;
-
-  // 1. elliptical band — normalise into unit space, correct, scale back out
-  const ex = (n.x - b.cx) / b.hw, ey = (n.y - b.cy) / b.hh;
-  const ed = Math.hypot(ex, ey) || 1e-4;
-  const pull = (n.bandN - ed) * (n.kind === 'm' ? 0.16 : 0.12);
-  n.vx += (ex/ed) * pull * b.hw; n.vy += (ey/ed) * pull * b.hh;
-
-  // 2. markers hold their panel lobe loosely so CBC/CMP/lipids stay grouped
-  if(n.kind === 'm'){
-   const tx = b.cx + Math.cos(n.lobe) * b.hw * n.bandN,
-         ty = b.cy + Math.sin(n.lobe) * b.hh * n.bandN;
-   n.vx += (tx - n.x) * 0.012; n.vy += (ty - n.y) * 0.012;
-  }
-
-  // 3. ambient drift — small, slow, unique phase per node
-  if(!REDUCED){
-   n.vx += Math.cos(t + n.ph) * 0.035;
-   n.vy += Math.sin(t * 1.13 + n.ph * 1.7) * 0.035;
-  }
+ // ---- markers: three panel groups stacked down the full height
+ const nGrp = D.panels.length, headH = 15, grpGap = 12;
+ const mAvail = b.h - nGrp * headH - (nGrp - 1) * grpGap;
+ const mRow = mAvail / SLUGS.length;
+ const mk = {}; let y = b.T, groups = [];
+ D.panels.forEach(p => {
+  groups.push({ label: p.name.replace(/\s*\(.*\)/, ''), y: y + 10, n: p.slugs.length });
+  y += headH;
+  p.slugs.forEach(sl => { mk[sl] = y + mRow / 2; y += mRow; });
+  y += grpGap;
  });
 
- // 4. concerns pulled toward the markers implicating them
- NODES.forEach(n => {
-  if(n.kind !== 'c') return;
-  const from = act[n.ref] || (n.live ? [] : C[n.ref].from);
-  const w = n.live ? 0.020 : 0.004;
-  let sx = 0, sy = 0, k = 0;
-  (from.length ? from : C[n.ref].from).forEach(sl => {
-   const m = NBY['m:'+sl]; if(!m) return; sx += m.x; sy += m.y; k++;
-  });
-  if(k){ n.vx += (sx/k - n.x) * w; n.vy += (sy/k - n.y) * w; }
+ // ---- concerns: reachable first, ordered by the mean row of their markers
+ const reach = [], unreach = [];
+ CIDS.forEach(ci => {
+  const from = C[ci].from.filter(sl => mk[sl] != null);
+  if(from.length){
+   let sum = 0; from.forEach(sl => sum += mk[sl]);
+   reach.push({ ci: ci, bary: sum / from.length });
+  } else unreach.push({ ci: ci, bary: 1e9 });
  });
- // follow-up tests hang off their concern
- NODES.forEach(n => {
-  if(n.kind !== 't') return;
-  const c = NBY['c:'+n.from]; if(!c) return;
-  const a = Math.atan2((c.y - b.cy)/b.hh, (c.x - b.cx)/b.hw);
-  const tx = b.cx + Math.cos(a) * b.hw * 0.94, ty = b.cy + Math.sin(a) * b.hh * 0.94;
-  n.vx += (tx - n.x) * 0.018; n.vy += (ty - n.y) * 0.018;
- });
+ reach.sort((a, c) => a.bary - c.bary || a.ci - c.ci);
+ unreach.sort((a, c) => C[a.ci].label.localeCompare(C[c.ci].label));
 
- // 5. repulsion + hard collision
- for(let i = 0; i < NODES.length; i++){
-  const a = NODES[i];
-  for(let j = i+1; j < NODES.length; j++){
-   const c = NODES[j];
-   let dx = c.x - a.x, dy = c.y - a.y;
-   let d2 = dx*dx + dy*dy;
-   if(d2 < 1e-6){ dx = Math.random()-.5; dy = Math.random()-.5; d2 = 1; }
-   const d = Math.sqrt(d2);
-   const want = a.r + c.r + 13;
-   if(d < want * 2.4){
-    const f = Math.min(2.2, (want*2.4 - d) * 0.020) / d;
-    a.vx -= dx*f; a.vy -= dy*f; c.vx += dx*f; c.vy += dy*f;
-   }
-   if(d < want){                        // positional correction, no overlap ever
-    const push = (want - d) / d * 0.5;
-    a.x -= dx*push; a.y -= dy*push; c.x += dx*push; c.y += dy*push;
-   }
-  }
+ const divH = 17;
+ const cRow = (b.h - divH) / CIDS.length;
+ const cn = {}; let cy = b.T, divY = 0;
+ reach.forEach(o => { cn[o.ci] = cy + cRow / 2; cy += cRow; });
+ divY = cy + divH / 2; cy += divH;
+ unreach.forEach(o => { cn[o.ci] = cy + cRow / 2; cy += cRow; });
+
+ // ---- follow-up tests for the open concern, centred on the full height
+ const ts = [];
+ if(open !== null){
+  const list = C[open].next || [], n = list.length;
+  const span = Math.min(b.h, n * 34), tRow = span / n, y0 = b.T + (b.h - span) / 2;
+  list.forEach((t, j) => ts.push({ t: t, y: y0 + tRow * (j + 0.5) }));
  }
 
- // 6. integrate, damp, and keep everything inside the free area
- NODES.forEach(n => {
-  n.vx *= 0.84; n.vy *= 0.84;
-  const cap = 3.2, sp = Math.hypot(n.vx, n.vy);
-  if(sp > cap){ n.vx = n.vx/sp*cap; n.vy = n.vy/sp*cap; }
-  n.x += n.vx; n.y += n.vy;
-  const m = n.r + 3;
-  if(n.x < b.L+m){ n.x = b.L+m; n.vx = Math.abs(n.vx)*0.4; }
-  if(n.x > b.R-m){ n.x = b.R-m; n.vx = -Math.abs(n.vx)*0.4; }
-  if(n.y < b.T+m){ n.y = b.T+m; n.vy = Math.abs(n.vy)*0.4; }
-  if(n.y > b.B-m){ n.y = b.B-m; n.vy = -Math.abs(n.vy)*0.4; }
- });
+ // type scales with the row height so nothing collides on a short window
+ const mFs = Math.max(8.5, Math.min(11.5, mRow * 0.58));
+ const cFs = Math.max(8,   Math.min(11,   cRow * 0.72));
+ return { xM:xM, xC:xC, xT:xT, xCend:xCend, mk:mk, cn:cn, ts:ts, groups:groups,
+          mRow:mRow, cRow:cRow, mFs:mFs, cFs:cFs, divY:divY, open:open,
+          nReach:reach.length, nUnreach:unreach.length };
 }
 
-/* ---------- labels: greedy, importance-first, never overlapping ---------- */
-function placeLabels(cands){
- const placed = [], out = [];
- const hit = (x,y,w,h) => placed.some(p =>
-   !(x+w < p.x - 3 || x > p.x+p.w + 3 || y+h < p.y - 2 || y > p.y+p.h + 2));
- cands.forEach(c => {
-  const w = c.text.length * c.size * 0.55, h = c.size * 1.15;
-  const g = c.r + 6;
-  const tries = [
-   [c.x + g, c.y + h*0.32, 'start'], [c.x - g - w, c.y + h*0.32, 'start'],
-   [c.x - w/2, c.y - g, 'start'],    [c.x - w/2, c.y + g + h*0.8, 'start'],
-  ];
-  for(let i = 0; i < tries.length; i++){
-   const [x, y, an] = tries[i];
-   if(x < BOX.L - 4 || x + w > BOX.R + 4 || y < BOX.T + 4 || y > BOX.B) continue;
-   if(hit(x, y - h*0.8, w, h)) continue;
-   placed.push({x:x, y:y - h*0.8, w:w, h:h});
-   out.push({ x:x, y:y, text:c.text, cls:c.cls, size:c.size, anchor:an });
-   return;
-  }
- });
- return out;
-}
+function clip(t, n){ return t.length > n ? t.slice(0, n - 1) + '…' : t; }
 
 function draw(){
- const b = BOX, act = activeConcerns();
+ const b = BOX, L = LAYOUT, act = activeConcerns();
  const selM = st.sel && st.sel.t === 'm' ? st.sel.v : null;
  const selC = st.sel && st.sel.t === 'c' ? +st.sel.v : null;
- let h = '', cands = [];
+ let h = '';
 
- // edges
- NODES.forEach(n => {
-  if(n.kind !== 'm') return;
-  const v = st.val[n.ref];
-  M[n.ref].k.forEach(ci => {
-   const c = NBY['c:'+ci]; if(!c) return;
-   const live = v !== 0 || selC === ci || selM === n.ref;
-   const cls = ['edge', live?'on':'', v<0?'lo':v>0?'hi':'',
-                (selC===ci||selM===n.ref||st.hot===n.ref)?'hot':'',
-                (v!==0 && !REDUCED)?'pulse':''].filter(Boolean).join(' ');
-   const mx = (n.x+c.x)/2 + (b.cx-(n.x+c.x)/2)*0.22, my = (n.y+c.y)/2 + (b.cy-(n.y+c.y)/2)*0.22;
-   h += '<path class="'+cls+'" d="M'+n.x.toFixed(1)+' '+n.y.toFixed(1)+'Q'+mx.toFixed(1)+' '+my.toFixed(1)
-     +' '+c.x.toFixed(1)+' '+c.y.toFixed(1)+'"/>';
+ // ---- column headers
+ h += '<text class="colhd" x="'+(b.L).toFixed(0)+'" y="'+(b.T-13)+'">YOUR ANNUAL PANEL &middot; '+SLUGS.length+'</text>'
+   +  '<text class="colhd" x="'+(L.xC+11).toFixed(0)+'" y="'+(b.T-13)+'">WHAT THEY CAN POINT AT &middot; '+CIDS.length+'</text>'
+   +  '<text class="colhd" x="'+(L.xT+11).toFixed(0)+'" y="'+(b.T-13)+'">WOULD FOLLOW IT UP</text>';
+ if(L.open === null){
+  const hy = b.T + b.h/2;
+  h += '<line class="rule dash" x1="'+(L.xT).toFixed(1)+'" y1="'+(b.T+4).toFixed(1)+'" x2="'+(L.xT).toFixed(1)+'" y2="'+(b.B-4).toFixed(1)+'"/>'
+    +  '<text class="hint" x="'+(L.xT+13).toFixed(1)+'" y="'+(hy-7).toFixed(1)+'">Open a concern in the</text>'
+    +  '<text class="hint" x="'+(L.xT+13).toFixed(1)+'" y="'+(hy+7).toFixed(1)+'">middle column to see what</text>'
+    +  '<text class="hint" x="'+(L.xT+13).toFixed(1)+'" y="'+(hy+21).toFixed(1)+'">would follow it up.</text>';
+ }
+
+ // ---- edges marker -> concern (dormant first so live ones draw on top)
+ const eds = [];
+ SLUGS.forEach(sl => {
+  const y1 = L.mk[sl], v = st.val[sl];
+  M[sl].k.forEach(ci => {
+   const y2 = L.cn[ci]; if(y2 == null) return;
+   const live = v !== 0 || selC === ci || selM === sl;
+   eds.push({ live: live, d:'M'+L.xM.toFixed(1)+' '+y1.toFixed(1)
+      +'C'+((L.xM+L.xC)/2).toFixed(1)+' '+y1.toFixed(1)+','
+      +((L.xM+L.xC)/2).toFixed(1)+' '+y2.toFixed(1)+','+L.xC.toFixed(1)+' '+y2.toFixed(1),
+      cls:['edge', live?'on':'', v<0?'lo':v>0?'hi':'',
+           (selC===ci||selM===sl||st.hot===sl||st.hot===('c'+ci))?'hot':''].filter(Boolean).join(' ') });
   });
  });
- NODES.forEach(n => {
-  if(n.kind !== 't') return;
-  const c = NBY['c:'+n.from]; if(!c) return;
-  h += '<path class="e3" d="M'+c.x.toFixed(1)+' '+c.y.toFixed(1)+'L'+n.x.toFixed(1)+' '+n.y.toFixed(1)+'"/>';
+ eds.sort((a,c) => (a.live?1:0) - (c.live?1:0));
+ eds.forEach(e => { h += '<path class="'+e.cls+'" d="'+e.d+'"/>'; });
+
+ // ---- edges concern -> follow-up
+ if(L.open !== null){
+  const y1 = L.cn[L.open];
+  L.ts.forEach(o => {
+   h += '<path class="e3" d="M'+L.xC.toFixed(1)+' '+y1.toFixed(1)
+     +'C'+((L.xC+L.xT)/2).toFixed(1)+' '+y1.toFixed(1)+','
+     +((L.xC+L.xT)/2).toFixed(1)+' '+o.y.toFixed(1)+','+L.xT.toFixed(1)+' '+o.y.toFixed(1)+'"/>';
+  });
+ }
+
+ // ---- marker rows
+ L.groups.forEach(g => {
+  h += '<text class="grphd" x="'+b.L.toFixed(0)+'" y="'+g.y.toFixed(0)+'">'+esc(g.label.toUpperCase())+'</text>';
+ });
+ const mLabW = L.xM - b.L - 14;
+ SLUGS.forEach(sl => {
+  const y = L.mk[sl], v = st.val[sl];
+  const cls = ['row','mkr', v<0?'lo':v>0?'hi':'', selM===sl?'sel':'', st.hot===sl?'hot':''].filter(Boolean).join(' ');
+  const nm = M[sl].name.split('[')[0].trim();
+  h += '<g class="'+cls+'" data-mk="'+sl+'"><title>'+esc(M[sl].name)+'</title>'
+    +  '<rect class="hitbox" x="'+b.L.toFixed(0)+'" y="'+(y-L.mRow/2).toFixed(1)+'" width="'+(L.xM-b.L+9).toFixed(0)+'" height="'+L.mRow.toFixed(1)+'" rx="4"/>'
+    +  '<text class="lb'+(v<0?' lo':v>0?' hi':'')+'" x="'+(L.xM-11).toFixed(1)+'" y="'+(y+L.mFs*0.34).toFixed(1)
+    +  '" text-anchor="end" style="font-size:'+L.mFs.toFixed(1)+'px">'
+    +  esc(clip(nm, Math.max(10, Math.floor(mLabW / (L.mFs*0.56))))) + (v!==0 ? (v<0?' ▼':' ▲') : '') + '</text>'
+    +  '<circle class="dot" cx="'+L.xM.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="'+(v!==0?5.6:4.2)+'"/>'
+    +  '</g>';
  });
 
- h += '<g class="hub"><circle cx="'+b.cx.toFixed(1)+'" cy="'+b.cy.toFixed(1)+'" r="20"/>'
-   +  '<text x="'+b.cx.toFixed(1)+'" y="'+(b.cy+3).toFixed(1)+'">PANEL</text></g>';
+ // ---- divider between reachable and unreachable concerns
+ h += '<line class="rule dash" x1="'+(L.xC-8).toFixed(1)+'" y1="'+L.divY.toFixed(1)+'" x2="'+L.xCend.toFixed(1)+'" y2="'+L.divY.toFixed(1)+'"/>'
+   +  '<text class="divlab" x="'+(L.xC+11).toFixed(1)+'" y="'+(L.divY-5).toFixed(1)+'">'
+   +  '↓ '+L.nUnreach+' CONCERNS NO PANEL MARKER CAN REACH</text>';
 
- // nodes, drawn dormant-first so live ones sit on top
- const order = NODES.slice().sort((p,q) => (p.live?1:0) - (q.live?1:0));
- order.forEach(n => {
-  if(n.kind === 'm'){
-   const v = st.val[n.ref];
-   const cls = ['nd','m', v<0?'lo':v>0?'hi':'', selM===n.ref?'sel':'', st.hot===n.ref?'hot':''].filter(Boolean).join(' ');
-   h += '<g class="'+cls+'" data-mk="'+n.ref+'"><title>'+esc(M[n.ref].name)+'</title>'
-     +  '<circle cx="'+n.x.toFixed(1)+'" cy="'+n.y.toFixed(1)+'" r="'+n.r.toFixed(1)+'"/>'
-     +  (v!==0 ? '<text class="dot" x="'+n.x.toFixed(1)+'" y="'+(n.y+3).toFixed(1)+'">'+(v<0?'▼':'▲')+'</text>' : '')
-     +  '</g>';
-   cands.push({ p: v!==0?0:selM===n.ref?0:st.hot===n.ref?1:4,
-                x:n.x, y:n.y, r:n.r, text:M[n.ref].abbr, size:v!==0?11:9.5,
-                cls:'lbl mk'+(v<0?' lo':v>0?' hi':'') });
-  } else if(n.kind === 'c'){
-   const from = act[n.ref], added = !!st.added[n.ref];
-   const cls = ['nd','c', from?'on':'', added?'added':'', selC===n.ref?'sel':'', st.hot===('c'+n.ref)?'hot':''].filter(Boolean).join(' ');
-   h += '<g class="'+cls+'" data-cn="'+n.ref+'"><title>'+esc(C[n.ref].label)+'</title>'
-     +  '<circle cx="'+n.x.toFixed(1)+'" cy="'+n.y.toFixed(1)+'" r="'+n.r.toFixed(1)+'"/></g>';
-   if(from || selC===n.ref || st.hot===('c'+n.ref))
-    cands.push({ p: selC===n.ref?0:st.hot===('c'+n.ref)?1:2,
-                 x:n.x, y:n.y, r:n.r, text:C[n.ref].label, size:11,
-                 cls:'lbl strong'+(added?' acc':'') });
-  } else {
-   h += '<g class="nd t"><title>'+esc(n.ref.n)+'</title>'
-     +  '<circle cx="'+n.x.toFixed(1)+'" cy="'+n.y.toFixed(1)+'" r="'+n.r.toFixed(1)+'"/></g>';
-   cands.push({ p:3, x:n.x, y:n.y, r:n.r,
-                text: n.ref.n.length>28 ? n.ref.n.slice(0,26)+'…' : n.ref.n, size:9.5, cls:'lbl tl' });
-  }
+ // ---- concern rows
+ const cLabMax = Math.max(8, Math.floor((L.xCend - L.xC - 76) / (L.cFs * 0.56)));
+ CIDS.forEach(ci => {
+  const y = L.cn[ci], from = act[ci], added = !!st.added[ci];
+  const cls = ['row','cnc', from?'on':'', added?'added':'', selC===ci?'sel':'',
+               st.hot===('c'+ci)?'hot':''].filter(Boolean).join(' ');
+  const lab = ['lb', from?'on':'mut', added?'acc':''].filter(Boolean).join(' ');
+  h += '<g class="'+cls+'" data-cn="'+ci+'"><title>'+esc(C[ci].label)+' — '+nf(C[ci].nOutside)+' follow-ups outside the panel</title>'
+    +  '<rect class="hitbox" x="'+(L.xC-9).toFixed(1)+'" y="'+(y-L.cRow/2).toFixed(1)+'" width="'+(L.xCend-L.xC+9).toFixed(1)+'" height="'+L.cRow.toFixed(1)+'" rx="4"/>'
+    +  '<circle class="dot" cx="'+L.xC.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="'+(from?5.4:3.4)+'"/>'
+    +  '<text class="'+lab+'" x="'+(L.xC+12).toFixed(1)+'" y="'+(y+L.cFs*0.34).toFixed(1)
+    +  '" style="font-size:'+L.cFs.toFixed(1)+'px">'+esc(clip(C[ci].label, cLabMax))+'</text>';
+  if(from && from.length)
+   h += '<text class="cnt'+(from.length?' on':'')+'" x="'+(L.xCend-2).toFixed(1)+'" y="'+(y+L.cFs*0.34).toFixed(1)
+     +  '" text-anchor="end">'+from.length+'&#215;</text>';
+  h += '</g>';
  });
 
- cands.sort((a,c) => a.p - c.p);
- placeLabels(cands).forEach(l => {
-  h += '<text class="'+l.cls+'" x="'+l.x.toFixed(1)+'" y="'+l.y.toFixed(1)
-    +  '" style="font-size:'+l.size+'px">'+esc(l.text)+'</text>';
+ // ---- follow-up rows
+ const tw = b.R - L.xT - 13;
+ const tFs = Math.max(8.5, Math.min(11, tw / 15));
+ L.ts.forEach(o => {
+  // the meta line is dropped rather than allowed to run past the column
+  let meta = o.t.v ? 'SOURCE-QUOTED' : 'AI-WRITTEN';
+  const withG = meta + (o.t.g ? ' · ' + o.t.g.toUpperCase() : '');
+  if(withG.length * 8.5 * 0.56 <= tw) meta = withG;
+  const showMeta = L.ts.length <= 10 && meta.length * 8.5 * 0.56 <= tw;
+  h += '<g class="row tst"><title>'+esc(o.t.n)+' — '+esc(o.t.g)+'</title>'
+    +  '<circle class="dot" cx="'+L.xT.toFixed(1)+'" cy="'+o.y.toFixed(1)+'" r="4.4"/>'
+    +  '<text class="lb" x="'+(L.xT+11).toFixed(1)+'" y="'+(o.y+tFs*0.34).toFixed(1)
+    +  '" style="font-size:'+tFs.toFixed(1)+'px">'
+    +  esc(clip(o.t.n, Math.max(10, Math.floor(tw / (tFs*0.56))))) + '</text>'
+    +  (showMeta ? '<text class="cnt" x="'+(L.xT+11).toFixed(1)+'" y="'+(o.y+tFs*0.34+12).toFixed(1)+'">'
+                  + esc(meta) + '</text>' : '')
+    +  '</g>';
  });
 
  const m = $('map');
@@ -537,15 +456,7 @@ function draw(){
  m.innerHTML = h;
 }
 
-let raf = null;
-function loop(){
- step(); draw();
- raf = requestAnimationFrame(loop);
-}
-function restart(){
- BOX = box(); ensureNodes(); targets();
- if(!raf) loop();
-}
+function relayout(){ BOX = box(); LAYOUT = buildLayout(); draw(); }
 
 /* ---------- left rail ---------- */
 function drawRail(){
@@ -672,8 +583,8 @@ function drawChrome(){
   + nf(META.total)+' markers in the catalogue';
  const nOn = Object.keys(act).length;
  $('mapNote').textContent = nFlag
-  ? nOn + ' CONCERN' + (nOn===1?'':'S') + ' IN PLAY · ' + (META.nConcerns - nOn) + ' DORMANT AT THE EDGE'
-  : 'ALL ' + META.nConcerns + ' CONCERNS DORMANT · MARK A MARKER TO PULL ONE IN';
+  ? nOn + ' OF ' + META.nConcerns + ' CONCERNS RAISED BY WHAT YOU MARKED'
+  : 'MARK A MARKER LOW OR HIGH TO LIGHT UP WHAT IT CAN POINT AT';
  const off = Object.keys(act).reduce((a,ci)=>a+C[ci].nOutside, 0);
  $('fnote').innerHTML = nFlag
   ? 'You marked <b>'+nFlag+'</b> marker'+(nFlag===1?'':'s')+', raising <b>'+Object.keys(act).length
@@ -683,7 +594,7 @@ function drawChrome(){
     +'raise <b>'+META.panelConcerns+'</b> of '+META.nConcerns+' concerns. Mark something low or high to see the ripple.';
 }
 
-function render(){ BOX = box(); ensureNodes(); targets(); drawRail(); drawDetail(); drawChrome(); }
+function render(){ relayout(); drawRail(); drawDetail(); drawChrome(); }
 
 /* ---------- events ---------- */
 document.addEventListener('click', function(e){
@@ -705,24 +616,19 @@ document.addEventListener('click', function(e){
 $('map').addEventListener('mouseover', function(e){
  const mk = e.target.closest('[data-mk]'), cn = e.target.closest('[data-cn]');
  const v = mk ? mk.dataset.mk : cn ? 'c'+cn.dataset.cn : null;
- if(v !== st.hot){ st.hot = v; targets(); }
+ if(v !== st.hot){ st.hot = v; draw(); }
 });
-$('map').addEventListener('mouseleave', function(){ if(st.hot){ st.hot = null; targets(); } });
+$('map').addEventListener('mouseleave', function(){ if(st.hot){ st.hot = null; draw(); } });
 $('btnReset').addEventListener('click', function(){
  SLUGS.forEach(s => st.val[s] = 0); st.added = {}; st.sel = null; save(); render();
 });
 window.addEventListener('resize', function(){
  clearTimeout(window.__rt);
- window.__rt = setTimeout(function(){ BOX = box(); targets(); }, 120);
-});
-document.addEventListener('visibilitychange', function(){
- if(document.hidden){ if(raf){ cancelAnimationFrame(raf); raf = null; } }
- else if(!raf) loop();
+ window.__rt = setTimeout(relayout, 100);
 });
 document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && st.sel){ st.sel = null; render(); } });
 
 render();
-restart();
 </script>
 </body>
 </html>

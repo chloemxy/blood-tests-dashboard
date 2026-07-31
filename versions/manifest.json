@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-31T19:22:50Z",
+ "generated": "2026-07-31T19:33:44Z",
  "live": "index.html",
  "constraints": [
   [
@@ -17,11 +17,60 @@
  ],
  "feedback": [
   {
+   "id": "F9",
+   "date": "2026-07-31",
+   "who": "Chloe",
+   "title": "No floating. Use the space.",
+   "status": "addressed",
+   "versions": [
+    "v2.2"
+   ],
+   "quote": "uhm, this is ridiculous, no floating around, and improve the space utility",
+   "did": [
+    [
+     "All motion removed",
+     "addressed",
+     "The force simulation, the ambient drift and the animation loop are gone. Layout is a pure function of state and window size — same inputs, same pixels. Nothing moves unless you change something."
+    ],
+    [
+     "Circle replaced by columns",
+     "addressed",
+     "A radial layout inscribes a circle in a rectangle and wastes the corners. Three fixed columns — panel markers, concerns, follow-up tests — use the full width and height instead. <b>99–100% of the height and 91–96% of the width</b> now carry content, up from 30–42%."
+    ],
+    [
+     "Every concern is legible",
+     "addressed",
+     "All 47 are readable rows with full labels, instead of unlabelled dots that only got a name when there was room. The 26 markers show full names rather than abbreviations."
+    ],
+    [
+     "Edges ordered to avoid crossings",
+     "addressed",
+     "Concerns are sorted by the average row of the markers pointing at them — barycentre ordering, the standard method in layered graph drawing — so the connecting curves mostly run flat."
+    ],
+    [
+     "The missing-data split is drawn",
+     "addressed",
+     "A divider separates the 18 concerns your panel can reach from the <b>29 it cannot</b>, labelled in place. The gap is now a visible feature of the layout rather than a sentence somewhere."
+    ],
+    [
+     "Type scales to the row",
+     "addressed",
+     "Font size is derived from row height and labels are clipped to their column, so a 1200×700 window degrades instead of colliding. Zero label overlaps and zero overflow measured at five window sizes."
+    ],
+    [
+     "Columns hold still",
+     "addressed",
+     "Column x positions are constants, so opening a concern does not shift anything already on screen — the guarantee from [[F7]] holds again, which the floating version had quietly broken."
+    ]
+   ],
+   "open": null
+  },
+  {
    "id": "F8",
    "date": "2026-07-31",
    "who": "Chloe",
    "title": "Make the map readable — let it float and spread",
-   "status": "addressed",
+   "status": "partial",
    "versions": [
     "v2.1"
    ],
@@ -60,10 +109,15 @@
     [
      "Panels still never move",
      "addressed",
-     "The organic motion is confined to the map. Rails, detail slots and scroll gutters remain fixed exactly as [[F7]] asked — the two requirements do not conflict once motion is scoped to the canvas."
+     "The organic motion is confined to the map. Rails, detail slots and scroll gutters remain fixed."
+    ],
+    [
+     "The floating itself",
+     "open",
+     "Rejected on sight — see [[F9]]. Reading the brief as an invitation to build a physics simulation was the wrong call: drifting nodes make a diagram harder to read, not easier, and the radial form wasted the wide canvas. Replaced by a static column layout in v2.2."
     ]
    ],
-   "open": null
+   "open": "The readability goal was right; the means were wrong. v2.1 is kept in the panel as the record of a direction that did not work."
   },
   {
    "id": "F7",
@@ -352,12 +406,37 @@
  ],
  "versions": [
   {
+   "id": "v2.2",
+   "file": "v2.2-column-atlas.html",
+   "title": "Ripple atlas — three columns",
+   "date": "2026-07-31",
+   "source": "index-v3.html",
+   "status": "candidate",
+   "tag": "v2.2-column-atlas",
+   "gitpath": "index-v3.html",
+   "answers": [
+    "F9"
+   ],
+   "summary": "Static, deterministic, and dense: panel markers, concerns and follow-up tests as three fixed columns filling the whole canvas. No physics, no drift, no animation.",
+   "changes": [
+    "<b>Force simulation deleted.</b> Layout is a pure function of state and window size.",
+    "<b>Three fixed columns</b> — 26 panel markers grouped by CBC / CMP / lipid, all 47 concerns, and the follow-up tests for whichever concern is open.",
+    "<b>Every row is labelled.</b> Full marker names, full concern names, no culling.",
+    "<b>Barycentre ordering</b> puts each concern beside the markers that point at it, so edges run flat rather than crossing.",
+    "<b>A drawn divider</b> separates the 18 concerns the annual panel can reach from the 29 it cannot.",
+    "<b>Type scales with row height</b> and clips to its column: zero label overlaps and zero overflow at 1200×700 through 2560×1400.",
+    "Space used: 99–100% of the height, 91–96% of the width."
+   ],
+   "note": "Supersedes both v2.0 (fixed rings) and v2.1 (force layout). The rail, detail panel and the 29 sourced relationship notes are unchanged.",
+   "mb": 0.1
+  },
+  {
    "id": "v2.1",
    "file": "v2.1-organic-ripple.html",
    "title": "Ripple atlas — organic layout",
    "date": "2026-07-31",
    "source": "index-v3.html",
-   "status": "candidate",
+   "status": "superseded",
    "tag": "v2.1-organic-ripple",
    "gitpath": "index-v3.html",
    "answers": [
