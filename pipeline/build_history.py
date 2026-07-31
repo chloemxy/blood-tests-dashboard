@@ -37,6 +37,43 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F7",
+  "date": "2026-07-31",
+  "who": "Chloe",
+  "title": "A different atlas: start from the annual panel and ripple outward",
+  "status": "partial",
+  "versions": ["v2.0"],
+  "quote": "overall, the atlas should show the ripple effect of the abnormal findings user explore, not just data lists",
+  "quotes": [
+   "start with annual blood routine, show the potential concerns each/multiple markers can represent",
+   "for each concern raised, click into it should what additional blood tests need to be done to confirm",
+   "all interactions and panels and scroll bars are fixed and reserved space on screen, so any clicks and interaction user has won't shift content on screen",
+   "when biomarkers relate to one another, contain little fun fact on how they relate across physiology etc.",
+   "on top of what normal blood routine shows, user can add additional personal concerns of their health on another layer, which introduce more suggestions in blood works, related content might also reveal which tests have never been ordered but needed? which families of tests are incomplete? missing data is itself a clinical information to collect",
+  ],
+  "did": [
+   ("Starts from the annual panel", "addressed",
+    "All 26 markers of the CBC, CMP and lipid panel are the inner ring and the left rail. Each can be marked low or high; the ripple spreads from there."),
+   ("Concerns each marker can represent", "addressed",
+    "Derived from the catalogue's own concern tags: the 26 panel markers between them can raise <b>18 of 47</b> concerns. Calcium alone points at nine."),
+   ("Click a concern for what would follow it up", "addressed",
+    "Opening a concern fans its follow-up tests into an outer ring and lists them, ranked by how well sourced and how commonly ordered they are, each linking to its LOINC record."),
+   ("Nothing shifts on interaction", "addressed",
+    "Ring positions are computed once per window size and cached; every interaction changes colour and opacity only. All 47 concerns hold a permanent slot, so adding a personal concern moves nothing. Scroll areas use reserved gutters so a scrollbar never appears and nudges content."),
+   ("Fun facts on how markers relate", "addressed",
+    "<b>29 relationship notes</b>, each a verbatim quote from a MedlinePlus (NIH) page with a verify link \u2014 bilirubin coming from broken-down red cells, ALP living in both liver and bone, calcium riding on albumin, LDL being calculated rather than measured. All 29 were re-fetched and checked against their source pages: none altered, none missing."),
+   ("Personal concern layer", "addressed",
+    "The 29 concerns the annual panel cannot reach are addable as a second layer. Adding one that no panel marker touches says so plainly: <i>nothing in your routine bloodwork would reveal it</i>."),
+   ("Missing data as clinical information", "addressed",
+    "Marking one marker abnormal surfaces how many related tests sit outside the panel and have never been ordered. Across all 18 reachable concerns that is <b>3,399</b> tests."),
+   ("A confirmed diagnostic sequence", "partial",
+    "The follow-up lists are markers <b>tagged to a concern</b> in the catalogue, ranked \u2014 not a verified screen-then-confirm path. Only the 29 sourced notes and the 11 hand-authored conditions carry real sequencing. The panel says so rather than implying more."),
+   ("Marker-to-marker network beyond the 29", "open",
+    "Still blocked on the relationship layer from [[F1]]: 6 of 6,192 markers carry a cross-family link. The 29 notes are hand-curated, not a data model \u2014 they cover the annual panel and stop there."),
+  ],
+  "open": "The 29 relationship notes prove the idea but do not scale: they were researched one page at a time and cover only the 26 panel markers. Turning them into the <code>sets</code> and <code>edges</code> arrays scoped in \u00a75 of <code>INDEX-REFINEMENT.md</code> is what would let the ripple run past the annual panel into the rest of the catalogue.",
+ },
+ {
   "id": "F6",
   "date": "2026-07-30",
   "who": "Chloe",
@@ -174,6 +211,28 @@ FEEDBACK = [
 # VERSIONS — newest first
 # ===========================================================================
 VERSIONS = [
+ {
+  "id": "v2.0",
+  "file": "v2.0-ripple-atlas.html",
+  "title": "Ripple atlas",
+  "date": "2026-07-31",
+  "source": "index-v3.html",
+  "status": "candidate",
+  "tag": "v2.0-ripple-atlas",
+  "gitpath": "index-v3.html",
+  "answers": ["F7"],
+  "summary": "A different route into the atlas: start from the 26 markers of a routine annual panel, mark what came back abnormal, and watch the ripple spread into concerns and the tests that would follow them up.",
+  "changes": [
+   "<b>Three concentric rings.</b> Inner: the 26 annual-panel markers, grouped by CBC / CMP / lipid. Middle: all 47 concerns, each holding a permanent slot. Outer: the follow-up tests for whichever concern is open.",
+   "<b>Mark low or high</b> on any panel marker and the concerns it can represent light up, with edges coloured by direction.",
+   "<b>29 sourced relationship notes</b> \u2014 every one a verbatim MedlinePlus (NIH) quote with a verify link, re-checked against the source pages after authoring.",
+   "<b>Personal concern layer.</b> The 29 concerns a routine panel cannot reach can be added by hand; one that no panel marker touches says so outright.",
+   "<b>Nothing moves.</b> Ring geometry is computed once per window size and cached; interactions change colour and opacity only. Scroll areas reserve their gutters. Verified by diffing every circle coordinate across marking, selecting and adding.",
+   "<b>Marker radius derived from the ring chord</b>, so the 26 inner circles cannot overlap at any window size. Checked at 1200\u00d7700 through 1920\u00d71080.",
+   "95 KB standalone \u2014 no 6,192-row table, so it loads instantly.",
+  ],
+  "note": "This is an alternative to the v1.1 family atlas, not a replacement. v1.1 maps the whole catalogue by family; v2.0 starts from what you have actually had done. Both are candidates.",
+ },
  {
   "id": "v1.1",
   "file": "v1.1-atlas-cockpit.html",

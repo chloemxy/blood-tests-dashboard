@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The ripple atlas — what is your blood telling you?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+ --font-serif:Georgia,"Times New Roman",serif;
+ --font-sans:"Open Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+ --font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Consolas,monospace;
+ --teal:#007385;--slate:#24434D;--accent:#B84A0E;--warm:#F09A57;
+ --aqua:#EAF7F8;--paper:#F7F9F9;--ink:#1D1B1A;--muted:#5A6B70;
+ --line:#D7E1E2;--panel:#fff;--dim:#8B9799;--ok:#2E7D5B;--warn:#B8860B;
+ --low:#0E8496;--high:#B84A0E;
+ --railW:306px;--detW:344px;--footH:74px;--gap:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%;overflow:hidden}
+body{background:var(--paper);color:var(--ink);font-family:var(--font-sans);font-size:15px;line-height:1.5}
+a{color:var(--teal)}
+button{font-family:inherit;cursor:pointer}
+/* every scroll area reserves its scrollbar so nothing shifts when content grows */
+.scroll{overflow-y:scroll;scrollbar-gutter:stable}
+.scroll::-webkit-scrollbar{width:8px}
+.scroll::-webkit-scrollbar-track{background:transparent}
+.scroll::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+
+/* ---------------- chrome ---------------- */
+.top{position:absolute;top:0;left:0;right:0;height:53px;display:flex;align-items:center;gap:13px;
+ padding:0 18px;background:var(--panel);border-bottom:1px solid var(--line);z-index:6}
+.top .logo{font-family:var(--font-serif);font-size:18px;color:var(--slate);font-weight:700}
+.top .logo b{color:var(--teal)}
+.top .tag{font-family:var(--font-mono);font-size:10.5px;color:var(--muted);letter-spacing:.04em}
+.top .sp{flex:1}
+.top .stat{font-family:var(--font-mono);font-size:10.5px;color:var(--dim);white-space:nowrap}
+.top .btn{border:1px solid var(--line);background:#fff;color:var(--slate);font-size:11.5px;font-weight:600;
+ padding:5px 11px;border-radius:15px}
+.top .btn:hover{border-color:var(--accent);color:var(--accent)}
+@media(max-width:1000px){.top .stat{display:none}}
+
+.stage{position:absolute;top:53px;left:0;right:0;bottom:0;overflow:hidden}
+.map{position:absolute;inset:0;width:100%;height:100%;display:block}
+
+.pnl{position:absolute;background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:14px;
+ box-shadow:0 12px 32px rgba(12,30,36,.10);z-index:3;display:flex;flex-direction:column;
+ -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.pnl > header{flex:0 0 auto;padding:10px 14px 8px;border-bottom:1px solid var(--line);
+ font-family:var(--font-mono);font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--dim);
+ display:flex;align-items:center;gap:7px}
+.pnl > header b{font-family:var(--font-mono);color:var(--slate);font-weight:600}
+.pnl > header .sp{flex:1}
+
+/* ---------------- left rail ---------------- */
+.rail{top:var(--gap);left:var(--gap);bottom:calc(var(--footH) + var(--gap)*2);width:var(--railW)}
+.railtop{flex:0 0 auto;padding:13px 15px 11px;border-bottom:1px solid var(--line)}
+.railtop h1{font-family:var(--font-serif);font-size:19px;color:var(--slate);margin:0 0 3px;line-height:1.25}
+.railtop p{font-size:11.5px;color:var(--muted);margin:0;line-height:1.5}
+.railbody{flex:1 1 auto;min-height:0;padding:6px 7px 8px}
+.grouphd{font-family:var(--font-mono);font-size:9px;letter-spacing:.07em;text-transform:uppercase;
+ color:var(--dim);padding:9px 8px 5px;display:flex;align-items:baseline;gap:6px}
+.grouphd b{color:var(--slate);font-weight:600}
+.mrow{display:grid;grid-template-columns:1fr 64px;gap:6px;align-items:center;height:32px;
+ padding:0 8px;border-radius:8px;border:1px solid transparent}
+.mrow:hover{background:var(--aqua)}
+.mrow.sel{background:#fdf1ea;border-color:var(--accent)}
+.mrow .nm{font-size:12px;color:var(--slate);font-weight:600;white-space:nowrap;overflow:hidden;
+ text-overflow:ellipsis;cursor:pointer}
+.mrow.lo .nm{color:var(--low)}
+.mrow.hi .nm{color:var(--high)}
+.tri{display:flex;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;height:20px}
+.tri button{flex:1;border:none;background:none;font-family:var(--font-mono);font-size:9px;color:var(--dim);
+ padding:0;border-right:1px solid var(--line);line-height:18px}
+.tri button:last-child{border-right:none}
+.tri button:hover{background:var(--aqua)}
+.tri button.on[data-v="-1"]{background:var(--low);color:#fff}
+.tri button.on[data-v="0"]{background:var(--line);color:var(--slate)}
+.tri button.on[data-v="1"]{background:var(--high);color:#fff}
+
+.layer{flex:0 0 auto;border-top:1px solid var(--line);padding:11px 13px 12px;max-height:186px;
+ display:flex;flex-direction:column}
+.layer h3{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;
+ color:var(--dim);margin:0 0 3px}
+.layer p{font-size:11px;color:var(--muted);margin:0 0 8px;line-height:1.45}
+.chips{flex:1 1 auto;min-height:0;display:flex;flex-wrap:wrap;gap:5px;align-content:flex-start;padding-right:4px}
+.chip{border:1px solid var(--line);background:#fff;color:var(--slate);font-size:11px;padding:3px 9px;
+ border-radius:13px;white-space:nowrap}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.chip.inpanel{color:var(--dim);border-style:dashed}
+
+/* ---------------- right detail ---------------- */
+.det{top:var(--gap);right:var(--gap);bottom:calc(var(--footH) + var(--gap)*2);width:var(--detW)}
+.dhead{flex:0 0 auto;padding:13px 15px 11px;border-bottom:1px solid var(--line);height:78px;overflow:hidden}
+.dhead .k{font-family:var(--font-mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
+.dhead h2{font-family:var(--font-serif);font-size:18px;color:var(--slate);margin:1px 0 2px;line-height:1.25;
+ white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dhead .s{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slot{flex:0 0 auto;border-bottom:1px solid var(--line);display:flex;flex-direction:column}
+.slot > .h{flex:0 0 auto;font-family:var(--font-mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;
+ color:var(--dim);padding:9px 15px 5px;display:flex;align-items:baseline;gap:6px}
+.slot > .h b{color:var(--accent);font-weight:600}
+.slot > .c{flex:1 1 auto;min-height:0;padding:0 15px 11px}
+.slot.why{height:104px}
+.slot.fact{height:186px}
+.slot.next{flex:1 1 auto;min-height:0;border-bottom:none}
+.empty{font-size:11.5px;color:var(--dim);line-height:1.55;font-style:italic}
+.wl{list-style:none;margin:0;padding:0}
+.wl li{font-size:11.5px;color:var(--muted);padding:2px 0;line-height:1.45}
+.wl li b{color:var(--slate)}
+.wl li i{font-style:normal;font-family:var(--font-mono);font-size:9.5px;padding:0 5px;border-radius:7px;margin-right:5px}
+.wl li i.lo{background:#e2f2f5;color:var(--low)}
+.wl li i.hi{background:#fdf1ea;color:var(--high)}
+
+.fc{border-left:2px solid var(--warm);padding:1px 0 1px 11px;margin:0 0 11px}
+.fc q{font-family:var(--font-serif);font-size:12.5px;color:var(--slate);line-height:1.55;display:block;font-style:italic}
+.fc .cite{font-family:var(--font-mono);font-size:9px;color:var(--dim);margin-top:5px;display:block}
+.fc .rel{font-family:var(--font-mono);font-size:9px;letter-spacing:.04em;text-transform:uppercase;
+ color:var(--accent);display:block;margin-bottom:4px}
+
+.nl{list-style:none;margin:0;padding:0}
+.nl li{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:6px 0;
+ border-bottom:1px solid #eef2f2}
+.nl li:last-child{border-bottom:none}
+.nl .n{font-size:12px;color:var(--slate);line-height:1.35}
+.nl .n em{font-style:normal;font-family:var(--font-mono);font-size:9.5px;color:var(--dim);margin-left:5px}
+.tg{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.04em;text-transform:uppercase;
+ padding:2px 6px;border-radius:8px;white-space:nowrap}
+.tg.q{background:#e3f2ea;color:var(--ok)}
+.tg.g{background:#f0f3f3;color:var(--dim)}
+.tg.src{background:#fdf1ea;color:var(--accent)}
+
+/* ---------------- footer ---------------- */
+.foot{left:var(--gap);right:var(--gap);bottom:var(--gap);height:var(--footH);flex-direction:row;
+ align-items:center;gap:16px;padding:0 16px}
+.leg{display:flex;gap:13px;flex-wrap:wrap;font-size:11px;color:var(--muted);flex:0 0 auto}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.fnote{font-size:11.5px;color:var(--muted);margin:0;line-height:1.5;border-left:1px solid var(--line);
+ padding-left:16px;flex:1;min-width:0}
+.fnote b{color:var(--accent)}
+@media(max-width:1240px){.fnote{display:none}}
+
+/* ---------------- map ---------------- */
+.map .edge{fill:none;stroke:var(--line);stroke-width:1;opacity:0;transition:opacity .18s,stroke .18s}
+.map .edge.on{opacity:.55;stroke:var(--teal)}
+.map .edge.lo{stroke:var(--low)}
+.map .edge.hi{stroke:var(--high)}
+.map .edge.hot{opacity:.95;stroke-width:2}
+.map .e3{fill:none;stroke:var(--warm);stroke-width:1;opacity:0;transition:opacity .18s}
+.map .e3.on{opacity:.6}
+.map .hub circle{fill:#fff;stroke:var(--slate);stroke-width:2}
+.map .hub text{font-family:var(--font-mono);font-size:8.5px;fill:var(--slate);text-anchor:middle}
+.map .mk circle{fill:#fff;stroke:#c3ced0;stroke-width:1.4;transition:fill .18s,stroke .18s,stroke-width .18s}
+.map .mk text{font-family:var(--font-mono);font-size:9px;fill:var(--muted);text-anchor:middle;pointer-events:none}
+.map .mk.lo circle{fill:#dff0f3;stroke:var(--low);stroke-width:2.4}
+.map .mk.hi circle{fill:#fbe6da;stroke:var(--high);stroke-width:2.4}
+.map .mk.lo text{fill:var(--low)}
+.map .mk.hi text{fill:var(--high)}
+.map .mk.sel circle{stroke-width:3.4}
+.map .mk.hot circle{stroke-width:3}
+.map .cn circle{fill:#fff;stroke:#dde5e6;stroke-width:1.2;transition:fill .2s,stroke .2s,r .2s}
+.map .cn text{font-family:var(--font-sans);font-size:9.5px;fill:var(--slate);opacity:0;transition:opacity .2s;
+ pointer-events:none}
+.map .cn.on circle{fill:var(--aqua);stroke:var(--teal);stroke-width:2}
+.map .cn.on text{opacity:1}
+.map .cn.added circle{fill:#fdf1ea;stroke:var(--accent);stroke-width:2;stroke-dasharray:3 2}
+.map .cn.added text{opacity:1;fill:var(--accent)}
+.map .cn.sel circle{stroke-width:3.4}
+.map .cn.hot text{opacity:1}
+.map .t3{opacity:0;transition:opacity .2s;pointer-events:none}
+.map .t3.on{opacity:1}
+.map .t3 circle{fill:#fff;stroke:var(--warm);stroke-width:1.4}
+.map .t3 text{font-family:var(--font-sans);font-size:8.5px;fill:var(--muted)}
+.map .ringlab{font-family:var(--font-mono);font-size:8.5px;fill:#b9c4c6;letter-spacing:.08em;text-anchor:middle}
+.map g[data-mk],.map g[data-cn]{cursor:pointer}
+
+@media(max-width:1080px){
+ .det{display:none}
+ .foot{display:none}
+ .rail{bottom:var(--gap)}
+}
+</style>
+</head>
+<body>
+
+<div class="top">
+ <span class="logo">What is your blood telling you<b>?</b></span>
+ <span class="tag">the ripple atlas</span>
+ <span class="sp"></span>
+ <span class="stat" id="hdrStat"></span>
+ <button class="btn" id="btnReset">Reset</button>
+</div>
+
+<div class="stage" id="stage">
+ <svg class="map" id="map" role="img" aria-label="Ripple map: annual panel markers, the concerns they can represent, and the tests that would follow up"></svg>
+
+ <section class="pnl rail">
+  <div class="railtop">
+   <h1>Start with your annual panel</h1>
+   <p>Mark anything that came back low or high. The ripple spreads outward into what it could mean.</p>
+  </div>
+  <div class="railbody scroll" id="rail"></div>
+  <div class="layer">
+   <h3>Add a personal concern</h3>
+   <p id="layerSub"></p>
+   <div class="chips scroll" id="chips"></div>
+  </div>
+ </section>
+
+ <section class="pnl det">
+  <div class="dhead" id="dHead"></div>
+  <div class="slot why"><div class="h" id="whyH">why it is on the map</div><div class="c scroll" id="why"></div></div>
+  <div class="slot fact"><div class="h" id="factH">how these connect</div><div class="c scroll" id="fact"></div></div>
+  <div class="slot next"><div class="h" id="nextH">what would follow it up</div><div class="c scroll" id="next"></div></div>
+ </section>
+
+ <section class="pnl foot">
+  <div class="leg">
+   <span><i style="background:#dff0f3;border:2px solid var(--low)"></i>marked low</span>
+   <span><i style="background:#fbe6da;border:2px solid var(--high)"></i>marked high</span>
+   <span><i style="background:var(--aqua);border:2px solid var(--teal)"></i>concern raised</span>
+   <span><i style="background:#fdf1ea;border:2px dashed var(--accent)"></i>concern you added</span>
+  </div>
+  <p class="fnote" id="fnote"></p>
+ </section>
+</div>
+
+<script>
+"use strict";
+const D = __PAYLOAD__;
+const $ = id => document.getElementById(id);
+const esc = s => (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const nf = n => n.toLocaleString();
+const M = D.markers, C = D.concerns, REL = D.rel, OFF = D.off, META = D.meta;
+const SLUGS = D.panels.reduce((a,p)=>a.concat(p.slugs), []);
+const CIDS = Object.keys(C).map(Number);
+
+/* ---------- state ---------- */
+const st = { val:{}, added:{}, sel:null, hot:null };   // val: slug -> -1|0|1
+SLUGS.forEach(s => st.val[s] = 0);
+try{ const raw = localStorage.getItem('v3.state');
+     if(raw){ const o = JSON.parse(raw);
+       Object.keys(o.val||{}).forEach(k=>{ if(k in st.val) st.val[k]=o.val[k]; });
+       Object.keys(o.added||{}).forEach(k=>{ st.added[k]=1; }); } }catch(e){}
+const save = () => { try{ localStorage.setItem('v3.state', JSON.stringify({val:st.val, added:st.added})); }catch(e){} };
+
+const flagged = () => SLUGS.filter(s => st.val[s] !== 0);
+function activeConcerns(){
+ const out = {};
+ flagged().forEach(s => M[s].k.forEach(ci => { (out[ci] = out[ci] || []).push(s); }));
+ Object.keys(st.added).forEach(ci => { out[ci] = out[ci] || []; });
+ return out;                    // cid -> [slugs implicating it]  ([] = added by hand)
+}
+
+/* ---------- geometry: computed once per stage size, then never again ---------- */
+let LAY = null, LAYKEY = '';
+function layout(){
+ const stg = $('stage'), W = stg.clientWidth, H = stg.clientHeight;
+ const key = W + 'x' + H;
+ if(key === LAYKEY && LAY) return LAY;
+
+ const gap = 14, railW = 306, detW = 344, footH = 74;
+ const wide = W > 1080;
+ const L = wide ? gap + railW + gap : gap;
+ const R = W - (wide ? gap + detW + gap : gap);
+ const T = gap, B = H - (wide ? footH + gap*2 : gap);
+ const cx = (L + R) / 2, cy = (T + B) / 2;
+ const maxR = Math.max(120, Math.min((R - L) / 2, (B - T) / 2) - 14);
+ const R1 = maxR * 0.46, R2 = maxR * 0.72, R3 = maxR * 0.95;
+
+ // ring 1 — panel markers, one arc per panel, proportional, with gaps between.
+ // The marker radius is derived from the tightest chord on the ring, so circles
+ // can never overlap however small the window gets.
+ const total = SLUGS.length, gapDeg = 9, span = 360 - gapDeg * D.panels.length;
+ let minStep = Infinity;
+ D.panels.forEach(p => { minStep = Math.min(minStep, (span * p.slugs.length / total) / p.slugs.length); });
+ const chord = 2 * R1 * Math.sin(minStep * Math.PI / 360);
+ const mr = Math.max(6.5, Math.min(17, chord / 2 - 2.5));
+ const fs = Math.max(6, Math.min(10, mr * 0.78));
+
+ const pos = {}; let a0 = -90 + gapDeg / 2;
+ D.panels.forEach(p => {
+  const arc = span * p.slugs.length / total;
+  p.slugs.forEach((s, j) => {
+   const a = (a0 + arc * (j + 0.5) / p.slugs.length) * Math.PI / 180;
+   pos[s] = { a:a, x: cx + Math.cos(a) * R1, y: cy + Math.sin(a) * R1, r: mr };
+  });
+  a0 += arc + gapDeg;
+ });
+
+ // ring 2 — every concern gets a permanent slot, so adding one never moves anything.
+ // preferred angle = circular mean of the panel markers that implicate it.
+ const pref = {};
+ CIDS.forEach(ci => {
+  const from = C[ci].from.filter(s => pos[s]);
+  if(!from.length){ pref[ci] = null; return; }
+  let sx = 0, sy = 0;
+  from.forEach(s => { sx += Math.cos(pos[s].a); sy += Math.sin(pos[s].a); });
+  pref[ci] = Math.atan2(sy, sx);
+ });
+ const withA = CIDS.filter(ci => pref[ci] !== null).sort((p,q) => pref[p] - pref[q]);
+ const noA   = CIDS.filter(ci => pref[ci] === null);
+ // interleave the unreachable concerns evenly between the reachable ones
+ const order = [];
+ const every = withA.length ? Math.max(1, Math.round(withA.length / (noA.length + 1))) : 1;
+ let ni = 0;
+ withA.forEach((ci, i) => { order.push(ci);
+   if(ni < noA.length && (i + 1) % every === 0) order.push(noA[ni++]); });
+ while(ni < noA.length) order.push(noA[ni++]);
+
+ const cpos = {}, step = 2 * Math.PI / order.length;
+ const off = withA.length ? pref[withA[0]] : -Math.PI/2;
+ order.forEach((ci, i) => {
+  const a = off + i * step;
+  cpos[ci] = { a:a, x: cx + Math.cos(a) * R2, y: cy + Math.sin(a) * R2 };
+ });
+
+ // ring 3 — a permanent fan of slots per concern; only the selected one is shown
+ const fan = {}, fanStep = (2 * Math.PI / order.length) * 0.92;
+ CIDS.forEach(ci => {
+  const n = Math.min(8, (C[ci].next || []).length), a = cpos[ci].a, arr = [];
+  for(let j = 0; j < n; j++){
+   const aa = a + (j - (n - 1) / 2) * (fanStep / Math.max(1, n - 1)) * (n > 1 ? 1 : 0);
+   arr.push({ a:aa, x: cx + Math.cos(aa) * R3, y: cy + Math.sin(aa) * R3 });
+  }
+  fan[ci] = arr;
+ });
+
+ LAYKEY = key;
+ LAY = { W:W, H:H, cx:cx, cy:cy, R1:R1, R2:R2, R3:R3, mr:mr, fs:fs, pos:pos, cpos:cpos, fan:fan, order:order };
+ return LAY;
+}
+
+function curve(x1,y1,x2,y2,cx,cy){
+ const mx = (x1+x2)/2, my = (y1+y2)/2;
+ const qx = mx + (cx-mx)*0.30, qy = my + (cy-my)*0.30;
+ return 'M'+x1.toFixed(1)+' '+y1.toFixed(1)+'Q'+qx.toFixed(1)+' '+qy.toFixed(1)+' '+x2.toFixed(1)+' '+y2.toFixed(1);
+}
+
+/* ---------- paint: colours and opacity only, never positions ---------- */
+function paint(){
+ const L = layout(), act = activeConcerns();
+ const selM = st.sel && st.sel.t === 'm' ? st.sel.v : null;
+ const selC = st.sel && st.sel.t === 'c' ? +st.sel.v : null;
+ let h = '';
+
+ // edges: marker -> concern
+ SLUGS.forEach(s => {
+  const p = L.pos[s], v = st.val[s];
+  M[s].k.forEach(ci => {
+   const q = L.cpos[ci]; if(!q) return;
+   const live = v !== 0 || selC === ci || selM === s;
+   const cls = ['edge', live ? 'on' : '', v < 0 ? 'lo' : v > 0 ? 'hi' : '',
+                (selC === ci || selM === s || st.hot === s) ? 'hot' : ''].filter(Boolean).join(' ');
+   h += '<path class="'+cls+'" d="'+curve(p.x,p.y,q.x,q.y,L.cx,L.cy)+'"/>';
+  });
+ });
+ // edges: concern -> follow-up test (selected concern only)
+ if(selC !== null && L.fan[selC]){
+  const q = L.cpos[selC];
+  L.fan[selC].forEach(f => { h += '<path class="e3 on" d="'+curve(q.x,q.y,f.x,f.y,L.cx,L.cy)+'"/>'; });
+ }
+
+ // hub
+ h += '<g class="hub"><circle cx="'+L.cx+'" cy="'+L.cy+'" r="30"/>'
+   +  '<text x="'+L.cx+'" y="'+(L.cy-2)+'">ANNUAL</text>'
+   +  '<text x="'+L.cx+'" y="'+(L.cy+9)+'">PANEL</text></g>';
+ h += '<text class="ringlab" x="'+L.cx+'" y="'+(L.cy-L.R1-L.mr-7)+'">MARKERS</text>';
+
+ // ring 1
+ SLUGS.forEach(s => {
+  const p = L.pos[s], v = st.val[s];
+  const cls = ['mk', v<0?'lo':v>0?'hi':'', selM===s?'sel':'', st.hot===s?'hot':''].filter(Boolean).join(' ');
+  // when the ring gets tight the labels only stay on the markers that matter
+  const showLab = L.fs >= 7.5 || v !== 0 || selM === s || st.hot === s;
+  h += '<g class="'+cls+'" data-mk="'+s+'"><title>'+esc(M[s].name)+'</title>'
+    +  '<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+p.r.toFixed(1)+'"/>'
+    +  (showLab ? '<text x="'+p.x.toFixed(1)+'" y="'+(p.y + L.fs*0.35).toFixed(1)
+                 +'" style="font-size:'+L.fs.toFixed(1)+'px">'+esc(M[s].abbr)+'</text>' : '')
+    +  '</g>';
+ });
+
+ // ring 2
+ L.order.forEach(ci => {
+  const q = L.cpos[ci], from = act[ci], on = !!from, added = !!st.added[ci];
+  const n = from ? from.length : 0;
+  const r = on ? Math.min(13, 6.5 + n * 1.9) : 3.6;
+  const cls = ['cn', on?'on':'', added?'added':'', selC===ci?'sel':'', st.hot===('c'+ci)?'hot':''].filter(Boolean).join(' ');
+  const right = Math.cos(q.a) > -0.02;
+  const lx = q.x + Math.cos(q.a) * (r + 7), ly = q.y + Math.sin(q.a) * (r + 7) + 3;
+  h += '<g class="'+cls+'" data-cn="'+ci+'"><title>'+esc(C[ci].label)+'</title>'
+    +  '<circle cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="'+r.toFixed(1)+'"/>'
+    +  '<text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="'+(right?'start':'end')+'">'
+    +  esc(C[ci].label)+'</text></g>';
+ });
+
+ // ring 3
+ if(selC !== null && L.fan[selC]){
+  const list = C[selC].next || [];
+  L.fan[selC].forEach((f, j) => {
+   const t = list[j]; if(!t) return;
+   const right = Math.cos(f.a) > -0.02;
+   h += '<g class="t3 on"><circle cx="'+f.x.toFixed(1)+'" cy="'+f.y.toFixed(1)+'" r="5"/>'
+     +  '<text x="'+(f.x + Math.cos(f.a)*9).toFixed(1)+'" y="'+(f.y + Math.sin(f.a)*9 + 3).toFixed(1)
+     +  '" text-anchor="'+(right?'start':'end')+'">'+esc(t.n.length>26?t.n.slice(0,24)+'…':t.n)+'</text></g>';
+  });
+ }
+
+ const m = $('map');
+ m.setAttribute('viewBox', '0 0 ' + L.W + ' ' + L.H);
+ m.innerHTML = h;
+}
+
+/* ---------- left rail ---------- */
+function drawRail(){
+ let h = '';
+ D.panels.forEach(p => {
+  h += '<div class="grouphd"><b>'+esc(p.name.replace(/\s*\(.*\)/,''))+'</b> '+p.slugs.length+' markers</div>';
+  p.slugs.forEach(s => {
+   const v = st.val[s];
+   h += '<div class="mrow'+(v<0?' lo':v>0?' hi':'')+(st.sel&&st.sel.t==='m'&&st.sel.v===s?' sel':'')+'" data-row="'+s+'">'
+     +  '<span class="nm" data-mk="'+s+'" title="'+esc(M[s].name)+'">'+esc(M[s].name.split('[')[0].trim())+'</span>'
+     +  '<span class="tri">'
+     +   '<button data-set="'+s+'" data-v="-1" class="'+(v<0?'on':'')+'" title="low">low</button>'
+     +   '<button data-set="'+s+'" data-v="0" class="'+(v===0?'on':'')+'" title="normal">&mdash;</button>'
+     +   '<button data-set="'+s+'" data-v="1" class="'+(v>0?'on':'')+'" title="high">high</button>'
+     +  '</span></div>';
+  });
+ });
+ $('rail').innerHTML = h;
+
+ const act = activeConcerns();
+ $('layerSub').innerHTML = 'Your panel can raise <b>'+META.panelConcerns+'</b> of '+META.nConcerns
+  +' concerns. The rest need bloodwork you have not had.';
+ $('chips').innerHTML = CIDS.filter(ci => !C[ci].inPanel).map(ci =>
+   '<button class="chip'+(st.added[ci]?' on':'')+'" data-add="'+ci+'">'+esc(C[ci].label)+'</button>').join('');
+}
+
+/* ---------- relationship notes ---------- */
+function factsFor(slugs){
+ const set = {}; slugs.forEach(s => set[s] = 1);
+ return REL.filter(r => set[r.a] || set[r.b]);
+}
+function nameOf(x){ return M[x] ? M[x].name.split('[')[0].trim() : (OFF[x] || x); }
+function factHTML(r){
+ return '<div class="fc"><span class="rel">'+esc(nameOf(r.a))+' &harr; '+esc(nameOf(r.b))
+  + (r.when && r.when!=='any' ? ' &middot; when ' + esc(r.when) : '')
+  + (r.k==='next-test' ? ' &middot; next test' : '') + '</span>'
+  + '<q>' + esc(r.q) + '</q>'
+  + '<span class="cite">' + esc(r.s) + ' &middot; <a href="'+r.u+'" target="_blank" rel="noopener">verify</a></span></div>';
+}
+
+/* ---------- detail ---------- */
+function drawDetail(){
+ const act = activeConcerns(), sel = st.sel;
+ const nAct = Object.keys(act).length, nFlag = flagged().length;
+
+ if(!sel){
+  $('dHead').innerHTML = '<span class="k">nothing selected</span>'
+   + '<h2>'+(nFlag ? nf(nAct)+' concern'+(nAct===1?'':'s')+' in play' : 'A quiet panel')+'</h2>'
+   + '<span class="s">'+(nFlag ? nf(nFlag)+' marker'+(nFlag===1?'':'s')+' marked abnormal'
+                                : 'Nothing marked yet — mark a marker low or high')+'</span>';
+  $('whyH').textContent = 'how to read this';
+  $('why').innerHTML = '<p class="empty">Inner ring: the 26 markers in a routine annual panel. '
+   + 'Middle ring: every concern they could point at. Outer ring: what would follow one up.</p>';
+  $('factH').textContent = 'how these connect';
+  $('fact').innerHTML = '<p class="empty">Select a marker or a concern to see the sourced notes on how it '
+   + 'relates to the rest of the panel.</p>';
+  $('nextH').textContent = 'the shape of what is missing';
+  $('next').innerHTML = '<p class="empty">Your annual panel reaches '+META.panelConcerns+' of '
+   + META.nConcerns+' concerns in the catalogue. Across those '+META.panelConcerns+', <b>'
+   + nf(META.offPanelForPanelConcerns)+'</b> related tests sit outside the panel and have never been ordered.</p>';
+  return;
+ }
+
+ if(sel.t === 'm'){
+  const s = sel.v, m = M[s], v = st.val[s];
+  $('dHead').innerHTML = '<span class="k">annual panel marker &middot; '+esc(m.grp)+'</span>'
+   + '<h2>'+esc(m.name.split('[')[0].trim())+'</h2>'
+   + '<span class="s">'+(v<0?'marked low':v>0?'marked high':'not marked abnormal')+' &middot; '+esc(m.abbr)+'</span>';
+  $('whyH').textContent = 'what this measures';
+  $('why').innerHTML = m.q
+   ? '<q style="font-family:var(--font-serif);font-size:12px;color:var(--slate);font-style:italic">'+esc(m.q)+'</q>'
+     +'<span class="cite" style="font-family:var(--font-mono);font-size:9px;color:var(--dim);display:block;margin-top:4px">'
+     +esc(m.qs)+(m.url?' &middot; <a href="'+m.url+'" target="_blank" rel="noopener">verify</a>':'')+'</span>'
+   : '<p class="empty">No quoted description for this marker.</p>';
+  const fs = factsFor([s]);
+  $('factH').innerHTML = 'how these connect <b>'+fs.length+'</b>';
+  $('fact').innerHTML = fs.length ? fs.map(factHTML).join('')
+   : '<p class="empty">No sourced relationship note for this marker yet — a gap in our data, not in physiology.</p>';
+  const cs = m.k;
+  $('nextH').innerHTML = 'concerns it can represent <b>'+cs.length+'</b>';
+  $('next').innerHTML = cs.length ? '<ul class="nl">'+cs.map(ci =>
+    '<li><span class="n">'+esc(C[ci].label)+'<em>'+nf(C[ci].nOutside)+' follow-ups outside the panel</em></span>'
+    + '<button class="tg src" data-cn="'+ci+'">open</button></li>').join('')+'</ul>'
+   : '<p class="empty">This marker carries no concern tags in the catalogue.</p>';
+  return;
+ }
+
+ const ci = +sel.v, c = C[ci], from = act[ci] || [];
+ $('dHead').innerHTML = '<span class="k">concern &middot; '+esc(c.grp)+(st.added[ci]?' &middot; you added this':'')+'</span>'
+  + '<h2>'+esc(c.label)+'</h2>'
+  + '<span class="s">'+nf(c.nTagged)+' related markers &middot; '+nf(c.nOutside)+' outside your panel</span>';
+ $('whyH').textContent = 'why it is on the map';
+ if(from.length){
+  $('why').innerHTML = '<ul class="wl">'+from.map(s =>
+   '<li><i class="'+(st.val[s]<0?'lo':'hi')+'">'+(st.val[s]<0?'low':'high')+'</i><b>'
+   + esc(M[s].name.split('[')[0].trim())+'</b></li>').join('')+'</ul>';
+ } else if(st.added[ci]){
+  $('why').innerHTML = '<p class="empty">You added this. <b>'+(c.from.length
+    ? c.from.length+' of your panel markers relate to it, none of them marked abnormal.'
+    : 'None of the 26 markers in a routine annual panel point at it — nothing in your routine bloodwork would reveal it.')
+    +'</b></p>';
+ } else {
+  $('why').innerHTML = '<p class="empty">Not currently raised by anything you have marked.</p>';
+ }
+ const fs = factsFor(c.from);
+ $('factH').innerHTML = 'how these connect <b>'+fs.length+'</b>';
+ $('fact').innerHTML = fs.length ? fs.map(factHTML).join('')
+  : '<p class="empty">No sourced relationship note reaches this concern yet.</p>';
+ $('nextH').innerHTML = 'what would follow it up <b>'+nf(c.nOutside)+'</b>';
+ $('next').innerHTML = (c.next||[]).length
+  ? '<ul class="nl">'+c.next.map(t =>
+     '<li><span class="n">'+(t.u?'<a href="'+t.u+'" target="_blank" rel="noopener">'+esc(t.n)+'</a>':esc(t.n))
+     + (t.a?'<em>'+esc(t.a)+'</em>':'')+'</span>'
+     + '<span class="tg '+(t.v?'q':'g')+'">'+(t.v?'quoted':'ai-written')+'</span></li>').join('')+'</ul>'
+    + '<p class="empty" style="margin-top:9px">Ranked from the catalogue by how well sourced and how commonly '
+    + 'ordered they are. These are markers <b>tagged to this concern</b>, not a confirmed diagnostic sequence.</p>'
+  : '<p class="empty">Nothing outside your panel is tagged to this concern.</p>';
+}
+
+/* ---------- chrome ---------- */
+function drawChrome(){
+ const act = activeConcerns(), nFlag = flagged().length;
+ $('hdrStat').textContent = nf(META.base)+' panel markers · '+META.nConcerns+' concerns · '
+  + nf(META.total)+' markers in the catalogue';
+ const off = Object.keys(act).reduce((a,ci)=>a+C[ci].nOutside, 0);
+ $('fnote').innerHTML = nFlag
+  ? 'You marked <b>'+nFlag+'</b> marker'+(nFlag===1?'':'s')+', raising <b>'+Object.keys(act).length
+    +'</b> concern'+(Object.keys(act).length===1?'':'s')+'. <b>'+nf(off)+'</b> tests related to them sit outside '
+    +'your annual panel and have never been ordered — that absence is information too.'
+  : 'A routine annual panel measures <b>'+META.base+'</b> of '+nf(META.total)+' things measurable in blood, and can '
+    +'raise <b>'+META.panelConcerns+'</b> of '+META.nConcerns+' concerns. Mark something low or high to see the ripple.';
+}
+
+function render(){ drawRail(); paint(); drawDetail(); drawChrome(); }
+
+/* ---------- events ---------- */
+document.addEventListener('click', function(e){
+ const set = e.target.closest('[data-set]');
+ if(set){ st.val[set.dataset.set] = +set.dataset.v; save(); render(); return; }
+ const add = e.target.closest('[data-add]');
+ if(add){ const ci = add.dataset.add;
+   if(st.added[ci]) delete st.added[ci]; else st.added[ci] = 1;
+   st.sel = st.added[ci] ? {t:'c', v:ci} : null; save(); render(); return; }
+ const mk = e.target.closest('[data-mk]');
+ if(mk){ const s = mk.dataset.mk;
+   st.sel = (st.sel && st.sel.t==='m' && st.sel.v===s) ? null : {t:'m', v:s};
+   render(); return; }
+ const cn = e.target.closest('[data-cn]');
+ if(cn){ const ci = cn.dataset.cn;
+   st.sel = (st.sel && st.sel.t==='c' && String(st.sel.v)===String(ci)) ? null : {t:'c', v:ci};
+   render(); return; }
+});
+$('map').addEventListener('mouseover', function(e){
+ const mk = e.target.closest('[data-mk]'), cn = e.target.closest('[data-cn]');
+ const v = mk ? mk.dataset.mk : cn ? 'c'+cn.dataset.cn : null;
+ if(v !== st.hot){ st.hot = v; paint(); }
+});
+$('map').addEventListener('mouseleave', function(){ if(st.hot){ st.hot = null; paint(); } });
+$('btnReset').addEventListener('click', function(){
+ SLUGS.forEach(s => st.val[s] = 0); st.added = {}; st.sel = null; save(); render();
+});
+window.addEventListener('resize', function(){
+ clearTimeout(window.__rt);
+ window.__rt = setTimeout(function(){ LAYKEY = ''; paint(); }, 150);
+});
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && st.sel){ st.sel = null; render(); } });
+
+render();
+requestAnimationFrame(() => { LAYKEY = ''; paint(); });
+</script>
+</body>
+</html>
