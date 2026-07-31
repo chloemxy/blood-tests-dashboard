@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-31T19:13:13Z",
+ "generated": "2026-07-31T19:22:50Z",
  "live": "index.html",
  "constraints": [
   [
@@ -16,6 +16,55 @@
   ]
  ],
  "feedback": [
+  {
+   "id": "F8",
+   "date": "2026-07-31",
+   "who": "Chloe",
+   "title": "Make the map readable — let it float and spread",
+   "status": "addressed",
+   "versions": [
+    "v2.1"
+   ],
+   "quote": "find a smarter way to make these readable, can be more spread out organically floating moving in the empty space, or other ways you see fitting",
+   "did": [
+    [
+     "Fixed rings replaced by a force simulation",
+     "addressed",
+     "Nodes now float and settle where there is room. Three soft rules: a radial band per role, concerns pulled toward the markers that implicate them, and everything repelling everything. No node may enter a panel."
+    ],
+    [
+     "Dormant concerns get out of the way",
+     "addressed",
+     "The old ring gave all 47 concerns an equal slot whether or not they were in play. Now live concerns pull inward and grow; the other 44 drift to the edge as small dots. The crowding was structural, not cosmetic."
+    ],
+    [
+     "Labels are placed, not just drawn",
+     "addressed",
+     "Each frame, labels are sorted by importance and placed greedily — right, left, above, below — taking the first slot that collides with nothing already placed. A label that cannot fit is dropped rather than overlapped. Measured across four window sizes and every interaction state: <b>zero label collisions</b>."
+    ],
+    [
+     "Bands are elliptical, not circular",
+     "addressed",
+     "The free area between the panels is far wider than it is tall, so a circular layout left a third of the screen empty. Normalising into unit space and scaling back out fills the rectangle."
+    ],
+    [
+     "Ambient drift",
+     "addressed",
+     "Every node carries its own phase and breathes slowly even at rest, so the map reads as alive rather than as a diagram. Honoured <code>prefers-reduced-motion</code>."
+    ],
+    [
+     "Ripple made literal",
+     "addressed",
+     "Edges from a marker you have marked abnormal animate outward with a flowing dash, so the ripple travels rather than merely existing."
+    ],
+    [
+     "Panels still never move",
+     "addressed",
+     "The organic motion is confined to the map. Rails, detail slots and scroll gutters remain fixed exactly as [[F7]] asked — the two requirements do not conflict once motion is scoped to the canvas."
+    ]
+   ],
+   "open": null
+  },
   {
    "id": "F7",
    "date": "2026-07-31",
@@ -303,12 +352,37 @@
  ],
  "versions": [
   {
+   "id": "v2.1",
+   "file": "v2.1-organic-ripple.html",
+   "title": "Ripple atlas — organic layout",
+   "date": "2026-07-31",
+   "source": "index-v3.html",
+   "status": "candidate",
+   "tag": "v2.1-organic-ripple",
+   "gitpath": "index-v3.html",
+   "answers": [
+    "F8"
+   ],
+   "summary": "The ripple map stops being a fixed ring and becomes a live force simulation: nodes float, live concerns pull inward, dormant ones drift to the edge, and labels are placed only where they fit.",
+   "changes": [
+    "<b>Force simulation replaces the fixed rings.</b> A radial band per role, concerns sprung toward the markers that implicate them, universal repulsion, hard collision correction, and a boundary that keeps every node out of the panels.",
+    "<b>Live concerns come forward, dormant ones recede.</b> The 47 concerns no longer each hold a permanent ring slot — the ones in play grow and move inward where there is room to label them.",
+    "<b>Greedy label placement.</b> Labels are sorted by importance and take the first of four candidate positions that collides with nothing. Zero label overlaps at 1200×700 through 1920×1080, in every interaction state.",
+    "<b>Elliptical bands</b> so the layout fills a wide rectangle instead of inscribing a circle in it.",
+    "<b>Ambient drift</b> — per-node phase, slow breathing motion, disabled under <code>prefers-reduced-motion</code>.",
+    "<b>Flowing dash on live edges</b> so the ripple visibly travels outward from a marker you flag.",
+    "Node overlaps: zero once settled, at every size tested."
+   ],
+   "note": "Motion is confined to the map canvas. The rails, detail slots and scroll gutters stay fixed, so this does not undo the no-shift guarantee from v2.0.",
+   "mb": 0.1
+  },
+  {
    "id": "v2.0",
    "file": "v2.0-ripple-atlas.html",
    "title": "Ripple atlas",
    "date": "2026-07-31",
    "source": "index-v3.html",
-   "status": "candidate",
+   "status": "superseded",
    "tag": "v2.0-ripple-atlas",
    "gitpath": "index-v3.html",
    "answers": [
