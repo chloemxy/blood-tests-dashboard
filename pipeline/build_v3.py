@@ -83,13 +83,16 @@ for ci, c in enumerate(CONCERNS):
         "inPanel": ci in panel_concerns,
         "nTagged": len(tagged), "nOutside": len(outside),
         "from": [m["slug"] for m in markers.values() if ci in m["k"]],
+        # 8 shown on the map; the rest are carried so the detail panel can
+        # expand to them. Capped at 40 to keep the file small — the true total
+        # is nOutside and the panel says so.
         "next": [{
             "n": TESTS[k]["n"].split("[")[0].strip(),
             "a": TESTS[k].get("a") or "",
             "g": GROUPS[TESTS[k]["g"]],
             "v": 1 if TESTS[k].get("v") else 0,
             "u": (TESTS[k].get("r") or [["", ""]])[-1][0],
-        } for k in outside[:8]],
+        } for k in outside[:40]],
     }
 
 # ---------------------------------------------------------------------------
@@ -225,3 +228,4 @@ print("  %d panel markers · %d panels" % (len(markers), len(PANEL_ORDER)))
 print("  %d concerns (%d reachable from the annual panel)" % (m["nConcerns"], m["panelConcerns"]))
 print("  %d sourced relationship notes" % len(REL))
 print("  %s follow-up tests sit outside the panel for those concerns" % format(m["offPanelForPanelConcerns"], ","))
+print("  %d follow-up rows carried (cap 40 per concern)" % sum(len(c["next"]) for c in concerns.values()))

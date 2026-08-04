@@ -30,34 +30,34 @@ button{font-family:inherit;cursor:pointer}
 .scroll::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
 
 /* ---------------- chrome ---------------- */
-.top{position:absolute;top:0;left:0;right:0;height:53px;display:flex;align-items:center;gap:13px;
- padding:0 18px;background:var(--panel);border-bottom:1px solid var(--line);z-index:6}
+.top{position:absolute;top:0;left:0;right:0;height:56px;display:flex;align-items:center;gap:16px;
+ padding:0 16px;background:var(--panel);border-bottom:1px solid var(--line);z-index:6}
 .top .logo{font-family:var(--font-serif);font-size:18px;color:var(--slate);font-weight:700}
 .top .logo b{color:var(--teal)}
 .top .tag{font-family:var(--font-mono);font-size:10.5px;color:var(--muted);letter-spacing:.04em}
 .top .sp{flex:1}
 .top .stat{font-family:var(--font-mono);font-size:10.5px;color:var(--dim);white-space:nowrap}
 .top .btn{border:1px solid var(--line);background:#fff;color:var(--slate);font-size:11.5px;font-weight:600;
- padding:5px 11px;border-radius:15px}
+ padding:4px 12px;border-radius:16px}
 .top .btn:hover{border-color:var(--accent);color:var(--accent)}
 @media(max-width:1000px){.top .stat{display:none}}
 
-.stage{position:absolute;top:53px;left:0;right:0;bottom:0;overflow:hidden}
+.stage{position:absolute;top:56px;left:0;right:0;bottom:0;overflow:hidden}
 .map{position:absolute;inset:0;width:100%;height:100%;display:block}
 
 .pnl{position:absolute;background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:14px;
  box-shadow:0 12px 32px rgba(12,30,36,.10);z-index:3;display:flex;flex-direction:column;
  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
-.pnl > header{flex:0 0 auto;padding:10px 14px 8px;border-bottom:1px solid var(--line);
+.pnl > header{flex:0 0 auto;padding:8px 16px;border-bottom:1px solid var(--line);
  font-family:var(--font-mono);font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--dim);
- display:flex;align-items:center;gap:7px}
+ display:flex;align-items:center;gap:8px}
 .pnl > header b{font-family:var(--font-mono);color:var(--slate);font-weight:600}
 .pnl > header .sp{flex:1}
 
 /* ---------------- left rail ---------------- */
 .rail{top:var(--gap);left:var(--gap);bottom:calc(var(--footH) + var(--gap)*2);width:var(--railW)}
 .railtop{flex:0 0 auto;padding:16px;border-bottom:1px solid var(--line)}
-.railtop h1{font-family:var(--font-serif);font-size:19px;color:var(--slate);margin:0 0 3px;line-height:1.25}
+.railtop h1{font-family:var(--font-serif);font-size:19px;color:var(--slate);margin:0 0 4px;line-height:1.25}
 .railtop p{font-size:11.5px;color:var(--muted);margin:0;line-height:1.5}
 .railbody{flex:1 1 auto;min-height:0;padding:0 8px 8px}
 /* column header sits above the scroll area so it never scrolls away */
@@ -82,7 +82,7 @@ button{font-family:inherit;cursor:pointer}
 .tri{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:12px;
  overflow:hidden;background:#fff;height:24px}
 .tri button{border:none;background:none;font-family:var(--font-mono);font-size:10px;color:var(--dim);
- padding:0 8px;border-right:1px solid var(--line);line-height:22px;text-align:center;
+ padding:0 8px;border-right:1px solid var(--line);line-height:24px;text-align:center;
  white-space:nowrap;letter-spacing:.02em}
 .tri button:last-child{border-right:none}
 .tri button:hover{background:var(--aqua)}
@@ -104,41 +104,50 @@ button{font-family:inherit;cursor:pointer}
 
 /* ---------------- right detail ---------------- */
 .det{top:var(--gap);right:var(--gap);bottom:calc(var(--footH) + var(--gap)*2);width:var(--detW)}
-.dhead{flex:0 0 auto;padding:13px 15px 11px;border-bottom:1px solid var(--line);height:78px;overflow:hidden}
+.dhead{flex:0 0 auto;padding:16px;border-bottom:1px solid var(--line);min-height:96px;
+ display:flex;flex-direction:column;justify-content:center;gap:4px}
 .dhead .k{font-family:var(--font-mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
-.dhead h2{font-family:var(--font-serif);font-size:18px;color:var(--slate);margin:1px 0 2px;line-height:1.25;
+.dhead h2{font-family:var(--font-serif);font-size:18px;color:var(--slate);margin:0;line-height:1.3;
  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dhead .s{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dhead .s{font-size:11px;color:var(--muted);line-height:1.5;white-space:nowrap;overflow:hidden;
+ text-overflow:ellipsis;padding-bottom:4px}
 .slot{flex:0 0 auto;border-bottom:1px solid var(--line);display:flex;flex-direction:column}
 .slot > .h{flex:0 0 auto;font-family:var(--font-mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;
- color:var(--dim);padding:9px 15px 5px;display:flex;align-items:baseline;gap:6px}
+ color:var(--dim);padding:16px 16px 8px;display:flex;align-items:baseline;gap:8px}
 .slot > .h b{color:var(--accent);font-weight:600}
-.slot > .c{flex:1 1 auto;min-height:0;padding:0 15px 11px}
-.slot.why{height:104px}
-.slot.fact{height:186px}
+.slot > .c{flex:1 1 auto;min-height:0;padding:0 16px 16px}
+/* "why it is on the map" grows to fit — it is never scrolled and never clipped */
+.slot.why{flex:0 0 auto}
+.slot.why > .c{overflow:visible}
+.slot.fact{flex:0 0 auto;height:184px}
 .slot.next{flex:1 1 auto;min-height:0;border-bottom:none}
 .empty{font-size:11.5px;color:var(--dim);line-height:1.55;font-style:italic}
 .wl{list-style:none;margin:0;padding:0}
-.wl li{font-size:11.5px;color:var(--muted);padding:2px 0;line-height:1.45}
+.wl li{font-size:11.5px;color:var(--muted);padding:4px 0;line-height:1.45}
 .wl li b{color:var(--slate)}
-.wl li i{font-style:normal;font-family:var(--font-mono);font-size:9.5px;padding:0 5px;border-radius:7px;margin-right:5px}
+.wl li i{font-style:normal;font-family:var(--font-mono);font-size:9.5px;padding:0 4px;border-radius:8px;margin-right:8px}
 .wl li i.lo{background:#e2f2f5;color:var(--low)}
 .wl li i.hi{background:#fdf1ea;color:var(--high)}
 
-.fc{border-left:2px solid var(--warm);padding:1px 0 1px 11px;margin:0 0 11px}
+.fc{border-left:2px solid var(--warm);padding:0 0 0 12px;margin:0 0 16px}
 .fc q{font-family:var(--font-serif);font-size:12.5px;color:var(--slate);line-height:1.55;display:block;font-style:italic}
-.fc .cite{font-family:var(--font-mono);font-size:9px;color:var(--dim);margin-top:5px;display:block}
+.fc .cite{font-family:var(--font-mono);font-size:9px;color:var(--dim);margin-top:8px;display:block}
 .fc .rel{font-family:var(--font-mono);font-size:9px;letter-spacing:.04em;text-transform:uppercase;
- color:var(--accent);display:block;margin-bottom:4px}
+ color:var(--accent);display:block;margin-bottom:4px;line-height:1.4}
 
 .nl{list-style:none;margin:0;padding:0}
-.nl li{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:6px 0;
+.nl li{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:8px 0;
  border-bottom:1px solid #eef2f2}
 .nl li:last-child{border-bottom:none}
+.more{display:block;width:100%;margin:8px 0 0;padding:8px;border:1px solid var(--line);background:#fff;
+ border-radius:8px;font-family:var(--font-mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;
+ color:var(--teal)}
+.more:hover{border-color:var(--teal);background:var(--aqua)}
+.morenote{font-size:11px;color:var(--dim);margin:8px 0 0;line-height:1.5}
 .nl .n{font-size:12px;color:var(--slate);line-height:1.35}
-.nl .n em{font-style:normal;font-family:var(--font-mono);font-size:9.5px;color:var(--dim);margin-left:5px}
+.nl .n em{font-style:normal;font-family:var(--font-mono);font-size:9.5px;color:var(--dim);margin-left:8px}
 .tg{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.04em;text-transform:uppercase;
- padding:2px 6px;border-radius:8px;white-space:nowrap}
+ padding:4px 8px;border-radius:8px;white-space:nowrap}
 .tg.q{background:#e3f2ea;color:var(--ok)}
 .tg.g{background:#f0f3f3;color:var(--dim)}
 .tg.src{background:#fdf1ea;color:var(--accent)}
@@ -146,8 +155,8 @@ button{font-family:inherit;cursor:pointer}
 /* ---------------- footer ---------------- */
 .foot{left:var(--gap);right:var(--gap);bottom:var(--gap);height:var(--footH);flex-direction:row;
  align-items:center;gap:16px;padding:0 16px}
-.leg{display:flex;gap:13px;flex-wrap:wrap;font-size:11px;color:var(--muted);flex:0 0 auto}
-.leg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.leg{display:flex;gap:16px;flex-wrap:wrap;font-size:11px;color:var(--muted);flex:0 0 auto}
+.leg i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:-1px}
 .fnote{font-size:11.5px;color:var(--muted);margin:0;line-height:1.5;border-left:1px solid var(--line);
  padding-left:16px;flex:1;min-width:0}
 .fnote b{color:var(--accent)}
@@ -198,7 +207,7 @@ button{font-family:inherit;cursor:pointer}
 .map .slot{fill:none;stroke:#dfe6e7;stroke-width:1;stroke-dasharray:1.6 2}
 .map .cnt.on{fill:var(--teal)}
 
-.mapnote{position:absolute;left:50%;transform:translateX(-50%);bottom:6px;font-family:var(--font-mono);
+.mapnote{position:absolute;left:50%;transform:translateX(-50%);bottom:8px;font-family:var(--font-mono);
  font-size:9px;color:#b4c0c2;letter-spacing:.06em;pointer-events:none;z-index:2;white-space:nowrap}
 
 @media(max-width:1080px){
@@ -238,7 +247,7 @@ button{font-family:inherit;cursor:pointer}
 
  <section class="pnl det">
   <div class="dhead" id="dHead"></div>
-  <div class="slot why"><div class="h" id="whyH">why it is on the map</div><div class="c scroll" id="why"></div></div>
+  <div class="slot why"><div class="h" id="whyH">why it is on the map</div><div class="c" id="why"></div></div>
   <div class="slot fact"><div class="h" id="factH">how these connect</div><div class="c scroll" id="fact"></div></div>
   <div class="slot next"><div class="h" id="nextH">what would follow it up</div><div class="c scroll" id="next"></div></div>
  </section>
@@ -265,7 +274,7 @@ const SLUGS = D.panels.reduce((a,p)=>a.concat(p.slugs), []);
 const CIDS = Object.keys(C).map(Number);
 
 /* ---------- state ---------- */
-const st = { val:{}, added:{}, sel:null, hot:null };   // val: slug -> -1|0|1
+const st = { val:{}, added:{}, sel:null, hot:null, expand:false };   // val: slug -> -1|0|1
 SLUGS.forEach(s => st.val[s] = 0);
 try{ const raw = localStorage.getItem('v3.state');
      if(raw){ const o = JSON.parse(raw);
@@ -349,10 +358,10 @@ function buildLayout(){
  // ---- follow-up tests: one tight block, vertically centred on the concern row
  // it belongs to, so the fan of edges is symmetric about the connector dot.
  // Row pitch is 32px (8px grid). The block is clamped inside the column.
- const T_ROW = 24;   // 8px grid; short enough that the block can centre on almost any row
+ const T_ROW = 24, MAP_SHOW = 8;   // 8px grid; the map shows the top 8, the panel expands to the rest
  const ts = [];
  if(open !== null){
-  const list = (C[open].next || []), n = list.length, blockH = n * T_ROW;
+  const list = (C[open].next || []).slice(0, MAP_SHOW), n = list.length, blockH = n * T_ROW;
   const anchor = cn[open];
   const y0 = Math.max(b.T, Math.min(b.B - blockH, anchor - blockH / 2));
   list.forEach((t, j) => ts.push({ t: t, y: y0 + T_ROW * j + T_ROW / 2 }));
@@ -592,14 +601,23 @@ function drawDetail(){
  $('factH').innerHTML = 'how these connect <b>'+fs.length+'</b>';
  $('fact').innerHTML = fs.length ? fs.map(factHTML).join('')
   : '<p class="empty">No sourced relationship note reaches this concern yet.</p>';
+ const all = c.next || [], shown = st.expand ? all.length : Math.min(8, all.length);
  $('nextH').innerHTML = 'what would follow it up <b>'+nf(c.nOutside)+'</b>';
- $('next').innerHTML = (c.next||[]).length
-  ? '<ul class="nl">'+c.next.map(t =>
+ $('next').innerHTML = all.length
+  ? '<ul class="nl">'+all.slice(0, shown).map(t =>
      '<li><span class="n">'+(t.u?'<a href="'+t.u+'" target="_blank" rel="noopener">'+esc(t.n)+'</a>':esc(t.n))
      + (t.a?'<em>'+esc(t.a)+'</em>':'')+'</span>'
      + '<span class="tg '+(t.v?'q':'g')+'">'+(t.v?'quoted':'ai-written')+'</span></li>').join('')+'</ul>'
-    + '<p class="empty" style="margin-top:9px">Ranked from the catalogue by how well sourced and how commonly '
-    + 'ordered they are. These are markers <b>tagged to this concern</b>, not a confirmed diagnostic sequence.</p>'
+    + (all.length > 8
+       ? '<button class="more" data-expand="1">'
+         + (st.expand ? '\u2191 show the top 8 only' : '\u2193 show all '+all.length+' carried here')
+         + '</button>' : '')
+    + '<p class="morenote">The first <b>8</b> are drawn on the map. '
+    + (c.nOutside > all.length
+       ? 'This panel carries the top <b>'+all.length+'</b> of <b>'+nf(c.nOutside)+'</b> markers tagged to this concern outside your panel.'
+       : 'All <b>'+nf(c.nOutside)+'</b> are here.')
+    + ' Ranked by how well sourced and how commonly ordered they are \u2014 these are markers '
+    + '<b>tagged to this concern</b>, not a confirmed diagnostic sequence.</p>'
   : '<p class="empty">Nothing outside your panel is tagged to this concern.</p>';
 }
 
@@ -631,14 +649,16 @@ document.addEventListener('click', function(e){
  if(add){ const ci = add.dataset.add;
    if(st.added[ci]) delete st.added[ci]; else st.added[ci] = 1;
    st.sel = st.added[ci] ? {t:'c', v:ci} : null; save(); render(); return; }
+ const ex = e.target.closest('[data-expand]');
+ if(ex){ st.expand = !st.expand; drawDetail(); return; }
  const mk = e.target.closest('[data-mk]');
  if(mk){ const s = mk.dataset.mk;
    st.sel = (st.sel && st.sel.t==='m' && st.sel.v===s) ? null : {t:'m', v:s};
-   render(); return; }
+   st.expand = false; render(); return; }
  const cn = e.target.closest('[data-cn]');
  if(cn){ const ci = cn.dataset.cn;
    st.sel = (st.sel && st.sel.t==='c' && String(st.sel.v)===String(ci)) ? null : {t:'c', v:ci};
-   render(); return; }
+   st.expand = false; render(); return; }
 });
 $('map').addEventListener('mouseover', function(e){
  const mk = e.target.closest('[data-mk]'), cn = e.target.closest('[data-cn]');

@@ -24,6 +24,12 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # feedback. Shown on the overview screen.
 # ===========================================================================
 CONSTRAINTS = [
+ ("8px spacing system",
+  "Every spacing value \u2014 padding, margin, gap, row and panel height, column width \u2014 is a multiple of 8, at every level of the design. 4px is a permitted half-step; type, 1px borders and radii are exempt. Written up in <code>DESIGN-RULES.md</code>."),
+ ("Nothing shifts under the cursor",
+  "Panel and column positions are constants; content scrolls inside its own box rather than growing it; scroll gutters are reserved."),
+ ("No ambient motion",
+  "Nothing drifts, floats or animates on its own. Transitions are colour and opacity only, on direct interaction."),
  ("No hallucination",
   "Every claim carries a credible reference with a link so it can be verified."),
  ("Quote, don't rephrase",
@@ -36,6 +42,34 @@ CONSTRAINTS = [
 # FEEDBACK LEDGER — newest first
 # ===========================================================================
 FEEDBACK = [
+ {
+  "id": "F12",
+  "date": "2026-07-31",
+  "who": "Chloe",
+  "title": "Detail panel padding, no scroll on \u201cwhy\u201d, expandable follow-ups, 8px everywhere",
+  "status": "addressed",
+  "versions": ["v2.5"],
+  "quote": "apply 8px rule everywhere in every level of design. put that in rule and instruction",
+  "quotes": [
+   "fix the padding below [80 related markers] like the second img",
+   "always fully reveal content under [why it is on the map], no scroll bar for that section",
+   "need access to the rest [what would follow it up], make it an expandable section below maybe",
+   "apply 8px rule everywhere in every level of design. put that in rule and instruction",
+  ],
+  "did": [
+   ("Header no longer clips its subtitle", "addressed",
+    "The detail header was a hard 78px box with mixed 13/15/11px padding, so \u201c80 related markers \u00b7 79 outside your panel\u201d was cut at the descender. Now 16px padding on a 96px minimum, vertically centred."),
+   ("\u201cWhy it is on the map\u201d always reveals in full", "addressed",
+    "The fixed 104px height and its scrollbar are gone \u2014 the section sizes to its content and is never clipped."),
+   ("Follow-ups are expandable", "addressed",
+    "The build now carries the top 40 per concern instead of 8. The panel shows 8 by default with <i>show all 40 carried here</i>, and states the true total: <i>the top 40 of 79 markers tagged to this concern outside your panel</i>. The map still draws 8. Expander resets when the selection changes."),
+   ("8px applied at every level", "addressed",
+    "Audited the whole stylesheet, not just the layout: header 56, footer 72, panel padding 16, section headers 16/16/8, list rows 32 and 8, chips 4/8, badges 4/8, legend swatches 8 with 8 gap, control height 24 with 8 padding. <b>Zero off-grid padding, margin, gap or height remain.</b>"),
+   ("Written into the rules", "addressed",
+    "<code>DESIGN-RULES.md</code> added at the project root: the 8px system with the reference values and a regex audit to run before shipping, plus the no-shift and no-motion rules and the sourcing rules. The three design rules also now head the standing-rules list on this panel\u2019s overview."),
+  ],
+  "open": None,
+ },
  {
   "id": "F11",
   "date": "2026-07-31",
@@ -319,12 +353,33 @@ FEEDBACK = [
 # ===========================================================================
 VERSIONS = [
  {
+  "id": "v2.5",
+  "file": "v2.5-detail-8px.html",
+  "title": "Ripple atlas \u2014 detail panel, 8px audit",
+  "date": "2026-07-31",
+  "source": "index-v3.html",
+  "status": "candidate",
+  "tag": "v2.5-detail-8px",
+  "gitpath": "index-v3.html",
+  "answers": ["F12"],
+  "summary": "Detail panel rebuilt on the grid: nothing clipped in the header, the explanation section never scrolls, and the follow-up list expands to the rest.",
+  "changes": [
+   "<b>Header</b> \u2014 16px padding on a 96px minimum, vertically centred. The subtitle is no longer cut off.",
+   "<b>\u201cWhy it is on the map\u201d sizes to its content</b> and has no scrollbar.",
+   "<b>Follow-ups expand</b> \u2014 top 40 carried per concern (was 8), 8 shown by default, with the true total stated.",
+   "<b>Full 8px audit</b> of the stylesheet: zero off-grid padding, margin, gap or height.",
+   "<code>DESIGN-RULES.md</code> added, and the design rules now head the standing-rules list here.",
+   "File grew 101\u2009KB \u2192 238\u2009KB carrying the extra follow-up rows.",
+  ],
+  "note": "Follow-up centring still clamps for concerns in the top ~130px, where a centred block would leave the canvas.",
+ },
+ {
   "id": "v2.4",
   "file": "v2.4-centred-followups.html",
   "title": "Ripple atlas \u2014 centred follow-ups, 8px pill",
   "date": "2026-07-31",
   "source": "index-v3.html",
-  "status": "candidate",
+  "status": "superseded",
   "tag": "v2.4-centred-followups",
   "gitpath": "index-v3.html",
   "answers": ["F11"],
