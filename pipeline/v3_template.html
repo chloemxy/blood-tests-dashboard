@@ -55,7 +55,7 @@ button{font-family:inherit;cursor:pointer}
 .pnl > header .sp{flex:1}
 
 /* ---------------- left rail ---------------- */
-.rail{top:var(--gap);left:var(--gap);bottom:calc(var(--footH) + var(--gap)*2);width:var(--railW)}
+.rail{top:0;left:0;bottom:var(--footH);width:var(--railW);border-radius:0;border-left:none;border-top:none}
 .railtop{flex:0 0 auto;padding:16px;border-bottom:1px solid var(--line)}
 .railtop h1{font-family:var(--font-serif);font-size:19px;color:var(--slate);margin:0 0 4px;line-height:1.25}
 .railtop p{font-size:11.5px;color:var(--muted);margin:0;line-height:1.5}
@@ -73,10 +73,15 @@ button{font-family:inherit;cursor:pointer}
 .grouphd{font-family:var(--font-mono);font-size:9px;letter-spacing:.07em;text-transform:uppercase;
  color:var(--dim);padding:16px 8px 8px;display:flex;align-items:baseline;gap:8px}
 .grouphd b{color:var(--slate);font-weight:600}
+/* Row highlights bleed to the panel edge: the row carries the horizontal
+   padding and cancels its container's with a negative margin. Same pattern for
+   every row-like component — marker rows, follow-up rows, family headers, the
+   why-list — so a hover or a selection always covers the whole row. */
 .mrow{display:grid;grid-template-columns:1fr var(--tglW);gap:8px;align-items:center;height:32px;
- padding:0 8px;border-radius:8px;border:1px solid transparent}
+ padding:0 16px;margin:0 -8px;border-radius:0;border:1px solid transparent;border-left:none;border-right:none}
 .mrow:hover{background:var(--aqua)}
-.mrow.sel{background:#fdf1ea;border-color:var(--accent)}
+.mrow.sel{background:#fdf1ea;border-color:var(--accent);border-left:none;border-right:none}
+.mrow.foc{border-color:var(--teal);background:var(--aqua);border-left:none;border-right:none}
 .mrow .nm{font-size:12px;color:var(--slate);font-weight:600;white-space:nowrap;overflow:hidden;
  text-overflow:ellipsis;cursor:pointer}
 .mrow.lo .nm{color:var(--low)}
@@ -108,7 +113,7 @@ button{font-family:inherit;cursor:pointer}
 .chip.inpanel{color:var(--dim);border-style:dashed}
 
 /* ---------------- right detail ---------------- */
-.det{top:var(--gap);right:var(--gap);bottom:calc(var(--footH) + var(--gap)*2);width:var(--detW)}
+.det{top:0;right:0;bottom:var(--footH);width:var(--detW);border-radius:0;border-right:none;border-top:none}
 .dhead{flex:0 0 auto;padding:16px;border-bottom:1px solid var(--line);min-height:96px;
  display:flex;flex-direction:column;justify-content:center;gap:4px}
 .dhead .k{font-family:var(--font-mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
@@ -137,7 +142,7 @@ button{font-family:inherit;cursor:pointer}
 .slot.fact{flex:1 1 0;min-height:176px}
 .empty{font-size:11.5px;color:var(--dim);line-height:1.55;font-style:italic}
 .wl{list-style:none;margin:0;padding:0}
-.wl li{font-size:11.5px;color:var(--muted);padding:4px 0;line-height:1.45}
+.wl li{font-size:11.5px;color:var(--muted);padding:4px 16px;margin:0 -16px;line-height:1.45}
 .wl li b{color:var(--slate)}
 .wl li i{font-style:normal;font-family:var(--font-mono);font-size:9.5px;padding:0 4px;border-radius:8px;margin-right:8px}
 .wl li i.lo{background:#e2f2f5;color:var(--low)}
@@ -151,9 +156,19 @@ button{font-family:inherit;cursor:pointer}
  color:var(--accent);display:block;margin-bottom:4px;line-height:1.4}
 
 .nl{list-style:none;margin:0;padding:0}
-.nl li{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:4px 0;
- border-bottom:1px solid #eef2f2}
+.nl li{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:4px 16px;
+ margin:0 -16px;border-bottom:1px solid #eef2f2}
+.nl li:hover{background:var(--aqua)}
 .nl li:last-child{border-bottom:none}
+.famhd{margin:8px 0 4px}
+.famhd:first-child{margin-top:0}
+.famtog{display:grid;grid-template-columns:16px 1fr auto;gap:8px;align-items:baseline;width:auto;
+ background:none;border:none;padding:4px 16px;margin:0 -16px;border-bottom:1px solid var(--line);text-align:left}
+.famtog:hover{background:var(--aqua)}
+.famtog .fx{font-family:var(--font-mono);font-size:11px;color:var(--teal);text-align:center}
+.famtog .fn{font-family:var(--font-mono);font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:var(--slate)}
+.famtog .fc{font-family:var(--font-mono);font-size:9px;color:var(--dim)}
+.famtog:hover .fn{color:var(--teal)}
 .more{display:block;width:100%;margin:8px 0 0;padding:4px 8px;border:1px solid var(--line);background:#fff;
  border-radius:8px;font-family:var(--font-mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;
  color:var(--teal)}
@@ -165,7 +180,7 @@ button{font-family:inherit;cursor:pointer}
 .tlink{background:none;border:none;padding:0;font-family:inherit;font-size:12px;color:var(--teal);
  text-align:left;text-decoration:underline;text-underline-offset:2px;line-height:1.35}
 .tlink:hover{color:var(--accent)}
-.nl li.on{background:var(--aqua);border-radius:8px}
+.nl li.on{background:var(--aqua)}
 .nl li.on .tlink{font-weight:700;color:var(--accent);text-decoration:none}
 .tagchips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .tagchip{border:1px solid var(--line);background:#fff;color:var(--muted);font-size:10px;padding:4px 8px;
@@ -185,8 +200,8 @@ button{font-family:inherit;cursor:pointer}
 .tg.src{background:#fdf1ea;color:var(--accent)}
 
 /* ---------------- footer ---------------- */
-.foot{left:var(--gap);right:var(--gap);bottom:var(--gap);height:var(--footH);flex-direction:row;
- align-items:center;gap:16px;padding:0 16px}
+.foot{left:0;right:0;bottom:0;height:var(--footH);flex-direction:row;
+ align-items:center;gap:16px;padding:0 16px;border-radius:0;border-left:none;border-right:none;border-bottom:none}
 .leg{display:flex;gap:16px;flex-wrap:wrap;font-size:11px;color:var(--muted);flex:0 0 auto}
 .leg i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:-1px}
 .fnote{font-size:11.5px;color:var(--muted);margin:0;line-height:1.5;border-left:1px solid var(--line);
@@ -217,7 +232,6 @@ button{font-family:inherit;cursor:pointer}
 .map .row:hover .hitbox{fill:rgba(0,115,133,.055)}
 .map .row.sel .hitbox{fill:rgba(184,74,14,.09)}
 .map .row.foc .hitbox{fill:rgba(0,115,133,.07);stroke:var(--teal);stroke-width:1.5;stroke-dasharray:3 2}
-.mrow.foc{border-color:var(--teal);background:var(--aqua)}
 
 /* Every dot is the same size and shape. State is carried by fill and stroke
    colour, never by geometry, so the three columns read as one system. */
@@ -357,7 +371,7 @@ const SLUGS = D.panels.reduce((a,p)=>a.concat(p.slugs), []);
 const CIDS = Object.keys(C).map(Number);
 
 /* ---------- state ---------- */
-const st = { val:{}, added:{}, sel:null, hot:null, expand:false, foc:null };   // val: slug -> -1|0|1
+const st = { val:{}, added:{}, sel:null, hot:null, expand:false, foc:null, fam:{} };   // val: slug -> -1|0|1
 SLUGS.forEach(s => st.val[s] = 0);
 try{ const raw = localStorage.getItem('v3.state');
      if(raw){ const o = JSON.parse(raw);
@@ -392,10 +406,12 @@ function box(){
  // dropped on a narrow window. Counting the rail only when "wide" was what let
  // the marker column slide under it. Padding between a panel and the nearest
  // text is a constant 16px on every edge, at every size.
+ // Panels are docked to the window edges, so the map's margin is measured from
+ // the panel edge, not the window: a constant 16px on every side.
  const hasDet = W > 1080, hasFoot = W > 1080;
- const L = g + railW + g;
- const R = W - (hasDet ? g + detW + g : g);
- const T = 32, B = H - (hasFoot ? footH + g * 2 : g) - 24;
+ const L = railW + g;
+ const R = W - (hasDet ? detW + g : g);
+ const T = 32, B = H - (hasFoot ? footH + g : g) - 24;
  return { W:W, H:H, L:L, R:R, T:T, B:B, w:R-L, h:B-T };
 }
 
@@ -464,36 +480,19 @@ function buildLayout(){
  // names wrap, which needs more height, which may force the type down, which
  // changes the wrapping again — so settle it by iteration rather than by a
  // fixed multiplier. Stops as soon as everything fits, or at the 8px floor.
+ // One type size, 12px, and one row height for every row in every column.
+ // 12px only stops fitting on a window shorter than about 780px; below that it
+ // steps down rather than letting rows collide, which is the only case where
+ // the size is not exactly 12.
  const cAvail = b.h - divH;
- const LEAD = 1.06, PAD = 4;
- let cFs = 11, cLines = {}, nTwo = 0;
- for(let pass = 0; pass < 16; pass++){
-  const per = Math.max(8, Math.floor((xCend - xC - 52) / (cFs * 0.56)));
-  cLines = {}; nTwo = 0;
-  CIDS.forEach(ci => {
-   const ln = wrap(C[ci].label, per, 2);
-   cLines[ci] = ln;
-   if(ln.length > 1) nTwo++;
-  });
-  const need = (CIDS.length - nTwo) * (cFs * LEAD + PAD)
-             + nTwo * (2 * cFs * LEAD + PAD);
-  if(need <= cAvail || cFs <= 8) break;
-  cFs = Math.max(8, cFs - 0.25);
- }
- // If two lines still will not fit at the 8px floor, the column is simply too
- // short for 47 wrapped rows — fall back to one truncated line rather than
- // letting the rows run past the bottom of the map.
- const perFinal = Math.max(8, Math.floor((xCend - xC - 52) / (cFs * 0.56)));
- let rowOne = cFs * LEAD + PAD, rowTwo = 2 * cFs * LEAD + PAD;
- if((CIDS.length - nTwo) * rowOne + nTwo * rowTwo > cAvail){
-  CIDS.forEach(ci => { cLines[ci] = [clip(C[ci].label, perFinal)]; });
-  nTwo = 0;
- }
- const needTot = (CIDS.length - nTwo) * rowOne + nTwo * rowTwo;
- const slack = cAvail / needTot;                   // exact fill, never overflow
+ const LEAD = 1.06, PAD = 2;
+ const cFs = Math.max(8, Math.min(12, (cAvail / CIDS.length - PAD) / LEAD));
+ const cPer = Math.max(8, Math.floor((xCend - xC - 52) / (cFs * 0.56)));
+ const cLines = {};
+ CIDS.forEach(ci => { cLines[ci] = [clip(C[ci].label, cPer)]; });
+ const cUnit = cAvail / CIDS.length;               // uniform, exact fill
  const cH = {};
- CIDS.forEach(ci => { cH[ci] = (cLines[ci].length > 1 ? rowTwo : rowOne) * slack; });
- const cUnit = rowOne * slack;
+ CIDS.forEach(ci => { cH[ci] = cUnit; });
 
  const cn = {}; let cy = b.T, divY = 0;
  reach.forEach(o => { cn[o.ci] = cy + cH[o.ci] / 2; cy += cH[o.ci]; });
@@ -504,7 +503,7 @@ function buildLayout(){
  // ---- follow-up tests: one tight block, vertically centred on the concern row
  // it belongs to, so the fan of edges is symmetric about the connector dot.
  // Row pitch is 32px (8px grid). The block is clamped inside the column.
- const T_ROW = 24, MAP_SHOW = 8;   // 8px grid; the map shows the top 8, the panel expands to the rest
+ const T_ROW = 32, MAP_SHOW = 8;   // 8px grid; 32 so a wrapped 12px label still clears
  const ts = [];
  if(open !== null){
   const list = (C[open].next || []).slice(0, MAP_SHOW), n = list.length, blockH = n * T_ROW;
@@ -516,10 +515,10 @@ function buildLayout(){
  // One type size for all three columns — the tightest of the three budgets, so
  // the columns read as one system rather than three. State is carried by colour
  // only, never by size or weight.
- const mFs = Math.max(8.5, Math.min(11, mRow * 0.58));
+ const mFs = Math.max(8, Math.min(12, (mRow - 2) / 1.06));
  const cOrder = reach.map(o => o.ci).concat(unreach.map(o => o.ci));
  const headLeadOut = headLead;
- const FS = Math.max(8, Math.min(mFs, cFs));      // one size, every column
+ const FS = Math.max(8, Math.min(12, mFs, cFs));  // one size, every column; 12 unless it cannot fit
  const divTop = divY - divH / 2;
  return { xM:xM, xC:xC, xT:xT, xCend:xCend, mk:mk, cn:cn, ts:ts, groups:groups, cOrder:cOrder,
           divLines:divLines, divTop:divTop, divPad:divPad, divLead:divLead, divGap:divGap,
@@ -740,32 +739,47 @@ function factHTML(r){
    you click through to a single test — the row highlights in place rather than
    the list being replaced. */
 function drawNextList(ci, selIdx){
- const c = C[ci], all = c.next || [];
- const shown = st.expand ? all.length : Math.min(8, all.length);
+ const c = C[ci], all = c.next || [], fams = c.fams || [];
  $('nextH').innerHTML = 'what would follow it up <b>'+nf(c.nDistinct)+'</b>';
  $('nextSlot').classList.toggle('exp', !!st.expand);
  if(!all.length){ $('next').innerHTML = '<p class="empty">Nothing outside your panel is tagged to this concern.</p>'; return; }
- // keep a selected row visible even when it sits past the collapsed cut-off
- const idx = [];
- for(let i = 0; i < shown; i++) idx.push(i);
- if(selIdx >= 0 && idx.indexOf(selIdx) < 0) idx.push(selIdx);
- $('next').innerHTML =
-   '<ul class="nl">'+idx.map(i => { const t = all[i];
-     return '<li'+(i===selIdx?' class="on"':'')+'><span class="n">'
-      + '<button class="tlink" data-test="'+ci+'" data-ti="'+i+'">'+esc(t.n)+'</button>'
-      + (t.a?'<em>'+esc(t.a)+'</em>':'')
-      + (t.nv>1?'<i class="nv" title="'+t.nv+' LOINC codes for this marker — different units, specimens or methods">&times;'+t.nv+'</i>':'')
-      + '</span><span class="tg '+(t.v?'q':'g')+'">'+(t.v?'quoted':'ai-written')+'</span></li>';
-   }).join('')+'</ul>'
-  + (all.length > 8
+
+ // Grouped by family. A family shows its commonly-ordered markers by default —
+ // the catalogue's own ordering tier — and opens to the rest on demand. The
+ // count on the header is the true total, not what is carried.
+ const row = (t, i) =>
+   '<li'+(i===selIdx?' class="on"':'')+'><span class="n">'
+   + '<button class="tlink" data-test="'+ci+'" data-ti="'+i+'">'+esc(t.n)+'</button>'
+   + (t.a?'<em>'+esc(t.a)+'</em>':'')
+   + (t.nv>1?'<i class="nv" title="'+t.nv+' LOINC codes for this marker — different units, specimens or methods">&times;'+t.nv+'</i>':'')
+   + '</span><span class="tg '+(t.v?'q':'g')+'">'+(t.v?'quoted':'ai-written')+'</span></li>';
+
+ let h = '', anyHidden = false;
+ fams.forEach(f => {
+  const mine = [];
+  all.forEach((t, i) => { if(t.g === f.g) mine.push({t:t, i:i}); });
+  const open = !!st.fam[f.g] || st.expand;
+  const pick = open ? mine : mine.filter(o => o.t.t >= 8 || o.i === selIdx);
+  if(mine.length > pick.length) anyHidden = true;
+  h += '<div class="famhd"><button class="famtog" data-fam="'+esc(f.g)+'">'
+     + '<span class="fx">'+(open ? '\u2212' : '+')+'</span>'
+     + '<span class="fn">'+esc(f.g)+'</span>'
+     + '<span class="fc">'+nf(f.n)+'</span></button></div>';
+  if(pick.length) h += '<ul class="nl">'+pick.map(o => row(o.t, o.i)).join('')+'</ul>';
+  else h += '<p class="empty" style="margin:0 0 8px">none commonly ordered \u2014 open to see all '+nf(f.n)+'</p>';
+  if(open && mine.length < f.n)
+   h += '<p class="empty" style="margin:0 0 8px">showing '+mine.length+' of '+nf(f.n)+' carried for this family</p>';
+ });
+
+ $('next').innerHTML = h
+  + (anyHidden || st.expand
      ? '<button class="more" data-expand="1">'
-       + (st.expand ? '\u2191 show the top 8 only' : '\u2193 show all '+all.length+' carried here')
+       + (st.expand ? '\u2191 collapse every family' : '\u2193 open every family')
        + '</button>' : '')
-  + '<p class="morenote"><b>8</b> drawn on the map &middot; '
-  + (c.nDistinct > all.length ? 'top <b>'+all.length+'</b> of <b>'+nf(c.nDistinct)+'</b> markers carried here'
-                              : 'all <b>'+nf(c.nDistinct)+'</b> markers carried here')
-  + ' &middot; from <b>'+nf(c.nOutside)+'</b> LOINC rows'
-  + '<br>Tagged to this concern and ranked \u2014 not a confirmed diagnostic sequence.</p>';
+  + '<p class="morenote"><b>'+fams.length+'</b> famil'+(fams.length===1?'y':'ies')+' &middot; '
+  + '<b>'+nf(c.nDistinct)+'</b> markers &middot; from <b>'+nf(c.nOutside)+'</b> LOINC rows'
+  + '<br>Shown by default: the ones a general clinician commonly orders. '
+  + 'Tagged to this concern and ranked \u2014 not a confirmed diagnostic sequence.</p>';
 }
 
 /* ---------- detail ---------- */
@@ -905,17 +919,19 @@ document.addEventListener('click', function(e){
    if(st.added[ci]) delete st.added[ci]; else st.added[ci] = 1;
    st.sel = st.added[ci] ? {t:'c', v:ci} : null; save(); render(); return; }
  const ex = e.target.closest('[data-expand]');
- if(ex){ st.expand = !st.expand; drawDetail(); return; }
+ if(ex){ st.expand = !st.expand; st.fam = {}; drawDetail(); return; }
+ const ft = e.target.closest('[data-fam]');
+ if(ft){ const g = ft.dataset.fam; if(st.fam[g]) delete st.fam[g]; else st.fam[g] = 1; drawDetail(); return; }
  const tt = e.target.closest('[data-test]');
  if(tt){ st.sel = {t:'t', v:tt.dataset.test, i:+tt.dataset.ti}; st.expand = false; render(); return; }
  const mk = e.target.closest('[data-mk]');
  if(mk){ const s = mk.dataset.mk;
    st.sel = (st.sel && st.sel.t==='m' && st.sel.v===s) ? null : {t:'m', v:s};
-   st.expand = false; render(); return; }
+   st.expand = false; st.fam = {}; render(); return; }
  const cn = e.target.closest('[data-cn]');
  if(cn){ const ci = cn.dataset.cn;
    st.sel = (st.sel && st.sel.t==='c' && String(st.sel.v)===String(ci)) ? null : {t:'c', v:ci};
-   st.expand = false; render(); return; }
+   st.expand = false; st.fam = {}; render(); return; }
 });
 $('map').addEventListener('mouseover', function(e){
  const mk = e.target.closest('[data-mk]'), cn = e.target.closest('[data-cn]');

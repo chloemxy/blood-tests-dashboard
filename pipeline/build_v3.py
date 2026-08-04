@@ -116,9 +116,24 @@ for ci, c in enumerate(CONCERNS):
             "q": (TESTS[k].get("q") or "").strip('"')[:260],
             "qs": TESTS[k].get("qs") or "",
             "cs": TESTS[k].get("k") or [],
+            "t": TESTS[k].get("t", 0),      # how commonly ordered: 18 common .. -3 obscure
             "nv": 1,
         }
     distinct = list(byAnalyte.values())
+
+    # Family rollup over EVERY distinct marker, not just the carried top 40, so
+    # the counts a reader sees are the true ones. `common` is the catalogue's
+    # own ordering tier: 8 and above is a test a general clinician orders.
+    fams, order_seen = {}, []
+    for t in distinct:
+        f = fams.get(t["g"])
+        if not f:
+            f = fams[t["g"]] = {"g": t["g"], "n": 0, "c": 0}
+            order_seen.append(t["g"])
+        f["n"] += 1
+        if t["t"] >= 8:
+            f["c"] += 1
+    famList = sorted(fams.values(), key=lambda f: (-f["c"], -f["n"], f["g"]))
 
     concerns[ci] = {
         "id": c["id"], "label": c["label"], "grp": c["grp"],
@@ -129,6 +144,7 @@ for ci, c in enumerate(CONCERNS):
         "from": [m["slug"] for m in markers.values() if ci in m["k"]],
         # 8 drawn on the map; up to 40 carried so the panel can expand.
         "next": distinct[:40],
+        "fams": famList,
     }
 
 # ---------------------------------------------------------------------------
@@ -265,4 +281,8 @@ print("  %d concerns (%d reachable from the annual panel)" % (m["nConcerns"], m[
 print("  %d sourced relationship notes" % len(REL))
 print("  %s follow-up tests sit outside the panel for those concerns" % format(m["offPanelForPanelConcerns"], ","))
 print("  %d distinct follow-up markers carried (cap 40 per concern)" % sum(len(c["next"]) for c in concerns.values()))
+print("  families per concern: median %d, max %d" % (sorted(len(c["fams"]) for c in concerns.values())[len(concerns)//2], max(len(c["fams"]) for c in concerns.values())))
+print("  commonly-ordered markers per concern: median %d, max %d" % (
+    sorted(sum(f["c"] for f in c["fams"]) for c in concerns.values())[len(concerns)//2],
+    max(sum(f["c"] for f in c["fams"]) for c in concerns.values())))
 print("  de-duplicated from %d LOINC rows" % sum(sum(t["nv"] for t in c["next"]) for c in concerns.values()))

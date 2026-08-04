@@ -43,6 +43,34 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F21",
+  "date": "2026-07-31",
+  "who": "Chloe",
+  "title": "Group the long lists, dock the panels, 12px everywhere, full-row highlights",
+  "status": "addressed",
+  "versions": ["v3.4"],
+  "quote": "any follow up more than 10 are too overwhelming, how can we simplify the guide without losing info?",
+  "quotes": [
+   "any follow up more than 10 are too overwhelming, how can we simplify the guide without losing info?",
+   "fully left and right anchor the panels to reduce empty space, same as the bottom panel",
+   "use only 12 px for all at same height",
+   "the highlight should be the entire row, fix the framework to allow it, apply to all similar components",
+  ],
+  "did": [
+   ("What the long tail actually is", "addressed",
+    "23 of 47 concerns carry more than 40 markers. But <i>medication monitoring</i>, the worst at 378, has <b>372 of them in one family</b>, and by the catalogue's own ordering tier only <b>1</b> is commonly ordered against 117 specialist and 260 rarely ordered. The tail is not variety, it is obscure variants."),
+   ("Grouped by family, commonly-ordered first", "addressed",
+    "The list now opens as family headers carrying their <b>true</b> total, with only the commonly-ordered markers shown under each. Medication monitoring reads as <b>4 rows</b> instead of 378. Every family opens on click, and nothing is dropped \u2014 the counts state exactly what is behind each header."),
+   ("Panels docked to the window edges", "addressed",
+    "Rail, detail and footer sit flush to their edges with square outer corners; the 16px now lives only between a panel and the map, which hands the map back 32px of width and 32 of height."),
+   ("12px, one size, one row height", "addressed",
+    "Every label in every column is 12px Open Sans regular on a uniform row height. 12px holds from about 875px of window height upward; below that it steps down rather than letting rows collide, which is the only case where it is not exactly 12."),
+   ("Full-row highlights", "addressed",
+    "Rows now carry their own horizontal padding and cancel their container's with a negative margin, so a hover or a selection covers the whole row edge to edge. Applied to every row-like component \u2014 marker rows, follow-up rows, family headers and the why-list \u2014 not just the one that showed the problem."),
+  ],
+  "open": "The map's third column still draws individual markers rather than families; grouping it was agreed but is the next step.",
+ },
+ {
   "id": "F20",
   "date": "2026-07-31",
   "who": "Chloe",
@@ -548,12 +576,32 @@ FEEDBACK = [
 # ===========================================================================
 VERSIONS = [
  {
+  "id": "v3.4",
+  "file": "v3.4-grouped-docked.html",
+  "title": "Ripple atlas \u2014 grouped lists, docked panels",
+  "date": "2026-07-31",
+  "source": "index-v3.html",
+  "status": "candidate",
+  "tag": "v3.4-grouped-docked",
+  "gitpath": "index-v3.html",
+  "answers": ["F21"],
+  "summary": "Follow-up lists group by family with the commonly-ordered markers shown first, panels dock to the window edges, one 12px type size, and highlights that cover the whole row.",
+  "changes": [
+   "<b>Family grouping</b> with true counts on each header; 378 markers read as 4 rows. Open a family for the rest.",
+   "<b>Commonly-ordered first</b>, using the catalogue's own ordering tier.",
+   "<b>Panels docked</b> flush to the window edges; 16px only between panel and map.",
+   "<b>12px, uniform rows</b>, every column; steps down only below ~875px of window height.",
+   "<b>Full-bleed row highlights</b> across every row-like component.",
+   "Zero label overlaps at six window sizes; zero off-grid spacing.",
+  ],
+ },
+ {
   "id": "v3.3",
   "file": "v3.3-type-system.html",
   "title": "Ripple atlas \u2014 one type system",
   "date": "2026-07-31",
   "source": "index-v3.html",
-  "status": "candidate",
+  "status": "superseded",
   "tag": "v3.3-type-system",
   "gitpath": "index-v3.html",
   "answers": ["F20"],
