@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-31T19:33:44Z",
+ "generated": "2026-08-04T17:05:18Z",
  "live": "index.html",
  "constraints": [
   [
@@ -16,6 +16,40 @@
   ]
  ],
  "feedback": [
+  {
+   "id": "F10",
+   "date": "2026-07-31",
+   "who": "Chloe",
+   "title": "Connector dots on the right so lines clear the text",
+   "status": "addressed",
+   "versions": [
+    "v2.3"
+   ],
+   "quote": "I like it better. add another set of dots for connectors on the right side so the lines don't cover the text",
+   "did": [
+    [
+     "Right-hand connector dot on every concern row",
+     "addressed",
+     "47 out-dots at the right edge of the concern column. Quiet grey by default, warm and filled on the row currently feeding the third column."
+    ],
+    [
+     "Follow-up edges leave from the out-dot",
+     "addressed",
+     "They used to start at the left-hand dot, which meant every curve swept right across the label it belonged to. Now they start clear of the longest label — at 1512×880 the out-dot sits at x 927 while the longest label ends at x 844."
+    ],
+    [
+     "Row now reads left to right",
+     "addressed",
+     "Incoming edge → left dot → label → marker count → right dot → outgoing edge. The two dots make the direction of flow legible on a single row."
+    ],
+    [
+     "Labels re-measured for the narrower column",
+     "addressed",
+     "Clip width reduced to leave room for the count and the out-dot. Zero label overlaps and zero overflow at six window sizes, and the out-dots verified clear of all label text at each."
+    ]
+   ],
+   "open": null
+  },
   {
    "id": "F9",
    "date": "2026-07-31",
@@ -406,12 +440,35 @@
  ],
  "versions": [
   {
+   "id": "v2.3",
+   "file": "v2.3-right-connectors.html",
+   "title": "Ripple atlas — right-side connectors",
+   "date": "2026-07-31",
+   "source": "index-v3.html",
+   "status": "candidate",
+   "tag": "v2.3-right-connectors",
+   "gitpath": "index-v3.html",
+   "answers": [
+    "F10"
+   ],
+   "summary": "Concern rows gain a second connector dot on their right edge, and the follow-up edges leave from there instead of sweeping back across the label text.",
+   "changes": [
+    "<b>47 right-hand connector dots</b>, one per concern row, at the right edge of the column.",
+    "<b>Follow-up edges originate at the out-dot</b> rather than the left-hand dot, so no curve crosses a label.",
+    "The out-dot is quiet grey until its row is the one feeding the third column, then warm and filled.",
+    "Marker-count chip moved inboard to clear the new dot; label clip widths re-measured.",
+    "Verified at six window sizes: zero label overlaps, zero overflow, out-dots clear of all text."
+   ],
+   "note": "Only the concern column changed. Markers already had their dot on the outgoing side, and follow-up tests already had theirs on the incoming side.",
+   "mb": 0.1
+  },
+  {
    "id": "v2.2",
    "file": "v2.2-column-atlas.html",
    "title": "Ripple atlas — three columns",
    "date": "2026-07-31",
    "source": "index-v3.html",
-   "status": "candidate",
+   "status": "superseded",
    "tag": "v2.2-column-atlas",
    "gitpath": "index-v3.html",
    "answers": [

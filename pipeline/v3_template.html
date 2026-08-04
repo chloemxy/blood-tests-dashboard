@@ -169,6 +169,12 @@ button{font-family:inherit;cursor:pointer}
 .map .row.on  .dot{fill:var(--aqua);stroke:var(--teal);stroke-width:2.4}
 .map .row.added .dot{fill:#fdf1ea;stroke:var(--accent);stroke-width:2.4;stroke-dasharray:3 2}
 .map .row.tst .dot{fill:#fff;stroke:var(--warm);stroke-width:1.8}
+/* right-hand connector dots: quiet until the row is the one feeding the third column */
+.map .dot.out{fill:#fff;stroke:#d3dcdd;stroke-width:1.2}
+.map .row.on .dot.out{stroke:#a9c8cc}
+.map .row.added .dot.out{stroke:#e0b49b;stroke-dasharray:none}
+.map .dot.out.live{fill:#fdf1ea;stroke:var(--warm);stroke-width:2.4}
+.map .row:hover .dot.out{stroke:var(--teal)}
 .map .row.sel .dot,.map .row.hot .dot{stroke-width:3.4}
 
 .map .lb{font-family:var(--font-sans);font-size:11px;fill:var(--slate)}
@@ -382,12 +388,14 @@ function draw(){
  eds.forEach(e => { h += '<path class="'+e.cls+'" d="'+e.d+'"/>'; });
 
  // ---- edges concern -> follow-up
+ // Outgoing edges start at the concern's right-hand connector dot, so they
+ // never run across the label text on their way to the follow-up column.
  if(L.open !== null){
-  const y1 = L.cn[L.open];
+  const y1 = L.cn[L.open], x1 = L.xCend;
   L.ts.forEach(o => {
-   h += '<path class="e3" d="M'+L.xC.toFixed(1)+' '+y1.toFixed(1)
-     +'C'+((L.xC+L.xT)/2).toFixed(1)+' '+y1.toFixed(1)+','
-     +((L.xC+L.xT)/2).toFixed(1)+' '+o.y.toFixed(1)+','+L.xT.toFixed(1)+' '+o.y.toFixed(1)+'"/>';
+   h += '<path class="e3" d="M'+x1.toFixed(1)+' '+y1.toFixed(1)
+     +'C'+((x1+L.xT)/2).toFixed(1)+' '+y1.toFixed(1)+','
+     +((x1+L.xT)/2).toFixed(1)+' '+o.y.toFixed(1)+','+L.xT.toFixed(1)+' '+o.y.toFixed(1)+'"/>';
   });
  }
 
@@ -415,7 +423,7 @@ function draw(){
    +  '↓ '+L.nUnreach+' CONCERNS NO PANEL MARKER CAN REACH</text>';
 
  // ---- concern rows
- const cLabMax = Math.max(8, Math.floor((L.xCend - L.xC - 76) / (L.cFs * 0.56)));
+ const cLabMax = Math.max(8, Math.floor((L.xCend - L.xC - 92) / (L.cFs * 0.56)));
  CIDS.forEach(ci => {
   const y = L.cn[ci], from = act[ci], added = !!st.added[ci];
   const cls = ['row','cnc', from?'on':'', added?'added':'', selC===ci?'sel':'',
@@ -427,8 +435,11 @@ function draw(){
     +  '<text class="'+lab+'" x="'+(L.xC+12).toFixed(1)+'" y="'+(y+L.cFs*0.34).toFixed(1)
     +  '" style="font-size:'+L.cFs.toFixed(1)+'px">'+esc(clip(C[ci].label, cLabMax))+'</text>';
   if(from && from.length)
-   h += '<text class="cnt'+(from.length?' on':'')+'" x="'+(L.xCend-2).toFixed(1)+'" y="'+(y+L.cFs*0.34).toFixed(1)
+   h += '<text class="cnt on" x="'+(L.xCend-14).toFixed(1)+'" y="'+(y+L.cFs*0.34).toFixed(1)
      +  '" text-anchor="end">'+from.length+'&#215;</text>';
+  // right-hand connector dot — where follow-up edges leave from
+  h += '<circle class="dot out'+(selC===ci?' live':'')+'" cx="'+L.xCend.toFixed(1)+'" cy="'+y.toFixed(1)
+    +  '" r="'+(selC===ci?4.4:2.6)+'"/>';
   h += '</g>';
  });
 
