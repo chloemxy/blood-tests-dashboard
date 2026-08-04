@@ -43,6 +43,26 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F15",
+  "date": "2026-07-31",
+  "who": "Chloe",
+  "title": "Centre the low/norm/high labels over their pill segments",
+  "status": "addressed",
+  "versions": ["v2.8"],
+  "quote": "align the low norm high to the center of each pill option",
+  "did": [
+   ("Found the offset", "addressed",
+    "The header sat <b>8px right</b> of the pill it labels. The marker list reserves an 8px scrollbar gutter that the header, sitting outside the scroll area, does not \u2014 so identical 16px padding on both put them out of register."),
+   ("Header padding corrected", "addressed",
+    "Right padding 16 \u2192 24, matching the list\u2019s 8px gutter plus 8px row padding. Both columns now end at <code>panel &minus; 24</code>."),
+   ("Each label centred on its own segment", "addressed",
+    "The label row is a 3-column grid matching the pill\u2019s, with each label a block centred in its 24px cell rather than centred as one run of text."),
+   ("Crowding fixed", "addressed",
+    "<i>NORM</i> and <i>HIGH</i> were running together: 9px type with .06em tracking is ~22.4px in a 24px cell. Dropped to 8.5px with no tracking \u2014 20.4px, leaving clear gutters."),
+  ],
+  "open": None,
+ },
+ {
   "id": "F14",
   "date": "2026-07-31",
   "who": "Chloe",
@@ -403,12 +423,30 @@ FEEDBACK = [
 # ===========================================================================
 VERSIONS = [
  {
+  "id": "v2.8",
+  "file": "v2.8-pill-align.html",
+  "title": "Ripple atlas \u2014 pill header aligned",
+  "date": "2026-07-31",
+  "source": "index-v3.html",
+  "status": "candidate",
+  "tag": "v2.8-pill-align",
+  "gitpath": "index-v3.html",
+  "answers": ["F15"],
+  "summary": "The LOW / NORM / HIGH header now sits in register with the pill segments it labels.",
+  "changes": [
+   "<b>Header right padding 16 \u2192 24</b> to account for the scrollbar gutter the list reserves and the header does not.",
+   "<b>Each label centred in its own 24px cell</b> via a matching 3-column grid.",
+   "<b>8.5px, no tracking</b> so NORM and HIGH no longer touch.",
+   "Zero off-grid spacing.",
+  ],
+ },
+ {
   "id": "v2.7",
   "file": "v2.7-glyph-pill.html",
   "title": "Ripple atlas \u2014 glyph pill, anchored follow-ups",
   "date": "2026-07-31",
   "source": "index-v3.html",
-  "status": "candidate",
+  "status": "superseded",
   "tag": "v2.7-glyph-pill",
   "gitpath": "index-v3.html",
   "answers": ["F14"],

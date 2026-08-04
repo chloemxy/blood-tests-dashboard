@@ -60,13 +60,16 @@ button{font-family:inherit;cursor:pointer}
 .railtop h1{font-family:var(--font-serif);font-size:19px;color:var(--slate);margin:0 0 4px;line-height:1.25}
 .railtop p{font-size:11.5px;color:var(--muted);margin:0;line-height:1.5}
 .railbody{flex:1 1 auto;min-height:0;padding:0 8px 8px}
-/* column header sits above the scroll area so it never scrolls away */
+/* Column header sits above the scroll area so it never scrolls away. Its right
+   padding is 24 rather than 16 because the list below reserves an 8px scrollbar
+   gutter plus 8px of row padding — without that the header sat 8px to the right
+   of the pill it labels. Each label is centred over its own 24px segment. */
 .railhd{flex:0 0 auto;display:grid;grid-template-columns:1fr var(--tglW);gap:8px;align-items:center;
- padding:8px 16px;border-bottom:1px solid var(--line);background:rgba(247,249,249,.7)}
+ padding:8px 24px 8px 16px;border-bottom:1px solid var(--line);background:rgba(247,249,249,.7)}
 .railhd span{font-family:var(--font-mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
-.railhd .r{display:grid;grid-template-columns:repeat(3,1fr);text-align:center}
-.railhd .r i{font-style:normal;font-family:var(--font-mono);font-size:9px;letter-spacing:.06em;
- text-transform:uppercase;color:#a9b6b8}
+.railhd .r{display:grid;grid-template-columns:repeat(3,1fr)}
+.railhd .r i{font-style:normal;font-family:var(--font-mono);font-size:8.5px;letter-spacing:0;
+ text-transform:uppercase;color:#a9b6b8;text-align:center;display:block}
 .grouphd{font-family:var(--font-mono);font-size:9px;letter-spacing:.07em;text-transform:uppercase;
  color:var(--dim);padding:16px 8px 8px;display:flex;align-items:baseline;gap:8px}
 .grouphd b{color:var(--slate);font-weight:600}
