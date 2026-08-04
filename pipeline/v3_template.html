@@ -16,7 +16,7 @@
  --aqua:#EAF7F8;--paper:#F7F9F9;--ink:#1D1B1A;--muted:#5A6B70;
  --line:#D7E1E2;--panel:#fff;--dim:#8B9799;--ok:#2E7D5B;--warn:#B8860B;
  --low:#0E8496;--high:#B84A0E;
- --railW:306px;--detW:344px;--footH:74px;--gap:14px;
+ --railW:320px;--detW:344px;--footH:72px;--gap:16px;--tglW:96px;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;height:100%;overflow:hidden}
@@ -56,14 +56,21 @@ button{font-family:inherit;cursor:pointer}
 
 /* ---------------- left rail ---------------- */
 .rail{top:var(--gap);left:var(--gap);bottom:calc(var(--footH) + var(--gap)*2);width:var(--railW)}
-.railtop{flex:0 0 auto;padding:13px 15px 11px;border-bottom:1px solid var(--line)}
+.railtop{flex:0 0 auto;padding:16px;border-bottom:1px solid var(--line)}
 .railtop h1{font-family:var(--font-serif);font-size:19px;color:var(--slate);margin:0 0 3px;line-height:1.25}
 .railtop p{font-size:11.5px;color:var(--muted);margin:0;line-height:1.5}
-.railbody{flex:1 1 auto;min-height:0;padding:6px 7px 8px}
+.railbody{flex:1 1 auto;min-height:0;padding:0 8px 8px}
+/* column header sits above the scroll area so it never scrolls away */
+.railhd{flex:0 0 auto;display:grid;grid-template-columns:1fr var(--tglW);gap:8px;align-items:center;
+ padding:8px 16px;border-bottom:1px solid var(--line);background:rgba(247,249,249,.7)}
+.railhd span{font-family:var(--font-mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.railhd .r{display:grid;grid-template-columns:repeat(3,1fr);text-align:center}
+.railhd .r i{font-style:normal;font-family:var(--font-mono);font-size:9px;letter-spacing:.06em;
+ text-transform:uppercase;color:#a9b6b8}
 .grouphd{font-family:var(--font-mono);font-size:9px;letter-spacing:.07em;text-transform:uppercase;
- color:var(--dim);padding:9px 8px 5px;display:flex;align-items:baseline;gap:6px}
+ color:var(--dim);padding:16px 8px 8px;display:flex;align-items:baseline;gap:8px}
 .grouphd b{color:var(--slate);font-weight:600}
-.mrow{display:grid;grid-template-columns:1fr 64px;gap:6px;align-items:center;height:32px;
+.mrow{display:grid;grid-template-columns:1fr var(--tglW);gap:8px;align-items:center;height:32px;
  padding:0 8px;border-radius:8px;border:1px solid transparent}
 .mrow:hover{background:var(--aqua)}
 .mrow.sel{background:#fdf1ea;border-color:var(--accent)}
@@ -71,23 +78,26 @@ button{font-family:inherit;cursor:pointer}
  text-overflow:ellipsis;cursor:pointer}
 .mrow.lo .nm{color:var(--low)}
 .mrow.hi .nm{color:var(--high)}
-.tri{display:flex;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;height:20px}
-.tri button{flex:1;border:none;background:none;font-family:var(--font-mono);font-size:9px;color:var(--dim);
- padding:0;border-right:1px solid var(--line);line-height:18px}
+/* 8px system: 24px tall, 8px horizontal padding, so the words are not clipped */
+.tri{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:12px;
+ overflow:hidden;background:#fff;height:24px}
+.tri button{border:none;background:none;font-family:var(--font-mono);font-size:10px;color:var(--dim);
+ padding:0 8px;border-right:1px solid var(--line);line-height:22px;text-align:center;
+ white-space:nowrap;letter-spacing:.02em}
 .tri button:last-child{border-right:none}
 .tri button:hover{background:var(--aqua)}
 .tri button.on[data-v="-1"]{background:var(--low);color:#fff}
 .tri button.on[data-v="0"]{background:var(--line);color:var(--slate)}
 .tri button.on[data-v="1"]{background:var(--high);color:#fff}
 
-.layer{flex:0 0 auto;border-top:1px solid var(--line);padding:11px 13px 12px;max-height:186px;
+.layer{flex:0 0 auto;border-top:1px solid var(--line);padding:16px;max-height:184px;
  display:flex;flex-direction:column}
 .layer h3{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;
- color:var(--dim);margin:0 0 3px}
+ color:var(--dim);margin:0 0 4px}
 .layer p{font-size:11px;color:var(--muted);margin:0 0 8px;line-height:1.45}
-.chips{flex:1 1 auto;min-height:0;display:flex;flex-wrap:wrap;gap:5px;align-content:flex-start;padding-right:4px}
-.chip{border:1px solid var(--line);background:#fff;color:var(--slate);font-size:11px;padding:3px 9px;
- border-radius:13px;white-space:nowrap}
+.chips{flex:1 1 auto;min-height:0;display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;padding-right:8px}
+.chip{border:1px solid var(--line);background:#fff;color:var(--slate);font-size:11px;padding:4px 8px;
+ border-radius:12px;white-space:nowrap}
 .chip:hover{border-color:var(--accent);color:var(--accent)}
 .chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .chip.inpanel{color:var(--dim);border-style:dashed}
@@ -185,6 +195,7 @@ button{font-family:inherit;cursor:pointer}
 .map .lb.hi{fill:var(--high);font-weight:700}
 .map .cnt{font-family:var(--font-mono);font-size:8.5px;fill:#a9b6b8}
 .map .hint{font-family:var(--font-sans);font-size:11px;fill:#a9b6b8;font-style:italic}
+.map .slot{fill:none;stroke:#dfe6e7;stroke-width:1;stroke-dasharray:1.6 2}
 .map .cnt.on{fill:var(--teal)}
 
 .mapnote{position:absolute;left:50%;transform:translateX(-50%);bottom:6px;font-family:var(--font-mono);
@@ -216,6 +227,7 @@ button{font-family:inherit;cursor:pointer}
    <h1>Start with your annual panel</h1>
    <p>Mark anything that came back low or high. The ripple spreads outward into what it could mean.</p>
   </div>
+  <div class="railhd"><span>marker</span><span class="r"><i>low</i><i>norm</i><i>high</i></span></div>
   <div class="railbody scroll" id="rail"></div>
   <div class="layer">
    <h3>Add a personal concern</h3>
@@ -283,7 +295,7 @@ let BOX = null, LAYOUT = null;
 
 function box(){
  const stg = $('stage'), W = stg.clientWidth, H = stg.clientHeight;
- const g = 14, railW = 306, detW = 344, footH = 74, wide = W > 1080;
+ const g = 16, railW = 320, detW = 344, footH = 72, wide = W > 1080;
  const L = (wide ? g + railW + g : g) + 10;
  const R = W - (wide ? g + detW + g : g) - 10;
  const T = 30, B = H - (wide ? footH + g*2 : g) - 22;
@@ -334,12 +346,16 @@ function buildLayout(){
  divY = cy + divH / 2; cy += divH;
  unreach.forEach(o => { cn[o.ci] = cy + cRow / 2; cy += cRow; });
 
- // ---- follow-up tests for the open concern, centred on the full height
+ // ---- follow-up tests: one tight block, vertically centred on the concern row
+ // it belongs to, so the fan of edges is symmetric about the connector dot.
+ // Row pitch is 32px (8px grid). The block is clamped inside the column.
+ const T_ROW = 24;   // 8px grid; short enough that the block can centre on almost any row
  const ts = [];
  if(open !== null){
-  const list = C[open].next || [], n = list.length;
-  const span = Math.min(b.h, n * 34), tRow = span / n, y0 = b.T + (b.h - span) / 2;
-  list.forEach((t, j) => ts.push({ t: t, y: y0 + tRow * (j + 0.5) }));
+  const list = (C[open].next || []), n = list.length, blockH = n * T_ROW;
+  const anchor = cn[open];
+  const y0 = Math.max(b.T, Math.min(b.B - blockH, anchor - blockH / 2));
+  list.forEach((t, j) => ts.push({ t: t, y: y0 + T_ROW * j + T_ROW / 2 }));
  }
 
  // type scales with the row height so nothing collides on a short window
@@ -363,11 +379,14 @@ function draw(){
    +  '<text class="colhd" x="'+(L.xC+11).toFixed(0)+'" y="'+(b.T-13)+'">WHAT THEY CAN POINT AT &middot; '+CIDS.length+'</text>'
    +  '<text class="colhd" x="'+(L.xT+11).toFixed(0)+'" y="'+(b.T-13)+'">WOULD FOLLOW IT UP</text>';
  if(L.open === null){
-  const hy = b.T + b.h/2;
-  h += '<line class="rule dash" x1="'+(L.xT).toFixed(1)+'" y1="'+(b.T+4).toFixed(1)+'" x2="'+(L.xT).toFixed(1)+'" y2="'+(b.B-4).toFixed(1)+'"/>'
-    +  '<text class="hint" x="'+(L.xT+13).toFixed(1)+'" y="'+(hy-7).toFixed(1)+'">Open a concern in the</text>'
-    +  '<text class="hint" x="'+(L.xT+13).toFixed(1)+'" y="'+(hy+7).toFixed(1)+'">middle column to see what</text>'
-    +  '<text class="hint" x="'+(L.xT+13).toFixed(1)+'" y="'+(hy+21).toFixed(1)+'">would follow it up.</text>';
+  const hy = b.T + b.h / 2;
+  h += '<line class="rule dash" x1="'+L.xT.toFixed(1)+'" y1="'+(b.T+4).toFixed(1)+'" x2="'+L.xT.toFixed(1)+'" y2="'+(b.B-4).toFixed(1)+'"/>'
+    +  '<text class="hint" x="'+(L.xT+16).toFixed(1)+'" y="'+(hy-8).toFixed(1)+'">Open a concern to see</text>'
+    +  '<text class="hint" x="'+(L.xT+16).toFixed(1)+'" y="'+(hy+8).toFixed(1)+'">what would follow it up.</text>';
+ } else {
+  // a tick on the anchor row makes the centring legible
+  h += '<line class="rule" x1="'+(L.xT-7).toFixed(1)+'" y1="'+L.cn[L.open].toFixed(1)
+    +  '" x2="'+(L.xT+7).toFixed(1)+'" y2="'+L.cn[L.open].toFixed(1)+'" opacity=".45"/>';
  }
 
  // ---- edges marker -> concern (dormant first so live ones draw on top)
@@ -444,21 +463,18 @@ function draw(){
  });
 
  // ---- follow-up rows
+ // One line per test. The source badge is not repeated here — it is on every
+ // row of the detail list on the right, and two lines per row would force the
+ // block taller than it can be while staying centred.
  const tw = b.R - L.xT - 13;
- const tFs = Math.max(8.5, Math.min(11, tw / 15));
+ const tFs = Math.max(9, Math.min(11, tw / 15));
  L.ts.forEach(o => {
-  // the meta line is dropped rather than allowed to run past the column
-  let meta = o.t.v ? 'SOURCE-QUOTED' : 'AI-WRITTEN';
-  const withG = meta + (o.t.g ? ' · ' + o.t.g.toUpperCase() : '');
-  if(withG.length * 8.5 * 0.56 <= tw) meta = withG;
-  const showMeta = L.ts.length <= 10 && meta.length * 8.5 * 0.56 <= tw;
-  h += '<g class="row tst"><title>'+esc(o.t.n)+' — '+esc(o.t.g)+'</title>'
+  h += '<g class="row tst"><title>'+esc(o.t.n)+(o.t.g?' — '+esc(o.t.g):'')
+    +  (o.t.v?' — source-quoted':' — ai-written')+'</title>'
     +  '<circle class="dot" cx="'+L.xT.toFixed(1)+'" cy="'+o.y.toFixed(1)+'" r="4.4"/>'
-    +  '<text class="lb" x="'+(L.xT+11).toFixed(1)+'" y="'+(o.y+tFs*0.34).toFixed(1)
+    +  '<text class="lb'+(o.t.v?'':' mut')+'" x="'+(L.xT+12).toFixed(1)+'" y="'+(o.y+tFs*0.34).toFixed(1)
     +  '" style="font-size:'+tFs.toFixed(1)+'px">'
     +  esc(clip(o.t.n, Math.max(10, Math.floor(tw / (tFs*0.56))))) + '</text>'
-    +  (showMeta ? '<text class="cnt" x="'+(L.xT+11).toFixed(1)+'" y="'+(o.y+tFs*0.34+12).toFixed(1)+'">'
-                  + esc(meta) + '</text>' : '')
     +  '</g>';
  });
 
@@ -479,9 +495,9 @@ function drawRail(){
    h += '<div class="mrow'+(v<0?' lo':v>0?' hi':'')+(st.sel&&st.sel.t==='m'&&st.sel.v===s?' sel':'')+'" data-row="'+s+'">'
      +  '<span class="nm" data-mk="'+s+'" title="'+esc(M[s].name)+'">'+esc(M[s].name.split('[')[0].trim())+'</span>'
      +  '<span class="tri">'
-     +   '<button data-set="'+s+'" data-v="-1" class="'+(v<0?'on':'')+'" title="low">low</button>'
-     +   '<button data-set="'+s+'" data-v="0" class="'+(v===0?'on':'')+'" title="normal">&mdash;</button>'
-     +   '<button data-set="'+s+'" data-v="1" class="'+(v>0?'on':'')+'" title="high">high</button>'
+     +   '<button data-set="'+s+'" data-v="-1" class="'+(v<0?'on':'')+'" title="Mark low" aria-label="Mark low">low</button>'
+     +   '<button data-set="'+s+'" data-v="0" class="'+(v===0?'on':'')+'" title="Normal" aria-label="Normal">&mdash;</button>'
+     +   '<button data-set="'+s+'" data-v="1" class="'+(v>0?'on':'')+'" title="Mark high" aria-label="Mark high">high</button>'
      +  '</span></div>';
   });
  });

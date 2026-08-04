@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-04T17:05:18Z",
+ "generated": "2026-08-04T17:13:46Z",
  "live": "index.html",
  "constraints": [
   [
@@ -16,6 +16,65 @@
   ]
  ],
  "feedback": [
+  {
+   "id": "F11",
+   "date": "2026-07-31",
+   "who": "Chloe",
+   "title": "Centre the follow-ups on the selected row; fix the pill",
+   "status": "addressed",
+   "versions": [
+    "v2.4"
+   ],
+   "quote": "why does content in [would follow it up] always starts mid page? shouldn’t it be at top, or fix location of each test?",
+   "quotes": [
+    "why does content in [would follow it up] always starts mid page? shouldn’t it be at top, or fix location of each test?",
+    "also the contents in [would follow up] should be together and centered to the [what they can point at] selection row",
+    "improve the pill, either show text in pill with comfortable padding (always follow 8px system as a rule), or simplify the pill with label on top the column"
+   ],
+   "did": [
+    [
+     "Cause of the mid-page start",
+     "addressed",
+     "The block was being centred in the <i>column</i>, not on anything meaningful — 8 rows at 34px inside a 744px column lands a third of the way down. It looked arbitrary because it was."
+    ],
+    [
+     "Follow-ups are one block, centred on their concern row",
+     "addressed",
+     "The group is now anchored to the concern that produced it, so the fan of edges is symmetric about the connector dot. A short tick on the anchor row makes the alignment legible."
+    ],
+    [
+     "Row pitch tightened to 24px",
+     "addressed",
+     "A 32px pitch made the block 256px tall, which could not centre on any row in the top third without leaving the canvas. At 24px it centres exactly for every row below y ≈ 130 and clamps gracefully above that."
+    ],
+    [
+     "Source badge dropped from the map",
+     "addressed",
+     "Two lines per row forced the block taller than it could be while staying centred. Quoted vs AI-written still appears on every row of the detail list, and in the tooltip."
+    ],
+    [
+     "Pill given real padding on an 8px grid",
+     "addressed",
+     "24px tall, 8px horizontal padding per segment, 96px column, 32px rows — all multiples of 8. The words <i>low</i> and <i>high</i> are no longer clipped."
+    ],
+    [
+     "Column header above the toggles",
+     "addressed",
+     "A non-scrolling header row labels the marker column and the three segments, so the pill reads without hovering. Took both options in the brief rather than one."
+    ],
+    [
+     "Rail widened to 320px",
+     "addressed",
+     "8×40. Buys the room the padded pill needs without squeezing the marker names. The map's left boundary follows automatically."
+    ],
+    [
+     "8px audit across the rail",
+     "addressed",
+     "Gaps, paddings and chip spacing moved onto the grid: rail padding 16, group headers 16/8/8, chip gap 8, chip padding 4/8, footer 72."
+    ]
+   ],
+   "open": null
+  },
   {
    "id": "F10",
    "date": "2026-07-31",
@@ -440,12 +499,36 @@
  ],
  "versions": [
   {
+   "id": "v2.4",
+   "file": "v2.4-centred-followups.html",
+   "title": "Ripple atlas — centred follow-ups, 8px pill",
+   "date": "2026-07-31",
+   "source": "index-v3.html",
+   "status": "candidate",
+   "tag": "v2.4-centred-followups",
+   "gitpath": "index-v3.html",
+   "answers": [
+    "F11"
+   ],
+   "summary": "Follow-up tests become one block centred on the concern row that produced them, and the low/normal/high pill is rebuilt on an 8px grid with a column header.",
+   "changes": [
+    "<b>Follow-ups centred on their concern row</b> at a 24px pitch, with a tick on the anchor row. They were previously centred in the column, which is why they started mid-page.",
+    "<b>Pill rebuilt on the 8px system</b> — 24px tall, 8px padding per segment, 96px column, 32px rows. No more clipped words.",
+    "<b>Non-scrolling column header</b> labels the marker column and the three toggle segments.",
+    "<b>Rail widened to 320px</b> (8×40) so the padded pill does not squeeze the marker names.",
+    "Source badge moved off the map into the detail list and tooltip, so each follow-up is one line and the block stays short enough to centre.",
+    "Verified at six window sizes: zero label overlaps, zero overflow, out-dots clear of text, 92–96% width and 99–100% height in use."
+   ],
+   "note": "Centring clamps for concerns in the top ~130px, where a centred block would run off the canvas. Unavoidable; the anchor tick keeps the relationship readable.",
+   "mb": 0.1
+  },
+  {
    "id": "v2.3",
    "file": "v2.3-right-connectors.html",
    "title": "Ripple atlas — right-side connectors",
    "date": "2026-07-31",
    "source": "index-v3.html",
-   "status": "candidate",
+   "status": "superseded",
    "tag": "v2.3-right-connectors",
    "gitpath": "index-v3.html",
    "answers": [
