@@ -384,10 +384,15 @@ let BOX = null, LAYOUT = null;
 
 function box(){
  const stg = $('stage'), W = stg.clientWidth, H = stg.clientHeight;
- const g = 16, railW = 320, detW = 344, footH = 72, wide = W > 1080;
- const L = (wide ? g + railW + g : g) + 10;
- const R = W - (wide ? g + detW + g : g) - 10;
- const T = 30, B = H - (wide ? footH + g*2 : g) - 22;
+ const g = 16, railW = 320, detW = 344, footH = 72;
+ // The left rail is always on screen; only the detail panel and the footer are
+ // dropped on a narrow window. Counting the rail only when "wide" was what let
+ // the marker column slide under it. Padding between a panel and the nearest
+ // text is a constant 16px on every edge, at every size.
+ const hasDet = W > 1080, hasFoot = W > 1080;
+ const L = g + railW + g;
+ const R = W - (hasDet ? g + detW + g : g);
+ const T = 32, B = H - (hasFoot ? footH + g * 2 : g) - 24;
  return { W:W, H:H, L:L, R:R, T:T, B:B, w:R-L, h:B-T };
 }
 
@@ -406,14 +411,22 @@ function buildLayout(){
  const xT = b.L + b.w * 0.775;   // follow-up dots
  const xCend = xT - 26;          // right edge of the concern column
 
- // ---- markers: three panel groups stacked down the full height
- const nGrp = D.panels.length, headH = 15, grpGap = 12;
- const mAvail = b.h - nGrp * headH - (nGrp - 1) * grpGap;
+ // ---- markers: three panel groups stacked down the full height. The group
+ // sub-headers wrap to as many lines as the column needs, and the space they
+ // take is measured from that rather than assumed, so they can never collide
+ // with the rows or run under the rail.
+ const mEdgeX = xM - 24;                       // shared right edge for this column
+ const headLead = 11, headPad = 4, grpGap = 12;
+ const perHead = Math.max(8, Math.floor((mEdgeX - b.L) / 5.7));   // 8.5px mono + tracking
+ const gLines = D.panels.map(p => wrap(p.name.replace(/\s*\(.*\)/, '').toUpperCase(), perHead, 3));
+ const headTotal = gLines.reduce((a, l) => a + l.length * headLead + headPad, 0);
+ const nGrp = D.panels.length;
+ const mAvail = b.h - headTotal - (nGrp - 1) * grpGap;
  const mRow = mAvail / SLUGS.length;
  const mk = {}; let y = b.T, groups = [];
- D.panels.forEach(p => {
-  groups.push({ label: p.name.replace(/\s*\(.*\)/, ''), y: y + 10, n: p.slugs.length });
-  y += headH;
+ D.panels.forEach((p, gi) => {
+  groups.push({ lines: gLines[gi], y: y + 8, n: p.slugs.length });
+  y += gLines[gi].length * headLead + headPad;
   p.slugs.forEach(sl => { mk[sl] = y + mRow / 2; y += mRow; });
   y += grpGap;
  });
@@ -461,9 +474,11 @@ function buildLayout(){
  const mFs = Math.max(8.5, Math.min(11.5, mRow * 0.58));
  const cFs = Math.max(8,   Math.min(11,   cRow * 0.72));
  const cOrder = reach.map(o => o.ci).concat(unreach.map(o => o.ci));
+ const headLeadOut = headLead;
  const divTop = divY - divH / 2;
  return { xM:xM, xC:xC, xT:xT, xCend:xCend, mk:mk, cn:cn, ts:ts, groups:groups, cOrder:cOrder,
           divLines:divLines, divTop:divTop, divPad:divPad, divLead:divLead, divGap:divGap,
+          headLead:headLeadOut,
           mRow:mRow, cRow:cRow, mFs:mFs, cFs:cFs, divY:divY, open:open,
           nReach:reach.length, nUnreach:unreach.length };
 }
@@ -543,8 +558,9 @@ function draw(){
  // low/high arrow, so a label never shifts when a marker is marked.
  const mEdge = L.xM - 24, mArrow = L.xM - 16;
  L.groups.forEach(g => {
-  h += '<text class="grphd" x="'+mEdge.toFixed(1)+'" y="'+g.y.toFixed(0)+'" text-anchor="end">'
-    +  esc(g.label.toUpperCase())+'</text>';
+  h += g.lines.map((t2, li) =>
+    '<text class="grphd" x="'+mEdge.toFixed(1)+'" y="'+(g.y + li*L.headLead).toFixed(1)+'" text-anchor="end">'
+    + esc(t2)+'</text>').join('');
  });
  const mLabW = mEdge - b.L;
  SLUGS.forEach(sl => {

@@ -43,6 +43,26 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F19",
+  "date": "2026-07-31",
+  "who": "Chloe",
+  "title": "Respect the side panels on a narrow screen",
+  "status": "addressed",
+  "versions": ["v3.2"],
+  "quote": "when screen\u2019s smaller, respect the space taken by the side panels and show texts around it, the [complete blood count, comprehensive metabolic panel, and cholesterol lipid panel] are too close or covered by the panel right now, make them flexible to be on multiple rows as long as we keep same padding between panel and text always",
+  "did": [
+   ("The real cause", "addressed",
+    "The map only subtracted the rail\u2019s width when the window was wider than 1080px \u2014 but the rail is <b>always</b> on screen; it is the detail panel and footer that get dropped. Below 1080 the marker column was being laid out from the window edge, so it ran under the rail."),
+   ("Rail always counted", "addressed",
+    "The left boundary now always allows for it, and the padding between any panel and the nearest text is a constant <b>16px</b> on every edge at every size. Verified from 860px to 2560px wide: the leftmost text never crosses the rail."),
+   ("Sub-headers wrap", "addressed",
+    "<i>Complete blood count</i>, <i>comprehensive metabolic panel</i> and <i>cholesterol / lipid panel</i> wrap to as many lines as the column needs \u2014 4 lines across the three groups at 1512px, 7 at 860px \u2014 instead of running under the panel."),
+   ("Space they take is measured, not assumed", "addressed",
+    "The header block height is computed from the wrapped line count, so the marker rows are laid out around it. Previously a fixed 15px was reserved regardless."),
+  ],
+  "open": None,
+ },
+ {
   "id": "F18",
   "date": "2026-07-31",
   "who": "Chloe",
@@ -501,12 +521,30 @@ FEEDBACK = [
 # ===========================================================================
 VERSIONS = [
  {
+  "id": "v3.2",
+  "file": "v3.2-narrow-safe.html",
+  "title": "Ripple atlas \u2014 narrow-screen safe",
+  "date": "2026-07-31",
+  "source": "index-v3.html",
+  "status": "candidate",
+  "tag": "v3.2-narrow-safe",
+  "gitpath": "index-v3.html",
+  "answers": ["F19"],
+  "summary": "The map no longer lays out under the left rail on a narrow window, and the panel sub-headers wrap to fit whatever width is left.",
+  "changes": [
+   "<b>The rail is always subtracted</b> from the map\u2019s width. It was only counted above 1080px, though the rail never hides \u2014 only the detail panel and footer do.",
+   "<b>Constant 16px</b> between any panel and the nearest text, on every edge, at every size.",
+   "<b>Sub-headers wrap to multiple lines</b>, and the space they need is measured from the wrapped result rather than a fixed reserve.",
+   "Verified 860px to 2560px: no text crosses the rail, no ellipsis in the marker column, zero label overlaps.",
+  ],
+ },
+ {
   "id": "v3.1",
   "file": "v3.1-divider-header.html",
   "title": "Ripple atlas \u2014 divider wraps and breathes",
   "date": "2026-07-31",
   "source": "index-v3.html",
-  "status": "candidate",
+  "status": "superseded",
   "tag": "v3.1-divider-header",
   "gitpath": "index-v3.html",
   "answers": ["F18"],
