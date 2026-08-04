@@ -161,6 +161,23 @@ button{font-family:inherit;cursor:pointer}
 .morenote{font-size:10.5px;color:var(--dim);margin:8px 0 0;line-height:1.45}
 .nl .n{font-size:12px;color:var(--slate);line-height:1.35}
 .nl .n em{font-style:normal;font-family:var(--font-mono);font-size:9.5px;color:var(--dim);margin-left:8px}
+/* how many LOINC codes collapse into this one marker */
+.tlink{background:none;border:none;padding:0;font-family:inherit;font-size:12px;color:var(--teal);
+ text-align:left;text-decoration:underline;text-underline-offset:2px;line-height:1.35}
+.tlink:hover{color:var(--accent)}
+.nl li.on{background:var(--aqua);border-radius:8px}
+.nl li.on .tlink{font-weight:700;color:var(--accent);text-decoration:none}
+.tagchips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.tagchip{border:1px solid var(--line);background:#fff;color:var(--muted);font-size:10px;padding:4px 8px;
+ border-radius:12px;white-space:nowrap}
+.tagchip:hover{border-color:var(--teal);color:var(--teal)}
+.tagchip.inp{border-color:#b9ddc9;background:#e9f5ee;color:var(--ok)}
+.slot > .h b .backlink{font-size:9px}
+.backlink{background:none;border:none;padding:0;font-family:var(--font-mono);font-size:9px;
+ letter-spacing:.06em;text-transform:uppercase;color:var(--teal);margin-bottom:8px}
+.backlink:hover{color:var(--accent)}
+.nl .n i.nv{font-style:normal;font-family:var(--font-mono);font-size:9px;color:#a9b6b8;margin-left:8px;
+ border:1px solid var(--line);border-radius:8px;padding:0 4px;cursor:help}
 .tg{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.04em;text-transform:uppercase;
  padding:4px 8px;border-radius:8px;white-space:nowrap}
 .tg.q{background:#e3f2ea;color:var(--ok)}
@@ -196,20 +213,25 @@ button{font-family:inherit;cursor:pointer}
 .map .row .hitbox{fill:transparent}
 .map .row:hover .hitbox{fill:rgba(0,115,133,.055)}
 .map .row.sel .hitbox{fill:rgba(184,74,14,.09)}
+.map .row.foc .hitbox{fill:rgba(0,115,133,.07);stroke:var(--teal);stroke-width:1.5;stroke-dasharray:3 2}
+.mrow.foc{border-color:var(--teal);background:var(--aqua)}
 
-.map .dot{fill:#fff;stroke:#c6d0d1;stroke-width:1.4;transition:fill .15s,stroke .15s,stroke-width .15s}
-.map .row.lo .dot{fill:#dff0f3;stroke:var(--low);stroke-width:2.6}
-.map .row.hi .dot{fill:#fbe6da;stroke:var(--high);stroke-width:2.6}
-.map .row.on  .dot{fill:var(--aqua);stroke:var(--teal);stroke-width:2.4}
-.map .row.added .dot{fill:#fdf1ea;stroke:var(--accent);stroke-width:2.4;stroke-dasharray:3 2}
-.map .row.tst .dot{fill:#fff;stroke:var(--warm);stroke-width:1.8}
-/* right-hand connector dots: quiet until the row is the one feeding the third column */
-.map .dot.out{fill:#fff;stroke:#d3dcdd;stroke-width:1.2}
+/* Every dot is the same size and shape. State is carried by fill and stroke
+   colour, never by geometry, so the three columns read as one system. */
+.map .dot{fill:#fff;stroke:#c6d0d1;stroke-width:1.5;transition:fill .15s,stroke .15s,stroke-width .15s}
+.map .row.lo .dot{fill:#dff0f3;stroke:var(--low);stroke-width:2.5}
+.map .row.hi .dot{fill:#fbe6da;stroke:var(--high);stroke-width:2.5}
+.map .row.on  .dot{fill:var(--aqua);stroke:var(--teal);stroke-width:2.5}
+.map .row.added .dot{fill:#fdf1ea;stroke:var(--accent);stroke-width:2.5;stroke-dasharray:3 2}
+.map .row.tst .dot{fill:#fff;stroke:var(--warm);stroke-width:1.5}
+/* right-hand connector dots: same dot, quieter until the row feeds column three */
+.map .dot.out{fill:#fff;stroke:#dfe6e7;stroke-width:1.5}
 .map .row.on .dot.out{stroke:#a9c8cc}
 .map .row.added .dot.out{stroke:#e0b49b;stroke-dasharray:none}
-.map .dot.out.live{fill:#fdf1ea;stroke:var(--warm);stroke-width:2.4}
+.map .dot.out.live{fill:#fdf1ea;stroke:var(--warm);stroke-width:2.5}
 .map .row:hover .dot.out{stroke:var(--teal)}
-.map .row.sel .dot,.map .row.hot .dot{stroke-width:3.4}
+.map .row.sel .dot,.map .row.hot .dot{stroke-width:2.5}
+.map .row.sel .dot{stroke:var(--accent)}
 
 .map .lb{font-family:var(--font-sans);font-size:11px;fill:var(--slate)}
 .map .lb.mut{fill:#93a2a4;font-size:10px}
@@ -222,6 +244,26 @@ button{font-family:inherit;cursor:pointer}
 .map .slot{fill:none;stroke:#dfe6e7;stroke-width:1;stroke-dasharray:1.6 2}
 .map .cnt.on{fill:var(--teal)}
 
+/* ---------------- keyboard help ---------------- */
+.kbdhint{position:absolute;right:16px;bottom:16px;z-index:4;font-family:var(--font-mono);font-size:9px;
+ letter-spacing:.06em;text-transform:uppercase;color:#b4c0c2;background:rgba(255,255,255,.8);
+ border:1px solid var(--line);border-radius:8px;padding:4px 8px;cursor:pointer}
+.kbdhint:hover{color:var(--teal);border-color:var(--teal)}
+.kbdwrap{position:absolute;inset:0;z-index:9;background:rgba(24,44,50,.34);display:none;
+ align-items:center;justify-content:center}
+.kbdwrap.on{display:flex}
+.kbd{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px;
+ box-shadow:0 24px 56px rgba(12,30,36,.24);width:432px;max-width:calc(100% - 32px)}
+.kbd h3{font-family:var(--font-serif);font-size:19px;color:var(--slate);margin:0 0 16px}
+.kbd dl{display:grid;grid-template-columns:112px 1fr;gap:8px 16px;margin:0}
+.kbd dt{font-family:var(--font-mono);font-size:10px;color:var(--teal);text-align:right}
+.kbd dd{margin:0;font-size:12px;color:var(--muted);line-height:1.5}
+.kbd .sec{grid-column:1/3;font-family:var(--font-mono);font-size:9px;letter-spacing:.07em;
+ text-transform:uppercase;color:#b4c0c2;margin-top:8px}
+.kbd .close{margin-top:24px;width:100%;padding:8px;border:1px solid var(--line);background:#fff;
+ border-radius:8px;font-family:var(--font-mono);font-size:10px;letter-spacing:.05em;
+ text-transform:uppercase;color:var(--teal)}
+.kbd .close:hover{background:var(--aqua);border-color:var(--teal)}
 .mapnote{position:absolute;left:50%;transform:translateX(-50%);bottom:8px;font-family:var(--font-mono);
  font-size:9px;color:#b4c0c2;letter-spacing:.06em;pointer-events:none;z-index:2;white-space:nowrap}
 
@@ -245,6 +287,26 @@ button{font-family:inherit;cursor:pointer}
 <div class="stage" id="stage">
  <svg class="map" id="map" role="img" aria-label="Ripple map: annual panel markers, the concerns they can represent, and the tests that would follow up"></svg>
  <p class="mapnote" id="mapNote"></p>
+ <button class="kbdhint" id="kbdHint">? shortcuts</button>
+ <div class="kbdwrap" id="kbdWrap"><div class="kbd">
+  <h3>Keyboard</h3>
+  <dl>
+   <dt class="sec">move</dt>
+   <dt>&uarr; &darr;</dt><dd>up and down the focused column</dd>
+   <dt>&larr; &rarr;</dt><dd>between columns. Right lands on the first concern the focused marker points at; left lands on the first marker pointing at the focused concern.</dd>
+   <dt>Home / End</dt><dd>first or last row in the column</dd>
+   <dt class="sec">act</dt>
+   <dt>Enter</dt><dd>select the focused row &mdash; opens a concern, or shows a marker in the panel</dd>
+   <dt>L &middot; N &middot; H</dt><dd>mark the focused marker low, normal or high</dd>
+   <dt>X</dt><dd>add or remove the focused concern from your personal layer</dd>
+   <dt>E</dt><dd>expand or collapse the follow-up list</dd>
+   <dt class="sec">general</dt>
+   <dt>Esc</dt><dd>clear the selection, or close this</dd>
+   <dt>R</dt><dd>reset everything</dd>
+   <dt>?</dt><dd>show or hide this</dd>
+  </dl>
+  <button class="close" id="kbdClose">close</button>
+ </div></div>
 
  <section class="pnl rail">
   <div class="railtop">
@@ -289,7 +351,7 @@ const SLUGS = D.panels.reduce((a,p)=>a.concat(p.slugs), []);
 const CIDS = Object.keys(C).map(Number);
 
 /* ---------- state ---------- */
-const st = { val:{}, added:{}, sel:null, hot:null, expand:false };   // val: slug -> -1|0|1
+const st = { val:{}, added:{}, sel:null, hot:null, expand:false, foc:null };   // val: slug -> -1|0|1
 SLUGS.forEach(s => st.val[s] = 0);
 try{ const raw = localStorage.getItem('v3.state');
      if(raw){ const o = JSON.parse(raw);
@@ -328,7 +390,9 @@ function box(){
 
 function buildLayout(){
  const b = BOX, act = activeConcerns();
- const selC = st.sel && st.sel.t === 'c' ? +st.sel.v : null;
+ // a selected follow-up test keeps its parent concern open, so the third
+ // column stays on screen with that row highlighted rather than vanishing
+ const selC = st.sel && (st.sel.t === 'c' || st.sel.t === 't') ? +st.sel.v : null;
  const open = selC !== null && (C[selC].next || []).length ? selC : null;
 
  // column x positions as fractions of the free width
@@ -385,17 +449,35 @@ function buildLayout(){
  // type scales with the row height so nothing collides on a short window
  const mFs = Math.max(8.5, Math.min(11.5, mRow * 0.58));
  const cFs = Math.max(8,   Math.min(11,   cRow * 0.72));
- return { xM:xM, xC:xC, xT:xT, xCend:xCend, mk:mk, cn:cn, ts:ts, groups:groups,
+ const cOrder = reach.map(o => o.ci).concat(unreach.map(o => o.ci));
+ return { xM:xM, xC:xC, xT:xT, xCend:xCend, mk:mk, cn:cn, ts:ts, groups:groups, cOrder:cOrder,
           mRow:mRow, cRow:cRow, mFs:mFs, cFs:cFs, divY:divY, open:open,
           nReach:reach.length, nUnreach:unreach.length };
 }
 
 function clip(t, n){ return t.length > n ? t.slice(0, n - 1) + '…' : t; }
+/* Break a label onto up to `maxLines` lines at word boundaries. Only the last
+   line is ever ellipsised, and only if the whole name genuinely cannot fit. */
+function wrap(t, perLine, maxLines){
+ if(t.length <= perLine) return [t];
+ const words = t.split(' '), lines = [];
+ let cur = '';
+ for(let i = 0; i < words.length; i++){
+  const next = cur ? cur + ' ' + words[i] : words[i];
+  if(next.length <= perLine){ cur = next; continue; }
+  if(cur) lines.push(cur);
+  cur = words[i];
+  if(lines.length === maxLines - 1) break;
+ }
+ const rest = words.slice(lines.join(' ').split(' ').filter(Boolean).length).join(' ');
+ lines.push(lines.length === maxLines - 1 ? clip(rest, perLine) : cur);
+ return lines.slice(0, maxLines);
+}
 
 function draw(){
  const b = BOX, L = LAYOUT, act = activeConcerns();
  const selM = st.sel && st.sel.t === 'm' ? st.sel.v : null;
- const selC = st.sel && st.sel.t === 'c' ? +st.sel.v : null;
+ const selC = st.sel && (st.sel.t === 'c' || st.sel.t === 't') ? +st.sel.v : null;
  let h = '';
 
  // ---- column headers
@@ -449,14 +531,19 @@ function draw(){
  const mLabW = L.xM - b.L - 14;
  SLUGS.forEach(sl => {
   const y = L.mk[sl], v = st.val[sl];
-  const cls = ['row','mkr', v<0?'lo':v>0?'hi':'', selM===sl?'sel':'', st.hot===sl?'hot':''].filter(Boolean).join(' ');
+  const cls = ['row','mkr', v<0?'lo':v>0?'hi':'', selM===sl?'sel':'', st.hot===sl?'hot':'',
+               (st.foc&&st.foc.c===0&&SLUGS[st.foc.i]===sl)?'foc':''].filter(Boolean).join(' ');
   const nm = M[sl].name.split('[')[0].trim();
+  const perM = Math.max(8, Math.floor(mLabW / (L.mFs * 0.56)));
+  const canTwoM = L.mRow >= L.mFs * 2.3;
+  const ln = wrap(nm + (v !== 0 ? (v < 0 ? ' ▼' : ' ▲') : ''), perM, canTwoM ? 2 : 1);
+  const lh = L.mFs * 1.12, y0 = y + L.mFs * 0.34 - (ln.length - 1) * lh / 2;
   h += '<g class="'+cls+'" data-mk="'+sl+'"><title>'+esc(M[sl].name)+'</title>'
     +  '<rect class="hitbox" x="'+b.L.toFixed(0)+'" y="'+(y-L.mRow/2).toFixed(1)+'" width="'+(L.xM-b.L+9).toFixed(0)+'" height="'+L.mRow.toFixed(1)+'" rx="4"/>'
-    +  '<text class="lb'+(v<0?' lo':v>0?' hi':'')+'" x="'+(L.xM-11).toFixed(1)+'" y="'+(y+L.mFs*0.34).toFixed(1)
-    +  '" text-anchor="end" style="font-size:'+L.mFs.toFixed(1)+'px">'
-    +  esc(clip(nm, Math.max(10, Math.floor(mLabW / (L.mFs*0.56))))) + (v!==0 ? (v<0?' ▼':' ▲') : '') + '</text>'
-    +  '<circle class="dot" cx="'+L.xM.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="'+(v!==0?5.6:4.2)+'"/>'
+    +  ln.map((t2, li) => '<text class="lb'+(v<0?' lo':v>0?' hi':'')+'" x="'+(L.xM-11).toFixed(1)
+        +'" y="'+(y0 + li*lh).toFixed(1)+'" text-anchor="end" style="font-size:'+L.mFs.toFixed(1)+'px">'
+        +esc(t2)+'</text>').join('')
+    +  '<circle class="dot" cx="'+L.xM.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="5"/>'
     +  '</g>';
  });
 
@@ -466,23 +553,28 @@ function draw(){
    +  '↓ '+L.nUnreach+' CONCERNS NO PANEL MARKER CAN REACH</text>';
 
  // ---- concern rows
- const cLabMax = Math.max(8, Math.floor((L.xCend - L.xC - 92) / (L.cFs * 0.56)));
+ // Reserve only what the count chip and the out-dot actually need, so the
+ // full concern names fit on one line instead of being cut short.
+ const cLabPlain = Math.max(8, Math.floor((L.xCend - L.xC - 20) / (L.cFs * 0.56)));
+ const cLabChip  = Math.max(8, Math.floor((L.xCend - L.xC - 52) / (L.cFs * 0.56)));
  CIDS.forEach(ci => {
   const y = L.cn[ci], from = act[ci], added = !!st.added[ci];
   const cls = ['row','cnc', from?'on':'', added?'added':'', selC===ci?'sel':'',
-               st.hot===('c'+ci)?'hot':''].filter(Boolean).join(' ');
+               st.hot===('c'+ci)?'hot':'',
+               (st.foc&&st.foc.c===1&&L.cOrder[st.foc.i]===ci)?'foc':''].filter(Boolean).join(' ');
   const lab = ['lb', from?'on':'mut', added?'acc':''].filter(Boolean).join(' ');
-  h += '<g class="'+cls+'" data-cn="'+ci+'"><title>'+esc(C[ci].label)+' — '+nf(C[ci].nOutside)+' follow-ups outside the panel</title>'
+  h += '<g class="'+cls+'" data-cn="'+ci+'"><title>'+esc(C[ci].label)+' — '+nf(C[ci].nDistinct)+' markers outside the panel</title>'
     +  '<rect class="hitbox" x="'+(L.xC-9).toFixed(1)+'" y="'+(y-L.cRow/2).toFixed(1)+'" width="'+(L.xCend-L.xC+9).toFixed(1)+'" height="'+L.cRow.toFixed(1)+'" rx="4"/>'
-    +  '<circle class="dot" cx="'+L.xC.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="'+(from?5.4:3.4)+'"/>'
+    +  '<circle class="dot" cx="'+L.xC.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="5"/>'
     +  '<text class="'+lab+'" x="'+(L.xC+12).toFixed(1)+'" y="'+(y+L.cFs*0.34).toFixed(1)
-    +  '" style="font-size:'+L.cFs.toFixed(1)+'px">'+esc(clip(C[ci].label, cLabMax))+'</text>';
+    +  '" style="font-size:'+L.cFs.toFixed(1)+'px">'
+    +  esc(clip(C[ci].label, (from && from.length) ? cLabChip : cLabPlain))+'</text>';
   if(from && from.length)
    h += '<text class="cnt on" x="'+(L.xCend-14).toFixed(1)+'" y="'+(y+L.cFs*0.34).toFixed(1)
      +  '" text-anchor="end">'+from.length+'&#215;</text>';
   // right-hand connector dot — where follow-up edges leave from
   h += '<circle class="dot out'+(selC===ci?' live':'')+'" cx="'+L.xCend.toFixed(1)+'" cy="'+y.toFixed(1)
-    +  '" r="'+(selC===ci?4.4:2.6)+'"/>';
+    +  '" r="5"/>';
   h += '</g>';
  });
 
@@ -491,14 +583,21 @@ function draw(){
  // row of the detail list on the right, and two lines per row would force the
  // block taller than it can be while staying centred.
  const tw = b.R - L.xT - 13;
- const tFs = Math.max(9, Math.min(11, tw / 15));
- L.ts.forEach(o => {
-  h += '<g class="row tst"><title>'+esc(o.t.n)+(o.t.g?' — '+esc(o.t.g):'')
+ // when any label needs two lines, the type tightens so both fit the 24px pitch
+ const tWraps = L.ts.some(o => o.t.n.length > Math.floor(tw / (11 * 0.56)));
+ const tFs = tWraps ? Math.max(8.5, Math.min(10, tw / 16)) : Math.max(9, Math.min(11, tw / 15));
+ L.ts.forEach((o, j) => {
+  const perT = Math.max(8, Math.floor(tw / (tFs * 0.56)));
+  const lnT = wrap(o.t.n, perT, 2);
+  const lhT = tFs * 1.02, yT = o.y + tFs*0.34 - (lnT.length - 1) * lhT / 2;
+  h += '<g class="row tst'+((st.foc&&st.foc.c===2&&st.foc.i===j)?' foc':'')
+    +  ((st.sel&&st.sel.t==='t'&&st.sel.i===j)?' sel':'')+'" data-test="'+L.open+'" data-ti="'+j+'">'
+    +  '<rect class="hitbox" x="'+(L.xT-8).toFixed(1)+'" y="'+(o.y-12).toFixed(1)+'" width="'+(b.R-L.xT+8).toFixed(1)+'" height="24" rx="4"/>'
+    +  '<title>'+esc(o.t.n)+(o.t.g?' — '+esc(o.t.g):'')
     +  (o.t.v?' — source-quoted':' — ai-written')+'</title>'
-    +  '<circle class="dot" cx="'+L.xT.toFixed(1)+'" cy="'+o.y.toFixed(1)+'" r="4.4"/>'
-    +  '<text class="lb'+(o.t.v?'':' mut')+'" x="'+(L.xT+12).toFixed(1)+'" y="'+(o.y+tFs*0.34).toFixed(1)
-    +  '" style="font-size:'+tFs.toFixed(1)+'px">'
-    +  esc(clip(o.t.n, Math.max(10, Math.floor(tw / (tFs*0.56))))) + '</text>'
+    +  '<circle class="dot" cx="'+L.xT.toFixed(1)+'" cy="'+o.y.toFixed(1)+'" r="5"/>'
+    +  lnT.map((t2, li) => '<text class="lb'+(o.t.v?'':' mut')+'" x="'+(L.xT+12).toFixed(1)
+        +'" y="'+(yT + li*lhT).toFixed(1)+'" style="font-size:'+tFs.toFixed(1)+'px">'+esc(t2)+'</text>').join('')
     +  '</g>';
  });
 
@@ -516,7 +615,9 @@ function drawRail(){
   h += '<div class="grouphd"><b>'+esc(p.name.replace(/\s*\(.*\)/,''))+'</b> '+p.slugs.length+' markers</div>';
   p.slugs.forEach(s => {
    const v = st.val[s];
-   h += '<div class="mrow'+(v<0?' lo':v>0?' hi':'')+(st.sel&&st.sel.t==='m'&&st.sel.v===s?' sel':'')+'" data-row="'+s+'">'
+   const isFoc = st.foc && st.foc.c===0 && SLUGS[st.foc.i]===s;
+   h += '<div class="mrow'+(v<0?' lo':v>0?' hi':'')+(st.sel&&st.sel.t==='m'&&st.sel.v===s?' sel':'')
+     +  (isFoc?' foc':'')+'" data-row="'+s+'" id="mrow-'+s+'">'
      +  '<span class="nm" data-mk="'+s+'" title="'+esc(M[s].name)+'">'+esc(M[s].name.split('[')[0].trim())+'</span>'
      +  '<span class="tri">'
      +   '<button data-set="'+s+'" data-v="-1" class="'+(v<0?'on':'')+'" title="Mark low" aria-label="Mark low">&#9660;</button>'
@@ -546,6 +647,38 @@ function factHTML(r){
   + (r.k==='next-test' ? ' &middot; next test' : '') + '</span>'
   + '<q>' + esc(r.q) + '</q>'
   + '<span class="cite">' + esc(r.s) + ' &middot; <a href="'+r.u+'" target="_blank" rel="noopener">verify</a></span></div>';
+}
+
+/* The follow-up list is rendered by one function so it can stay on screen when
+   you click through to a single test — the row highlights in place rather than
+   the list being replaced. */
+function drawNextList(ci, selIdx){
+ const c = C[ci], all = c.next || [];
+ const shown = st.expand ? all.length : Math.min(8, all.length);
+ $('nextH').innerHTML = 'what would follow it up <b>'+nf(c.nDistinct)+'</b>';
+ $('nextSlot').classList.toggle('exp', !!st.expand);
+ if(!all.length){ $('next').innerHTML = '<p class="empty">Nothing outside your panel is tagged to this concern.</p>'; return; }
+ // keep a selected row visible even when it sits past the collapsed cut-off
+ const idx = [];
+ for(let i = 0; i < shown; i++) idx.push(i);
+ if(selIdx >= 0 && idx.indexOf(selIdx) < 0) idx.push(selIdx);
+ $('next').innerHTML =
+   '<ul class="nl">'+idx.map(i => { const t = all[i];
+     return '<li'+(i===selIdx?' class="on"':'')+'><span class="n">'
+      + '<button class="tlink" data-test="'+ci+'" data-ti="'+i+'">'+esc(t.n)+'</button>'
+      + (t.a?'<em>'+esc(t.a)+'</em>':'')
+      + (t.nv>1?'<i class="nv" title="'+t.nv+' LOINC codes for this marker — different units, specimens or methods">&times;'+t.nv+'</i>':'')
+      + '</span><span class="tg '+(t.v?'q':'g')+'">'+(t.v?'quoted':'ai-written')+'</span></li>';
+   }).join('')+'</ul>'
+  + (all.length > 8
+     ? '<button class="more" data-expand="1">'
+       + (st.expand ? '\u2191 show the top 8 only' : '\u2193 show all '+all.length+' carried here')
+       + '</button>' : '')
+  + '<p class="morenote"><b>8</b> drawn on the map &middot; '
+  + (c.nDistinct > all.length ? 'top <b>'+all.length+'</b> of <b>'+nf(c.nDistinct)+'</b> markers carried here'
+                              : 'all <b>'+nf(c.nDistinct)+'</b> markers carried here')
+  + ' &middot; from <b>'+nf(c.nOutside)+'</b> LOINC rows'
+  + '<br>Tagged to this concern and ranked \u2014 not a confirmed diagnostic sequence.</p>';
 }
 
 /* ---------- detail ---------- */
@@ -591,16 +724,51 @@ function drawDetail(){
   $('nextSlot').classList.remove('exp');
   $('nextH').innerHTML = 'concerns it can represent <b>'+cs.length+'</b>';
   $('next').innerHTML = cs.length ? '<ul class="nl">'+cs.map(ci =>
-    '<li><span class="n">'+esc(C[ci].label)+'<em>'+nf(C[ci].nOutside)+' follow-ups outside the panel</em></span>'
+    '<li><span class="n">'+esc(C[ci].label)+'<em>'+nf(C[ci].nDistinct)+' markers outside the panel</em></span>'
     + '<button class="tg src" data-cn="'+ci+'">open</button></li>').join('')+'</ul>'
    : '<p class="empty">This marker carries no concern tags in the catalogue.</p>';
   return;
  }
 
+ if(sel.t === 't'){
+  const pc = C[sel.v], t = (pc.next || [])[sel.i];
+  if(t){
+   $('nextSlot').classList.remove('exp');
+   $('dHead').innerHTML = '<span class="k">follow-up test &middot; '+esc(t.g)+'</span>'
+    + '<h2>'+esc(t.n)+'</h2>'
+    + '<span class="s">'+(t.a?esc(t.a)+' &middot; ':'')
+    + (t.nv>1 ? nf(t.nv)+' LOINC codes' : '1 LOINC code')
+    + ' &middot; '+(t.v?'source-quoted':'AI-written')+'</span>';
+
+   const cs = (t.cs || []).filter(x => C[x]);
+   $('whyH').innerHTML = 'what this measures <b>&middot; back to <button class="backlink" data-cn="'
+    + sel.v + '">' + esc(pc.label) + '</button></b>';
+   $('why').innerHTML = (t.q
+    ? '<q style="font-family:var(--font-serif);font-size:12.5px;color:var(--slate);font-style:italic;line-height:1.55">'
+      + esc(t.q)+'</q><span style="font-family:var(--font-mono);font-size:9px;color:var(--dim);display:block;margin-top:8px">'
+      + esc(t.qs)+(t.u?' &middot; <a href="'+t.u+'" target="_blank" rel="noopener">verify at LOINC</a>':'')+'</span>'
+    : '<p class="empty">No description carried for this marker.</p>')
+    + (cs.length ? '<div class="tagchips">'+cs.map(x =>
+        '<button class="tagchip'+(C[x].inPanel?' inp':'')+'" data-cn="'+x+'">'+esc(C[x].label)+'</button>').join('')
+        + '</div>' : '');
+
+   const tf = REL.filter(r => nameOf(r.a).toLowerCase() === t.n.toLowerCase()
+                           || nameOf(r.b).toLowerCase() === t.n.toLowerCase());
+   $('factH').innerHTML = 'how these connect <b>'+tf.length+'</b>';
+   $('fact').innerHTML = tf.length ? tf.map(factHTML).join('')
+    : '<p class="empty">No sourced relationship note reaches this marker. Our 29 notes cover the annual '
+      + 'panel only \u2014 a gap in our data, not in physiology.</p>';
+
+   // the list it came from stays on screen, with this row highlighted
+   drawNextList(sel.v, sel.i);
+   return;
+  }
+ }
+
  const ci = +sel.v, c = C[ci], from = act[ci] || [];
  $('dHead').innerHTML = '<span class="k">concern &middot; '+esc(c.grp)+(st.added[ci]?' &middot; you added this':'')+'</span>'
   + '<h2>'+esc(c.label)+'</h2>'
-  + '<span class="s">'+nf(c.nTagged)+' related markers &middot; '+nf(c.nOutside)+' outside your panel</span>';
+  + '<span class="s">'+nf(c.nDistinct)+' markers outside your panel &middot; '+nf(c.nOutside)+' LOINC rows</span>';
  $('whyH').textContent = 'why it is on the map';
  if(from.length){
   $('why').innerHTML = '<ul class="wl">'+from.map(s =>
@@ -618,23 +786,7 @@ function drawDetail(){
  $('factH').innerHTML = 'how these connect <b>'+fs.length+'</b>';
  $('fact').innerHTML = fs.length ? fs.map(factHTML).join('')
   : '<p class="empty">No sourced relationship note reaches this concern yet.</p>';
- const all = c.next || [], shown = st.expand ? all.length : Math.min(8, all.length);
- $('nextH').innerHTML = 'what would follow it up <b>'+nf(c.nOutside)+'</b>';
- $('nextSlot').classList.toggle('exp', !!st.expand);
- $('next').innerHTML = all.length
-  ? '<ul class="nl">'+all.slice(0, shown).map(t =>
-     '<li><span class="n">'+(t.u?'<a href="'+t.u+'" target="_blank" rel="noopener">'+esc(t.n)+'</a>':esc(t.n))
-     + (t.a?'<em>'+esc(t.a)+'</em>':'')+'</span>'
-     + '<span class="tg '+(t.v?'q':'g')+'">'+(t.v?'quoted':'ai-written')+'</span></li>').join('')+'</ul>'
-    + (all.length > 8
-       ? '<button class="more" data-expand="1">'
-         + (st.expand ? '\u2191 show the top 8 only' : '\u2193 show all '+all.length+' carried here')
-         + '</button>' : '')
-    + '<p class="morenote"><b>8</b> drawn on the map &middot; '
-    + (c.nOutside > all.length ? 'top <b>'+all.length+'</b> of <b>'+nf(c.nOutside)+'</b> carried here'
-                               : 'all <b>'+nf(c.nOutside)+'</b> carried here')
-    + '<br>Tagged to this concern and ranked \u2014 not a confirmed diagnostic sequence.</p>'
-  : '<p class="empty">Nothing outside your panel is tagged to this concern.</p>';
+ drawNextList(ci, -1);
 }
 
 /* ---------- chrome ---------- */
@@ -667,6 +819,8 @@ document.addEventListener('click', function(e){
    st.sel = st.added[ci] ? {t:'c', v:ci} : null; save(); render(); return; }
  const ex = e.target.closest('[data-expand]');
  if(ex){ st.expand = !st.expand; drawDetail(); return; }
+ const tt = e.target.closest('[data-test]');
+ if(tt){ st.sel = {t:'t', v:tt.dataset.test, i:+tt.dataset.ti}; st.expand = false; render(); return; }
  const mk = e.target.closest('[data-mk]');
  if(mk){ const s = mk.dataset.mk;
    st.sel = (st.sel && st.sel.t==='m' && st.sel.v===s) ? null : {t:'m', v:s};
@@ -689,7 +843,105 @@ window.addEventListener('resize', function(){
  clearTimeout(window.__rt);
  window.__rt = setTimeout(relayout, 100);
 });
-document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && st.sel){ st.sel = null; render(); } });
+/* ---------- keyboard navigation ----------------------------------------
+   Three columns, arrow keys move within and between them. Crossing columns
+   is not blind: moving right from a marker lands on the first concern that
+   marker points at, and moving left from a concern lands on the first marker
+   pointing at it, so the arrows follow the edges rather than the row order. */
+function colLen(c){
+ if(c === 0) return SLUGS.length;
+ if(c === 1) return LAYOUT ? LAYOUT.cOrder.length : 0;
+ return LAYOUT ? LAYOUT.ts.length : 0;
+}
+function focRefresh(){
+ drawRail(); draw();
+ if(st.foc && st.foc.c === 0){
+  const el = $('mrow-' + SLUGS[st.foc.i]);
+  if(el && el.scrollIntoView) el.scrollIntoView({block:'nearest'});
+ }
+}
+function moveCol(dir){
+ if(!LAYOUT) return;
+ const cur = st.foc;
+ if(dir > 0){
+  if(cur.c === 0){
+   // follow an edge: first concern this marker points at
+   const ks = M[SLUGS[cur.i]].k;
+   let i = 0;
+   if(ks.length){ const want = ks[0]; const at = LAYOUT.cOrder.indexOf(want); if(at >= 0) i = at; }
+   st.foc = {c:1, i:i};
+  } else if(cur.c === 1 && LAYOUT.ts.length){ st.foc = {c:2, i:0}; }
+ } else {
+  if(cur.c === 2){ st.foc = {c:1, i:Math.max(0, LAYOUT.cOrder.indexOf(LAYOUT.open)) }; }
+  else if(cur.c === 1){
+   const ci = LAYOUT.cOrder[cur.i], from = C[ci].from;
+   let i = 0;
+   if(from.length){ const at = SLUGS.indexOf(from[0]); if(at >= 0) i = at; }
+   st.foc = {c:0, i:i};
+  }
+ }
+}
+document.addEventListener('keydown', function(e){
+ const tag = (e.target.tagName || '').toLowerCase();
+ if(tag === 'input' || tag === 'textarea') return;
+ if(e.metaKey || e.ctrlKey || e.altKey) return;
+ const k = e.key;
+
+ if(k === '?' || (k === '/' && e.shiftKey)){ e.preventDefault(); $('kbdWrap').classList.toggle('on'); return; }
+ if(k === 'Escape'){
+  if($('kbdWrap').classList.contains('on')){ $('kbdWrap').classList.remove('on'); return; }
+  if(st.sel || st.foc){ st.sel = null; st.foc = null; st.expand = false; render(); }
+  return;
+ }
+ if($('kbdWrap').classList.contains('on')) return;
+
+ const arrows = ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Home','End'];
+ if(arrows.indexOf(k) >= 0){
+  e.preventDefault();
+  if(!st.foc) st.foc = {c:0, i:0};
+  else if(k === 'ArrowDown') st.foc.i = Math.min(colLen(st.foc.c) - 1, st.foc.i + 1);
+  else if(k === 'ArrowUp')   st.foc.i = Math.max(0, st.foc.i - 1);
+  else if(k === 'Home')      st.foc.i = 0;
+  else if(k === 'End')       st.foc.i = colLen(st.foc.c) - 1;
+  else moveCol(k === 'ArrowRight' ? 1 : -1);
+  focRefresh();
+  return;
+ }
+ if(!st.foc) return;
+
+ if(k === 'Enter' || k === ' '){
+  e.preventDefault();
+  if(st.foc.c === 0){
+   const sl = SLUGS[st.foc.i];
+   st.sel = (st.sel && st.sel.t === 'm' && st.sel.v === sl) ? null : {t:'m', v:sl};
+  } else if(st.foc.c === 1){
+   const ci = String(LAYOUT.cOrder[st.foc.i]);
+   st.sel = (st.sel && st.sel.t === 'c' && String(st.sel.v) === ci) ? null : {t:'c', v:ci};
+  } else if(st.foc.c === 2){
+   if(LAYOUT.open !== null) st.sel = {t:'t', v:String(LAYOUT.open), i:st.foc.i};
+  }
+  st.expand = false; render(); return;
+ }
+ const low = k.toLowerCase();
+ if(st.foc.c === 0 && (low === 'l' || low === 'n' || low === 'h')){
+  st.val[SLUGS[st.foc.i]] = low === 'l' ? -1 : low === 'h' ? 1 : 0;
+  save(); render(); return;
+ }
+ if(st.foc.c === 1 && low === 'x'){
+  const ci = String(LAYOUT.cOrder[st.foc.i]);
+  if(C[ci].inPanel) return;                       // only the personal layer is addable
+  if(st.added[ci]) delete st.added[ci]; else st.added[ci] = 1;
+  save(); render(); return;
+ }
+ if(low === 'e' && st.sel && st.sel.t === 'c'){ st.expand = !st.expand; drawDetail(); return; }
+ if(low === 'r'){
+  SLUGS.forEach(sl => st.val[sl] = 0); st.added = {}; st.sel = null; st.expand = false;
+  save(); render(); return;
+ }
+});
+$('kbdHint').addEventListener('click', () => $('kbdWrap').classList.add('on'));
+$('kbdClose').addEventListener('click', () => $('kbdWrap').classList.remove('on'));
+$('kbdWrap').addEventListener('click', e => { if(e.target === $('kbdWrap')) $('kbdWrap').classList.remove('on'); });
 
 render();
 </script>

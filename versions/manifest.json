@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-04T17:36:55Z",
+ "generated": "2026-08-04T17:49:50Z",
  "live": "index.html",
  "constraints": [
   [
@@ -28,6 +28,68 @@
   ]
  ],
  "feedback": [
+  {
+   "id": "F16",
+   "date": "2026-07-31",
+   "who": "Chloe",
+   "title": "Repeated recommendations, test drill-in, keyboard, full names, matching dots",
+   "status": "addressed",
+   "versions": [
+    "v2.9"
+   ],
+   "quote": "why would some returned content have bunch of repeated test recommendations?",
+   "quotes": [
+    "why would some returned content have bunch of repeated test recommendations?",
+    "give keyboard shortcuts (arrow keys to go down up the list, left right the columns etc.) to navigate the page better",
+    "click on each of them should lead to the curated right panel of the test details",
+    "instead of not showing the rest name using [...], put full names on two rows if needed",
+    "after clicking on a test, the right panel shows the test details while the test is highlighted under [would follow it up] with the rest content, not disappearing",
+    "dots should be in the same size and style"
+   ],
+   "did": [
+    [
+     "The repeats were real, and were ours",
+     "addressed",
+     "LOINC carries one code per unit, specimen and method, so <i>Lead [Presence] in Blood</i>, <i>Lead [Mass/volume] in Blood</i> and <i>Lead [Moles/volume] in Blood</i> are three codes for one test. Truncating the name at the first bracket collapsed them into a list that read <i>Lead, Lead, Lead</i>. <b>41% of carried rows</b> were duplicate labels."
+    ],
+    [
+     "De-duplicated by analyte",
+     "addressed",
+     "Rows are grouped by the thing measured — bracket, trailing <i>in &lt;specimen&gt;</i> and <i>by &lt;method&gt;</i> all stripped, since LOINC often puts the specimen in bare text. Best-ranked row per analyte kept, the rest counted as a <code>×n</code> chip. Heavy metals: 53 rows → 9 markers. Smoking: 21 → 4."
+    ],
+    [
+     "Counts now say which is which",
+     "addressed",
+     "Headers and tooltips report distinct markers; the note reports both — <i>all 9 markers carried here &middot; from 53 LOINC rows</i>."
+    ],
+    [
+     "Keyboard navigation",
+     "addressed",
+     "↑↓ within a column, ←→ between them, Home/End, Enter to select, L/N/H to mark the focused marker, X to add a concern, E to expand, R to reset, Esc to clear, ? for the shortcut sheet. Crossing columns follows the <b>edges</b>, not the row order: right from a marker lands on the first concern it points at, left from a concern lands on the first marker pointing at it."
+    ],
+    [
+     "Click a test for its own panel",
+     "addressed",
+     "Follow-ups are clickable from the list, the map and the keyboard. The panel shows what it measures with its source and verify link, any sourced relationship notes, and chips for every concern it is tagged to."
+    ],
+    [
+     "The list stays put",
+     "addressed",
+     "Selecting a test used to null the open concern, so the whole third column disappeared. The parent concern now stays open, the map keeps its rows, and the row highlights in place in the panel — including when it sits past the collapsed cut-off."
+    ],
+    [
+     "Full names over two rows",
+     "addressed",
+     "Labels wrap on word boundaries instead of truncating. The over-reserved right margin in the concern column was reclaimed, so every concern name now fits on one line down to 1366px wide. Type tightens when a follow-up wraps so both lines clear the 24px pitch."
+    ],
+    [
+     "One dot, everywhere",
+     "addressed",
+     "All four kinds of dot were different sizes. Now a single 5px radius across all three columns, with state carried by fill and stroke colour rather than geometry."
+    ]
+   ],
+   "open": "The file is 527 KB, up from 230, because each carried marker now brings its description so the test panel has something to show."
+  },
   {
    "id": "F15",
    "date": "2026-07-31",
@@ -677,12 +739,37 @@
  ],
  "versions": [
   {
+   "id": "v2.9",
+   "file": "v2.9-tests-and-keys.html",
+   "title": "Ripple atlas — de-duplicated, drillable, keyboard-driven",
+   "date": "2026-07-31",
+   "source": "index-v3.html",
+   "status": "candidate",
+   "tag": "v2.9-tests-and-keys",
+   "gitpath": "index-v3.html",
+   "answers": [
+    "F16"
+   ],
+   "summary": "Follow-up lists de-duplicated by analyte, every test drillable into its own panel, full keyboard navigation, wrapped labels, and one dot size throughout.",
+   "changes": [
+    "<b>De-duplication by analyte</b> — 53 LOINC rows become 9 markers with ×n chips. 41% of rows were previously duplicate labels.",
+    "<b>Test detail panel</b> reachable by click, map or keyboard: description, source, verify link, relationship notes, tagged concerns.",
+    "<b>The follow-up list stays on screen</b> when a test is selected, with the row highlighted.",
+    "<b>Keyboard</b>: arrows, Home/End, Enter, L/N/H, X, E, R, Esc, ?. Column changes follow the edges.",
+    "<b>Labels wrap</b> rather than truncate; concern names fit on one line to 1366px.",
+    "<b>One 5px dot</b> across all three columns; state is colour only.",
+    "Zero label overlaps at six window sizes."
+   ],
+   "note": "527 KB, up from 230, because each carried marker now brings its description.",
+   "mb": 0.52
+  },
+  {
    "id": "v2.8",
    "file": "v2.8-pill-align.html",
    "title": "Ripple atlas — pill header aligned",
    "date": "2026-07-31",
    "source": "index-v3.html",
-   "status": "candidate",
+   "status": "superseded",
    "tag": "v2.8-pill-align",
    "gitpath": "index-v3.html",
    "answers": [

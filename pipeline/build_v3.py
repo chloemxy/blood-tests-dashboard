@@ -70,6 +70,22 @@ for p in PANELS:
 # ---------------------------------------------------------------------------
 # 2. concerns, and the tests that would follow each one up
 # ---------------------------------------------------------------------------
+def analyte(name):
+    """Collapse a LOINC long name to the thing being measured.
+
+    LOINC carries one code per unit, specimen and method. The property sits in
+    brackets — "Lead [Mass/volume] in Blood" — but the specimen and method are
+    often bare text, so "Carboxyhemoglobin/Hemoglobin.total in Venous blood"
+    and "... in Arterial blood" are two codes for one measurement. Stripping
+    the bracket, the trailing "in <specimen>" and any "by <method>" leaves the
+    analyte, which is what a reader means by "the test".
+    """
+    n = name.split("[")[0]
+    n = re.sub(r"\s+by\s+.*$", "", n, flags=re.I)
+    n = re.sub(r"\s+in\s+(?:the\s+)?[A-Z].*$", "", n)
+    return n.strip(" /,") or name.strip()
+
+
 base_idx = {k for k, t in enumerate(TESTS) if t.get("b")}
 panel_concerns = sorted({c for m in markers.values() for c in m["k"]})
 
@@ -78,21 +94,41 @@ for ci, c in enumerate(CONCERNS):
     tagged = [k for k, t in enumerate(TESTS) if ci in (t.get("k") or [])]
     outside = [k for k in tagged if k not in base_idx]
     outside.sort(key=lambda k: (-(TESTS[k].get("v") or 0), -(TESTS[k].get("t") or 0), len(TESTS[k]["n"])))
-    concerns[ci] = {
-        "id": c["id"], "label": c["label"], "grp": c["grp"],
-        "inPanel": ci in panel_concerns,
-        "nTagged": len(tagged), "nOutside": len(outside),
-        "from": [m["slug"] for m in markers.values() if ci in m["k"]],
-        # 8 shown on the map; the rest are carried so the detail panel can
-        # expand to them. Capped at 40 to keep the file small — the true total
-        # is nOutside and the panel says so.
-        "next": [{
-            "n": TESTS[k]["n"].split("[")[0].strip(),
+    # De-duplicate by analyte. LOINC carries one code per unit and method, so
+    # "Lead [Presence] in Blood", "Lead [Mass/volume] in Blood" and
+    # "Lead [Moles/volume] in Blood" are three rows for one test. Truncating at
+    # the first "[" for display collapsed them into a list that read as
+    # "Lead, Lead, Lead". Keep the best-ranked row per analyte and count the
+    # rest as variants. `outside` is already in rank order, so the first
+    # occurrence is the representative.
+    byAnalyte = {}
+    for k in outside:
+        name = analyte(TESTS[k]["n"])
+        if name in byAnalyte:
+            byAnalyte[name]["nv"] += 1
+            continue
+        byAnalyte[name] = {
+            "n": name,
             "a": TESTS[k].get("a") or "",
             "g": GROUPS[TESTS[k]["g"]],
             "v": 1 if TESTS[k].get("v") else 0,
             "u": (TESTS[k].get("r") or [["", ""]])[-1][0],
-        } for k in outside[:40]],
+            "q": (TESTS[k].get("q") or "").strip('"')[:260],
+            "qs": TESTS[k].get("qs") or "",
+            "cs": TESTS[k].get("k") or [],
+            "nv": 1,
+        }
+    distinct = list(byAnalyte.values())
+
+    concerns[ci] = {
+        "id": c["id"], "label": c["label"], "grp": c["grp"],
+        "inPanel": ci in panel_concerns,
+        "nTagged": len(tagged),
+        "nOutside": len(outside),        # LOINC rows outside the panel
+        "nDistinct": len(distinct),      # distinct markers among them
+        "from": [m["slug"] for m in markers.values() if ci in m["k"]],
+        # 8 drawn on the map; up to 40 carried so the panel can expand.
+        "next": distinct[:40],
     }
 
 # ---------------------------------------------------------------------------
@@ -228,4 +264,5 @@ print("  %d panel markers · %d panels" % (len(markers), len(PANEL_ORDER)))
 print("  %d concerns (%d reachable from the annual panel)" % (m["nConcerns"], m["panelConcerns"]))
 print("  %d sourced relationship notes" % len(REL))
 print("  %s follow-up tests sit outside the panel for those concerns" % format(m["offPanelForPanelConcerns"], ","))
-print("  %d follow-up rows carried (cap 40 per concern)" % sum(len(c["next"]) for c in concerns.values()))
+print("  %d distinct follow-up markers carried (cap 40 per concern)" % sum(len(c["next"]) for c in concerns.values()))
+print("  de-duplicated from %d LOINC rows" % sum(sum(t["nv"] for t in c["next"]) for c in concerns.values()))
