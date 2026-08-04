@@ -24,6 +24,17 @@ i = s.index('id="payload" type="application/json">') + len('id="payload" type="a
 D = json.loads(s[i:s.index("</script>", i)])
 TESTS, GROUPS, CONCERNS, CGROUPS, PANELS = D["tests"], D["groups"], D["concerns"], D["cgroups"], D["panels"]
 
+def unquote(t):
+    """Strip wrapping quote marks of any flavour.
+
+    The catalogue stores descriptions already wrapped in quotes, and the panel
+    renders them in a <q> element which adds its own — so the straight-quote
+    strip we had left curly ones through and produced a doubled mark.
+    """
+    return (t or "").strip().strip('"\u201c\u201d\u2018\u2019\'').strip()
+
+
+
 # ---------------------------------------------------------------------------
 # 1. the 26 annual-panel markers, with a stable slug each
 # ---------------------------------------------------------------------------
@@ -54,7 +65,7 @@ for k, t in enumerate(TESTS):
         idx_by_slug[sl] = k
         markers[sl] = {
             "slug": sl, "name": t["n"], "abbr": ABBR[sl], "grp": GROUPS[t["g"]],
-            "k": t.get("k") or [], "q": (t.get("q") or "").strip('"'),
+            "k": t.get("k") or [], "q": unquote(t.get("q")),
             "qs": t.get("qs") or "", "v": 1 if t.get("v") else 0,
             "url": (t.get("r") or [["", ""]])[0][0],
         }
@@ -113,7 +124,7 @@ for ci, c in enumerate(CONCERNS):
             "g": GROUPS[TESTS[k]["g"]],
             "v": 1 if TESTS[k].get("v") else 0,
             "u": (TESTS[k].get("r") or [["", ""]])[-1][0],
-            "q": (TESTS[k].get("q") or "").strip('"')[:260],
+            "q": unquote(TESTS[k].get("q"))[:260],
             "qs": TESTS[k].get("qs") or "",
             "cs": TESTS[k].get("k") or [],
             "t": TESTS[k].get("t", 0),      # how commonly ordered: 18 common .. -3 obscure

@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-04T18:13:38Z",
+ "generated": "2026-08-04T18:19:27Z",
  "live": "index.html",
  "constraints": [
   [
@@ -28,6 +28,50 @@
   ]
  ],
  "feedback": [
+  {
+   "id": "F22",
+   "date": "2026-07-31",
+   "who": "Chloe",
+   "title": "Full names with constant padding, doubled quote mark, keyboard resumes from the last click",
+   "status": "addressed",
+   "versions": [
+    "v3.5"
+   ],
+   "quote": "show full name, put in rule, allow multiple rows if needed. each test will have the same paddings around regardless how many rows of the name it takes",
+   "quotes": [
+    "show full name, put in rule, allow multiple rows if needed. each test will have the same paddings around regardless how many rows of the name it takes",
+    "remove the one additional quotation mark",
+    "when using shortcuts on keyboard, esp arrow keys, start navigation based on where the last click was, not from default beginning"
+   ],
+   "did": [
+    [
+     "Full names on the map, never cut",
+     "addressed",
+     "Follow-up entries wrap to up to three lines instead of ending in an ellipsis. Zero truncated at every width tested."
+    ],
+    [
+     "Constant padding whatever the line count",
+     "addressed",
+     "Each entry carries exactly <b>8px above and below</b> whether its name takes one line or three — the row grows, the padding does not. Measured identical across a mixed one- and two-line block."
+    ],
+    [
+     "Written into the rules",
+     "addressed",
+     "<code>DESIGN-RULES.md</code> §4 now states it: names are shown in full and wrap rather than truncate; padding is constant regardless of line count so rows in a list may legitimately differ in height; long lists are grouped rather than cut, with the true count on every header."
+    ],
+    [
+     "Doubled quotation mark",
+     "addressed",
+     "Descriptions arrive from the catalogue already wrapped in quotes and are rendered in a <code>&lt;q&gt;</code> element, which adds its own. The strip only handled straight quotes, so curly ones came through and doubled up. Now every flavour is stripped at build time."
+    ],
+    [
+     "Keyboard resumes from the last click",
+     "addressed",
+     "Clicking a marker, a concern, a follow-up test or a low/high toggle now moves the keyboard focus to that item, so the arrow keys carry on from where you were rather than restarting at the top of the first column."
+    ]
+   ],
+   "open": null
+  },
   {
    "id": "F21",
    "date": "2026-07-31",
@@ -929,12 +973,34 @@
  ],
  "versions": [
   {
+   "id": "v3.5",
+   "file": "v3.5-full-names.html",
+   "title": "Ripple atlas — full names, constant padding",
+   "date": "2026-07-31",
+   "source": "index-v3.html",
+   "status": "candidate",
+   "tag": "v3.5-full-names",
+   "gitpath": "index-v3.html",
+   "answers": [
+    "F22"
+   ],
+   "summary": "Follow-up names wrap to up to three lines rather than truncating, with identical padding whatever the line count; the doubled quote mark is gone and the keyboard resumes from the last click.",
+   "changes": [
+    "<b>Full names, up to three lines</b>, zero truncated at every width tested.",
+    "<b>8px above and below every entry</b> regardless of line count — the row grows, the padding does not.",
+    "<b>Rule written down</b> in <code>DESIGN-RULES.md</code> §4, along with the grouping rule for long lists.",
+    "<b>Doubled quotation mark fixed</b> — curly quotes are now stripped at build time before the <code>&lt;q&gt;</code> element adds its own.",
+    "<b>Keyboard focus follows the last click</b> instead of restarting at the top."
+   ],
+   "mb": 0.55
+  },
+  {
    "id": "v3.4",
    "file": "v3.4-grouped-docked.html",
    "title": "Ripple atlas — grouped lists, docked panels",
    "date": "2026-07-31",
    "source": "index-v3.html",
-   "status": "candidate",
+   "status": "superseded",
    "tag": "v3.4-grouped-docked",
    "gitpath": "index-v3.html",
    "answers": [

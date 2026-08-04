@@ -76,10 +76,24 @@ harder to read than one that does not.
 
 ## 4. Reveal, don't clip
 
+**Names are shown in full.** A label wraps onto as many rows as it needs; it is
+never cut with an ellipsis while there is a way to wrap it. Truncation is a last
+resort for when the container genuinely cannot hold the text at the minimum
+type size, and even then the full name stays in the tooltip.
+
+**Padding is constant regardless of line count.** An entry with a three-line
+name carries exactly the same space above and below as a one-line one — the row
+grows, the padding does not change. Rows in a list may therefore have different
+heights; that is correct.
+
 If a section's job is to explain something, it grows to fit its content rather
 than scrolling or truncating it. Long *lists* may be capped with an explicit
 expander that states the true total. Truncation without a stated count is never
 acceptable.
+
+**Long lists are grouped, not cut.** Past about ten entries, group by a
+meaningful axis, show the commonly-relevant members by default, and put the true
+count on every group header so nothing is hidden without being counted.
 
 ## 5. Sourcing
 

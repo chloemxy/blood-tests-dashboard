@@ -442,6 +442,8 @@ function buildLayout(){
  const nGrp = D.panels.length;
  const mAvail = b.h - headTotal - (nGrp - 1) * grpGap;
  const mRow = mAvail / SLUGS.length;
+ // only, never by size or weight.
+ const mFs = Math.max(8, Math.min(12, (mRow - 2) / 1.06));
  const mk = {}; let y = b.T, groups = [];
  D.panels.forEach((p, gi) => {
   groups.push({ lines: gLines[gi], y: y + 8, n: p.slugs.length });
@@ -500,25 +502,33 @@ function buildLayout(){
  unreach.forEach(o => { cn[o.ci] = cy + cH[o.ci] / 2; cy += cH[o.ci]; });
  const cRow = cUnit;
 
- // ---- follow-up tests: one tight block, vertically centred on the concern row
- // it belongs to, so the fan of edges is symmetric about the connector dot.
- // Row pitch is 32px (8px grid). The block is clamped inside the column.
- const T_ROW = 32, MAP_SHOW = 8;   // 8px grid; 32 so a wrapped 12px label still clears
+ // One size for every column: 12px unless a column cannot fit it.
+ const FS = Math.max(8, Math.min(12, mFs, cFs));
+
+ // ---- follow-up tests: one block, centred on the concern row it belongs to.
+ // Full names, never truncated — each wraps to as many lines as it needs, and
+ // every entry carries the same 8px above and below whatever its line count,
+ // so the padding around each is identical.
+ const MAP_SHOW = 8, T_PAD = 8;
  const ts = [];
  if(open !== null){
-  const list = (C[open].next || []).slice(0, MAP_SHOW), n = list.length, blockH = n * T_ROW;
+  const twAvail = b.R - xT - 13;
+  const tLead = FS * 1.06;
+  const perT = Math.max(8, Math.floor(twAvail / (FS * 0.56)));
+  const items = (C[open].next || []).slice(0, MAP_SHOW).map(t => {
+   const ln = wrap(t.n, perT, 3);
+   return { t: t, lines: ln, h: ln.length * tLead + T_PAD * 2 };
+  });
+  const blockH = items.reduce((a, it) => a + it.h, 0);
   const anchor = cn[open];
-  const y0 = Math.max(b.T, Math.min(b.B - blockH, anchor - blockH / 2));
-  list.forEach((t, j) => ts.push({ t: t, y: y0 + T_ROW * j + T_ROW / 2 }));
+  let y = Math.max(b.T, Math.min(b.B - blockH, anchor - blockH / 2));
+  items.forEach(it => { ts.push({ t: it.t, lines: it.lines, h: it.h, y: y + it.h / 2 }); y += it.h; });
  }
 
  // One type size for all three columns — the tightest of the three budgets, so
  // the columns read as one system rather than three. State is carried by colour
- // only, never by size or weight.
- const mFs = Math.max(8, Math.min(12, (mRow - 2) / 1.06));
  const cOrder = reach.map(o => o.ci).concat(unreach.map(o => o.ci));
  const headLeadOut = headLead;
- const FS = Math.max(8, Math.min(12, mFs, cFs));  // one size, every column; 12 unless it cannot fit
  const divTop = divY - divH / 2;
  return { xM:xM, xC:xC, xT:xT, xCend:xCend, mk:mk, cn:cn, ts:ts, groups:groups, cOrder:cOrder,
           divLines:divLines, divTop:divTop, divPad:divPad, divLead:divLead, divGap:divGap,
@@ -669,16 +679,13 @@ function draw(){
  // One line per test. The source badge is not repeated here — it is on every
  // row of the detail list on the right, and two lines per row would force the
  // block taller than it can be while staying centred.
- const tw = b.R - L.xT - 13;
- // when any label needs two lines, the type tightens so both fit the 24px pitch
  const tFs = L.FS;
  L.ts.forEach((o, j) => {
-  const perT = Math.max(8, Math.floor(tw / (tFs * 0.56)));
-  const lnT = wrap(o.t.n, perT, 2);
-  const lhT = tFs * 1.02, yT = o.y + tFs*0.34 - (lnT.length - 1) * lhT / 2;
+  const lnT = o.lines;
+  const lhT = tFs * 1.06, yT = o.y + tFs*0.34 - (lnT.length - 1) * lhT / 2;
   h += '<g class="row tst'+((st.foc&&st.foc.c===2&&st.foc.i===j)?' foc':'')
     +  ((st.sel&&st.sel.t==='t'&&st.sel.i===j)?' sel':'')+'" data-test="'+L.open+'" data-ti="'+j+'">'
-    +  '<rect class="hitbox" x="'+(L.xT-8).toFixed(1)+'" y="'+(o.y-12).toFixed(1)+'" width="'+(b.R-L.xT+8).toFixed(1)+'" height="24" rx="4"/>'
+    +  '<rect class="hitbox" x="'+(L.xT-8).toFixed(1)+'" y="'+(o.y-o.h/2).toFixed(1)+'" width="'+(b.R-L.xT+8).toFixed(1)+'" height="'+o.h.toFixed(1)+'" rx="4"/>'
     +  '<title>'+esc(o.t.n)+(o.t.g?' — '+esc(o.t.g):'')
     +  (o.t.v?' — source-quoted':' — ai-written')+'</title>'
     +  '<circle class="dot" cx="'+L.xT.toFixed(1)+'" cy="'+o.y.toFixed(1)+'" r="5"/>'
@@ -913,7 +920,9 @@ function render(){ relayout(); drawRail(); drawDetail(); drawChrome(); }
 /* ---------- events ---------- */
 document.addEventListener('click', function(e){
  const set = e.target.closest('[data-set]');
- if(set){ st.val[set.dataset.set] = +set.dataset.v; save(); render(); return; }
+ if(set){ st.val[set.dataset.set] = +set.dataset.v;
+   st.foc = {c:0, i:Math.max(0, SLUGS.indexOf(set.dataset.set))};
+   save(); render(); return; }
  const add = e.target.closest('[data-add]');
  if(add){ const ci = add.dataset.add;
    if(st.added[ci]) delete st.added[ci]; else st.added[ci] = 1;
@@ -922,15 +931,21 @@ document.addEventListener('click', function(e){
  if(ex){ st.expand = !st.expand; st.fam = {}; drawDetail(); return; }
  const ft = e.target.closest('[data-fam]');
  if(ft){ const g = ft.dataset.fam; if(st.fam[g]) delete st.fam[g]; else st.fam[g] = 1; drawDetail(); return; }
+ // Clicking moves the keyboard focus to what you clicked, so the arrow keys
+ // carry on from there rather than restarting at the top of the first column.
  const tt = e.target.closest('[data-test]');
- if(tt){ st.sel = {t:'t', v:tt.dataset.test, i:+tt.dataset.ti}; st.expand = false; render(); return; }
+ if(tt){ st.sel = {t:'t', v:tt.dataset.test, i:+tt.dataset.ti};
+   if(LAYOUT && LAYOUT.ts && +tt.dataset.ti < LAYOUT.ts.length) st.foc = {c:2, i:+tt.dataset.ti};
+   st.expand = false; render(); return; }
  const mk = e.target.closest('[data-mk]');
  if(mk){ const s = mk.dataset.mk;
    st.sel = (st.sel && st.sel.t==='m' && st.sel.v===s) ? null : {t:'m', v:s};
+   st.foc = {c:0, i:Math.max(0, SLUGS.indexOf(s))};
    st.expand = false; st.fam = {}; render(); return; }
  const cn = e.target.closest('[data-cn]');
  if(cn){ const ci = cn.dataset.cn;
    st.sel = (st.sel && st.sel.t==='c' && String(st.sel.v)===String(ci)) ? null : {t:'c', v:ci};
+   if(LAYOUT){ const at = LAYOUT.cOrder.indexOf(+ci); if(at >= 0) st.foc = {c:1, i:at}; }
    st.expand = false; st.fam = {}; render(); return; }
 });
 $('map').addEventListener('mouseover', function(e){
