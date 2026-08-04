@@ -43,6 +43,26 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F13",
+  "date": "2026-07-31",
+  "who": "Chloe",
+  "title": "Give the relationship notes more room by default",
+  "status": "addressed",
+  "versions": ["v2.6"],
+  "quote": "give more space for this section by default",
+  "did": [
+   ("Section is no longer a fixed 184px box", "addressed",
+    "\u201cHow these connect\u201d now flexes. It takes the larger share of whatever height is left after the header and the explanation \u2014 <code>flex:1.6</code> against <code>flex:1</code> for the follow-up list \u2014 with a 264px floor."),
+   ("Two full notes visible by default", "addressed",
+    "At a 880px-tall window the section clears roughly 300px, enough for two complete quote cards instead of one and a clipped second."),
+   ("More air between cards", "addressed",
+    "Card spacing 16px \u2192 24px, with the last card\u2019s margin removed so the section does not end on dead space."),
+   ("Still on the grid", "addressed",
+    "264, 160 and 24 are all multiples of 8. Re-audited: zero off-grid spacing."),
+  ],
+  "open": None,
+ },
+ {
   "id": "F12",
   "date": "2026-07-31",
   "who": "Chloe",
@@ -353,12 +373,30 @@ FEEDBACK = [
 # ===========================================================================
 VERSIONS = [
  {
+  "id": "v2.6",
+  "file": "v2.6-facts-space.html",
+  "title": "Ripple atlas \u2014 roomier relationship notes",
+  "date": "2026-07-31",
+  "source": "index-v3.html",
+  "status": "candidate",
+  "tag": "v2.6-facts-space",
+  "gitpath": "index-v3.html",
+  "answers": ["F13"],
+  "summary": "\u201cHow these connect\u201d gets the larger share of the detail panel instead of a fixed 184px box, so two full quote cards are visible by default.",
+  "changes": [
+   "<b>Relationship notes flex</b> at 1.6 against 1 for the follow-up list, with a 264px floor \u2014 they are the substance of the panel, so they get the space.",
+   "<b>24px between cards</b>, last margin removed.",
+   "Follow-up list keeps a 160px floor and its expander.",
+   "Re-audited: zero off-grid spacing.",
+  ],
+ },
+ {
   "id": "v2.5",
   "file": "v2.5-detail-8px.html",
   "title": "Ripple atlas \u2014 detail panel, 8px audit",
   "date": "2026-07-31",
   "source": "index-v3.html",
-  "status": "candidate",
+  "status": "superseded",
   "tag": "v2.5-detail-8px",
   "gitpath": "index-v3.html",
   "answers": ["F12"],

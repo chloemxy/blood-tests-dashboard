@@ -119,8 +119,10 @@ button{font-family:inherit;cursor:pointer}
 /* "why it is on the map" grows to fit — it is never scrolled and never clipped */
 .slot.why{flex:0 0 auto}
 .slot.why > .c{overflow:visible}
-.slot.fact{flex:0 0 auto;height:184px}
-.slot.next{flex:1 1 auto;min-height:0;border-bottom:none}
+/* the relationship notes are the substance of the panel, so they take the
+   larger share of whatever height is left after the header and the explanation */
+.slot.fact{flex:1.6 1 0;min-height:264px}
+.slot.next{flex:1 1 0;min-height:160px;border-bottom:none}
 .empty{font-size:11.5px;color:var(--dim);line-height:1.55;font-style:italic}
 .wl{list-style:none;margin:0;padding:0}
 .wl li{font-size:11.5px;color:var(--muted);padding:4px 0;line-height:1.45}
@@ -129,7 +131,8 @@ button{font-family:inherit;cursor:pointer}
 .wl li i.lo{background:#e2f2f5;color:var(--low)}
 .wl li i.hi{background:#fdf1ea;color:var(--high)}
 
-.fc{border-left:2px solid var(--warm);padding:0 0 0 12px;margin:0 0 16px}
+.fc{border-left:2px solid var(--warm);padding:0 0 0 12px;margin:0 0 24px}
+.fc:last-child{margin-bottom:0}
 .fc q{font-family:var(--font-serif);font-size:12.5px;color:var(--slate);line-height:1.55;display:block;font-style:italic}
 .fc .cite{font-family:var(--font-mono);font-size:9px;color:var(--dim);margin-top:8px;display:block}
 .fc .rel{font-family:var(--font-mono);font-size:9px;letter-spacing:.04em;text-transform:uppercase;
