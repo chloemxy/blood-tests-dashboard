@@ -43,6 +43,24 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F18",
+  "date": "2026-07-31",
+  "who": "Chloe",
+  "title": "Divider: more air on top, balanced, wrapping",
+  "status": "addressed",
+  "versions": ["v3.1"],
+  "quote": "more space on top, align text with top and bottom, put in multiple rows if needed",
+  "did": [
+   ("It was running past the column", "addressed",
+    "<i>29 concerns no panel marker can reach</i> was a single unwrapped line, so <i>can reach</i> fell off the right edge below about 1440px. It now wraps on word boundaries to fit the column \u2014 one line to 1440, two below that, never truncated."),
+   ("Band sized from the content", "addressed",
+    "Height is computed from the number of wrapped lines rather than fixed, so a two-line divider gets a taller band instead of crowding."),
+   ("Space balanced top and bottom", "addressed",
+    "24px above the first baseline and 16px below the rule \u2014 the extra 8 on top pays for the cap height, so the white space reads as equal. Measured: <b>~30px above, ~34px below</b>, against 21/21 before and a visibly tighter top."),
+  ],
+  "open": None,
+ },
+ {
   "id": "F17",
   "date": "2026-07-31",
   "who": "Chloe",
@@ -483,12 +501,30 @@ FEEDBACK = [
 # ===========================================================================
 VERSIONS = [
  {
+  "id": "v3.1",
+  "file": "v3.1-divider-header.html",
+  "title": "Ripple atlas \u2014 divider wraps and breathes",
+  "date": "2026-07-31",
+  "source": "index-v3.html",
+  "status": "candidate",
+  "tag": "v3.1-divider-header",
+  "gitpath": "index-v3.html",
+  "answers": ["F18"],
+  "summary": "The unreachable-concerns divider wraps to fit its column and its band is sized from the content, with balanced space above and below.",
+  "changes": [
+   "<b>Wraps on word boundaries</b> \u2014 one line to 1440px, two below, never running past the column or truncated.",
+   "<b>Band height computed from the line count</b> rather than fixed.",
+   "<b>24px above the first baseline, 16px below the rule</b>, so the visual space reads as equal.",
+   "Zero label overlaps at six window sizes; zero off-grid spacing.",
+  ],
+ },
+ {
   "id": "v3.0",
   "file": "v3.0-marker-column.html",
   "title": "Ripple atlas \u2014 aligned marker column",
   "date": "2026-07-31",
   "source": "index-v3.html",
-  "status": "candidate",
+  "status": "superseded",
   "tag": "v3.0-marker-column",
   "gitpath": "index-v3.html",
   "answers": ["F17"],

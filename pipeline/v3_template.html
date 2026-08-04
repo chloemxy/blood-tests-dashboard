@@ -430,7 +430,15 @@ function buildLayout(){
  reach.sort((a, c) => a.bary - c.bary || a.ci - c.ci);
  unreach.sort((a, c) => C[a.ci].label.localeCompare(C[c.ci].label));
 
- const divH = 40;   // room to read the divider as a section header, not a squeeze
+ // The divider is a section header: it wraps to fit the column, and the band
+ // is sized from the number of lines so the space above and below is equal.
+ const divTxt = unreach.length + ' CONCERNS NO PANEL MARKER CAN REACH';
+ const divPer = Math.max(12, Math.floor((xCend - xC + 9) / 6.2));   // 9px mono + tracking
+ const divLines = wrap(divTxt, divPer, 2);
+ // 24 above the first baseline, 16 below the rule — the extra 8 on top pays for
+ // the cap height, so the white space reads as equal above and below
+ const divPad = 24, divPadBot = 16, divLead = 12, divGap = 8;
+ const divH = divPad + divLines.length * divLead + divGap + divPadBot;
  const cRow = (b.h - divH) / CIDS.length;
  const cn = {}; let cy = b.T, divY = 0;
  reach.forEach(o => { cn[o.ci] = cy + cRow / 2; cy += cRow; });
@@ -453,7 +461,9 @@ function buildLayout(){
  const mFs = Math.max(8.5, Math.min(11.5, mRow * 0.58));
  const cFs = Math.max(8,   Math.min(11,   cRow * 0.72));
  const cOrder = reach.map(o => o.ci).concat(unreach.map(o => o.ci));
+ const divTop = divY - divH / 2;
  return { xM:xM, xC:xC, xT:xT, xCend:xCend, mk:mk, cn:cn, ts:ts, groups:groups, cOrder:cOrder,
+          divLines:divLines, divTop:divTop, divPad:divPad, divLead:divLead, divGap:divGap,
           mRow:mRow, cRow:cRow, mFs:mFs, cFs:cFs, divY:divY, open:open,
           nReach:reach.length, nUnreach:unreach.length };
 }
@@ -558,11 +568,16 @@ function draw(){
  });
 
  // ---- divider between reachable and unreachable concerns
- // set in the same key as the column headers, with air above and below
- h += '<text class="colhd" x="'+(L.xC-9).toFixed(1)+'" y="'+(L.divY-6).toFixed(1)+'">'
-   +  L.nUnreach+' CONCERNS NO PANEL MARKER CAN REACH</text>'
-   +  '<line class="rule dash" x1="'+(L.xC-9).toFixed(1)+'" y1="'+(L.divY+6).toFixed(1)
-   +  '" x2="'+L.xCend.toFixed(1)+'" y2="'+(L.divY+6).toFixed(1)+'"/>';
+ // Section header: equal air above the first line and below the rule, wrapping
+ // to a second line rather than running past the column.
+ const dY = L.divTop + L.divPad;
+ h += L.divLines.map((t2, li) =>
+        '<text class="colhd" x="'+(L.xC-9).toFixed(1)+'" y="'+(dY + li*L.divLead).toFixed(1)+'">'
+        + esc(t2) + '</text>').join('')
+   +  '<line class="rule dash" x1="'+(L.xC-9).toFixed(1)
+   +  '" y1="'+(dY + (L.divLines.length-1)*L.divLead + L.divGap).toFixed(1)
+   +  '" x2="'+L.xCend.toFixed(1)
+   +  '" y2="'+(dY + (L.divLines.length-1)*L.divLead + L.divGap).toFixed(1)+'"/>';
 
  // ---- concern rows
  // Reserve only what the count chip and the out-dot actually need, so the
