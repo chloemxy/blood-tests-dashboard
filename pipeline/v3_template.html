@@ -132,12 +132,17 @@ button{font-family:inherit;cursor:pointer}
 /* "what would follow it up" is anchored at the bottom of the panel and shows
    its default eight rows in full, without scrolling. Expanding it turns it into
    the flexible section instead, and it scrolls from there. */
-.slot.next{flex:0 0 auto;border-bottom:none;border-top:1px solid var(--line);margin-top:auto}
-.slot.next > .c{overflow:visible}
-.slot.next.exp{flex:1 1 0;min-height:160px}
-.slot.next.exp > .c{overflow-y:scroll;scrollbar-gutter:stable}
-.slot.next.exp > .c::-webkit-scrollbar{width:8px}
-.slot.next.exp > .c::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+/* Fixed default height, so the panel keeps the same shape whichever concern is
+   open — a concern with 3 families and one with 12 both get this box, and the
+   content scrolls inside it. Expanding hands the section the remaining space
+   instead. 384 = 8x48; the cap keeps it sane on a short window. */
+.slot.next{flex:0 0 auto;height:384px;max-height:52%;border-bottom:none;
+ border-top:1px solid var(--line);margin-top:auto}
+.slot.next > .c{overflow-y:scroll;scrollbar-gutter:stable}
+.slot.next > .c::-webkit-scrollbar{width:8px}
+.slot.next > .c::-webkit-scrollbar-track{background:transparent}
+.slot.next > .c::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+.slot.next.exp{flex:1 1 0;height:auto;max-height:none;min-height:160px}
 /* the relationship notes take whatever is left above it */
 .slot.fact{flex:1 1 0;min-height:176px}
 .empty{font-size:11.5px;color:var(--dim);line-height:1.55;font-style:italic}
@@ -371,7 +376,7 @@ const SLUGS = D.panels.reduce((a,p)=>a.concat(p.slugs), []);
 const CIDS = Object.keys(C).map(Number);
 
 /* ---------- state ---------- */
-const st = { val:{}, added:{}, sel:null, hot:null, expand:false, foc:null, fam:{} };   // val: slug -> -1|0|1
+const st = { val:{}, added:{}, sel:null, hot:null, expand:false, foc:null, focVia:'key', fam:{} };   // val: slug -> -1|0|1
 SLUGS.forEach(s => st.val[s] = 0);
 try{ const raw = localStorage.getItem('v3.state');
      if(raw){ const o = JSON.parse(raw);
@@ -539,6 +544,10 @@ function buildLayout(){
 }
 
 function clip(t, n){ return t.length > n ? t.slice(0, n - 1) + '…' : t; }
+/* The dashed ring marks *keyboard* focus. A mouse click selects instead, and a
+   selection is a filled row with no outline — so clicking never leaves a dashed
+   box behind. */
+function kfoc(c, i){ return st.foc && st.focVia === 'key' && st.foc.c === c && st.foc.i === i; }
 /* Break a label onto up to `maxLines` lines at word boundaries. Only the last
    line is ever ellipsised, and only if the whole name genuinely cannot fit. */
 function wrap(t, perLine, maxLines){
@@ -621,7 +630,7 @@ function draw(){
  SLUGS.forEach(sl => {
   const y = L.mk[sl], v = st.val[sl];
   const cls = ['row','mkr', v<0?'lo':v>0?'hi':'', selM===sl?'sel':'', st.hot===sl?'hot':'',
-               (st.foc&&st.foc.c===0&&SLUGS[st.foc.i]===sl)?'foc':''].filter(Boolean).join(' ');
+               kfoc(0, SLUGS.indexOf(sl))?'foc':''].filter(Boolean).join(' ');
   const nm = M[sl].name.split('[')[0].trim();
   const perM = Math.max(8, Math.floor(mLabW / (L.mFs * 0.56)));
   const canTwoM = L.mRow >= L.mFs * 2.3;
@@ -657,7 +666,7 @@ function draw(){
   const y = L.cn[ci], from = act[ci], added = !!st.added[ci];
   const cls = ['row','cnc', from?'on':'', added?'added':'', selC===ci?'sel':'',
                st.hot===('c'+ci)?'hot':'',
-               (st.foc&&st.foc.c===1&&L.cOrder[st.foc.i]===ci)?'foc':''].filter(Boolean).join(' ');
+               kfoc(1, L.cOrder.indexOf(ci))?'foc':''].filter(Boolean).join(' ');
   const lab = ['lb', from?'on':'mut', added?'acc':''].filter(Boolean).join(' ');
   const cln = L.cLines[ci], ch = L.cH[ci];
   const cy0 = y + L.cFs * 0.34 - (cln.length - 1) * cLead / 2;
@@ -683,7 +692,7 @@ function draw(){
  L.ts.forEach((o, j) => {
   const lnT = o.lines;
   const lhT = tFs * 1.06, yT = o.y + tFs*0.34 - (lnT.length - 1) * lhT / 2;
-  h += '<g class="row tst'+((st.foc&&st.foc.c===2&&st.foc.i===j)?' foc':'')
+  h += '<g class="row tst'+(kfoc(2, j)?' foc':'')
     +  ((st.sel&&st.sel.t==='t'&&st.sel.i===j)?' sel':'')+'" data-test="'+L.open+'" data-ti="'+j+'">'
     +  '<rect class="hitbox" x="'+(L.xT-8).toFixed(1)+'" y="'+(o.y-o.h/2).toFixed(1)+'" width="'+(b.R-L.xT+8).toFixed(1)+'" height="'+o.h.toFixed(1)+'" rx="4"/>'
     +  '<title>'+esc(o.t.n)+(o.t.g?' — '+esc(o.t.g):'')
@@ -708,7 +717,7 @@ function drawRail(){
   h += '<div class="grouphd"><b>'+esc(p.name.replace(/\s*\(.*\)/,''))+'</b> '+p.slugs.length+' markers</div>';
   p.slugs.forEach(s => {
    const v = st.val[s];
-   const isFoc = st.foc && st.foc.c===0 && SLUGS[st.foc.i]===s;
+   const isFoc = kfoc(0, SLUGS.indexOf(s));
    h += '<div class="mrow'+(v<0?' lo':v>0?' hi':'')+(st.sel&&st.sel.t==='m'&&st.sel.v===s?' sel':'')
      +  (isFoc?' foc':'')+'" data-row="'+s+'" id="mrow-'+s+'">'
      +  '<span class="nm" data-mk="'+s+'" title="'+esc(M[s].name)+'">'+esc(M[s].name.split('[')[0].trim())+'</span>'
@@ -920,7 +929,7 @@ function render(){ relayout(); drawRail(); drawDetail(); drawChrome(); }
 /* ---------- events ---------- */
 document.addEventListener('click', function(e){
  const set = e.target.closest('[data-set]');
- if(set){ st.val[set.dataset.set] = +set.dataset.v;
+ if(set){ st.val[set.dataset.set] = +set.dataset.v; st.focVia = 'mouse';
    st.foc = {c:0, i:Math.max(0, SLUGS.indexOf(set.dataset.set))};
    save(); render(); return; }
  const add = e.target.closest('[data-add]');
@@ -934,18 +943,19 @@ document.addEventListener('click', function(e){
  // Clicking moves the keyboard focus to what you clicked, so the arrow keys
  // carry on from there rather than restarting at the top of the first column.
  const tt = e.target.closest('[data-test]');
- if(tt){ st.sel = {t:'t', v:tt.dataset.test, i:+tt.dataset.ti};
+ if(tt){ st.sel = {t:'t', v:tt.dataset.test, i:+tt.dataset.ti}; st.focVia = 'mouse';
    if(LAYOUT && LAYOUT.ts && +tt.dataset.ti < LAYOUT.ts.length) st.foc = {c:2, i:+tt.dataset.ti};
    st.expand = false; render(); return; }
  const mk = e.target.closest('[data-mk]');
  if(mk){ const s = mk.dataset.mk;
    st.sel = (st.sel && st.sel.t==='m' && st.sel.v===s) ? null : {t:'m', v:s};
-   st.foc = {c:0, i:Math.max(0, SLUGS.indexOf(s))};
+   st.foc = {c:0, i:Math.max(0, SLUGS.indexOf(s))}; st.focVia = 'mouse';
    st.expand = false; st.fam = {}; render(); return; }
  const cn = e.target.closest('[data-cn]');
  if(cn){ const ci = cn.dataset.cn;
    st.sel = (st.sel && st.sel.t==='c' && String(st.sel.v)===String(ci)) ? null : {t:'c', v:ci};
    if(LAYOUT){ const at = LAYOUT.cOrder.indexOf(+ci); if(at >= 0) st.foc = {c:1, i:at}; }
+   st.focVia = 'mouse';
    st.expand = false; st.fam = {}; render(); return; }
 });
 $('map').addEventListener('mouseover', function(e){
@@ -1016,6 +1026,7 @@ document.addEventListener('keydown', function(e){
  const arrows = ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Home','End'];
  if(arrows.indexOf(k) >= 0){
   e.preventDefault();
+  st.focVia = 'key';
   if(!st.foc) st.foc = {c:0, i:0};
   else if(k === 'ArrowDown') st.foc.i = Math.min(colLen(st.foc.c) - 1, st.foc.i + 1);
   else if(k === 'ArrowUp')   st.foc.i = Math.max(0, st.foc.i - 1);

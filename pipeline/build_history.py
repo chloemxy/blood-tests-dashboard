@@ -43,6 +43,26 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F23",
+  "date": "2026-07-31",
+  "who": "Chloe",
+  "title": "Fixed height for the follow-up section; a click is a fill, not a dashed ring",
+  "status": "addressed",
+  "versions": ["v3.6"],
+  "quote": "use this height as fixed default for what would follow it up section",
+  "quotes": [
+   "use this height as fixed default for what would follow it up section",
+   "when mouse clicked, it shouldn\u2019t be the dashed line status, should be filled color no border status",
+  ],
+  "did": [
+   ("Fixed default height", "addressed",
+    "The section was sizing to its content, so the panel changed shape between concerns \u2014 2 families or 12 gave very different layouts. It now holds a fixed <b>384px</b> (8\u00d748) and scrolls inside, capped at 52% of the panel so a short window stays sane. Expanding still hands it the remaining space."),
+   ("A click is a fill, not an outline", "addressed",
+    "The dashed ring is a <i>keyboard</i> focus affordance and was appearing on mouse clicks too. Focus now records how it was moved: clicking gives the solid filled row with no border, arrow keys give the dashed ring. Verified both ways in both the map and the rail."),
+  ],
+  "open": None,
+ },
+ {
   "id": "F22",
   "date": "2026-07-31",
   "who": "Chloe",
@@ -603,12 +623,29 @@ FEEDBACK = [
 # ===========================================================================
 VERSIONS = [
  {
+  "id": "v3.6",
+  "file": "v3.6-fixed-section.html",
+  "title": "Ripple atlas \u2014 stable panel, click vs keyboard",
+  "date": "2026-07-31",
+  "source": "index-v3.html",
+  "status": "candidate",
+  "tag": "v3.6-fixed-section",
+  "gitpath": "index-v3.html",
+  "answers": ["F23"],
+  "summary": "The follow-up section holds a fixed 384px so the panel keeps its shape between concerns, and a mouse click now gives a filled row rather than the keyboard focus ring.",
+  "changes": [
+   "<b>384px fixed default</b> for the follow-up section, scrolling inside, capped at 52% of the panel.",
+   "<b>Dashed ring is keyboard-only</b> \u2014 clicking gives the solid fill with no border.",
+   "Zero label overlaps at seven window sizes.",
+  ],
+ },
+ {
   "id": "v3.5",
   "file": "v3.5-full-names.html",
   "title": "Ripple atlas \u2014 full names, constant padding",
   "date": "2026-07-31",
   "source": "index-v3.html",
-  "status": "candidate",
+  "status": "superseded",
   "tag": "v3.5-full-names",
   "gitpath": "index-v3.html",
   "answers": ["F22"],
