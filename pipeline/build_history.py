@@ -43,6 +43,30 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F17",
+  "date": "2026-07-31",
+  "who": "Chloe",
+  "title": "Marker column alignment, arrow gutter, and the divider as a header",
+  "status": "addressed",
+  "versions": ["v3.0"],
+  "quote": "reserve space on the left of dot for arrow icons, right align all texts including the subheaders, put in multiple rows if needed",
+  "quotes": [
+   "reserve space on the left of dot for arrow icons, right align all texts including the subheaders, put in multiple rows if needed",
+   "more space around this title, put in the same style as [what they can point at], remove the arrow",
+  ],
+  "did": [
+   ("Arrow gets its own gutter", "addressed",
+    "The \u25bc\u25b2 was appended to the label text, so marking a marker pushed its name left. It now sits in a reserved 16px slot between the label edge and the dot \u2014 verified that every label x is identical before and after marking."),
+   ("One right edge for the whole column", "addressed",
+    "Labels and the panel sub-headers (<i>complete blood count</i>, <i>comprehensive metabolic panel</i>, <i>cholesterol / lipid panel</i>) are all right-aligned to the same line, 24px left of the dot. The sub-headers were left-aligned against the opposite edge."),
+   ("Wrapping where it is needed", "addressed",
+    "Losing 24px to the gutter is absorbed by the existing word-wrap; no marker name is truncated down to 1280px, and only one is at 1200."),
+   ("Divider reads as a section header", "addressed",
+    "<i>29 concerns no panel marker can reach</i> now uses the same style as <i>what they can point at</i>, with the arrow dropped and the band opened from 17px to 55px \u2014 21px of clearance above the label and below the rule."),
+  ],
+  "open": None,
+ },
+ {
   "id": "F16",
   "date": "2026-07-31",
   "who": "Chloe",
@@ -459,12 +483,30 @@ FEEDBACK = [
 # ===========================================================================
 VERSIONS = [
  {
+  "id": "v3.0",
+  "file": "v3.0-marker-column.html",
+  "title": "Ripple atlas \u2014 aligned marker column",
+  "date": "2026-07-31",
+  "source": "index-v3.html",
+  "status": "candidate",
+  "tag": "v3.0-marker-column",
+  "gitpath": "index-v3.html",
+  "answers": ["F17"],
+  "summary": "The marker column gets one right edge, a reserved gutter for the low/high arrow, and the unreachable-concerns divider is restyled as a section header.",
+  "changes": [
+   "<b>16px arrow gutter</b> between the label edge and the dot, so marking a marker no longer shifts its name.",
+   "<b>Labels and panel sub-headers share one right edge</b>, 24px left of the dot.",
+   "<b>Divider restyled</b> to match the column headers, arrow removed, band opened 17px \u2192 55px.",
+   "Zero label overlaps at six window sizes; zero off-grid spacing.",
+  ],
+ },
+ {
   "id": "v2.9",
   "file": "v2.9-tests-and-keys.html",
   "title": "Ripple atlas \u2014 de-duplicated, drillable, keyboard-driven",
   "date": "2026-07-31",
   "source": "index-v3.html",
-  "status": "candidate",
+  "status": "superseded",
   "tag": "v2.9-tests-and-keys",
   "gitpath": "index-v3.html",
   "answers": ["F16"],

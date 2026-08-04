@@ -205,9 +205,12 @@ button{font-family:inherit;cursor:pointer}
 
 .map .colhd{font-family:var(--font-mono);font-size:9px;fill:var(--dim);letter-spacing:.09em}
 .map .grphd{font-family:var(--font-mono);font-size:8.5px;fill:#a9b6b8;letter-spacing:.07em}
+/* the arrow lives in its own reserved gutter, so labels never move */
+.map .arw{font-family:var(--font-sans);font-size:9px;fill:var(--dim)}
+.map .arw.lo{fill:var(--low)}
+.map .arw.hi{fill:var(--high)}
 .map .rule{stroke:var(--line);stroke-width:1}
 .map .rule.dash{stroke-dasharray:3 3}
-.map .divlab{font-family:var(--font-mono);font-size:8.5px;fill:var(--accent);letter-spacing:.05em}
 
 .map .row{cursor:pointer}
 .map .row .hitbox{fill:transparent}
@@ -427,7 +430,7 @@ function buildLayout(){
  reach.sort((a, c) => a.bary - c.bary || a.ci - c.ci);
  unreach.sort((a, c) => C[a.ci].label.localeCompare(C[c.ci].label));
 
- const divH = 17;
+ const divH = 40;   // room to read the divider as a section header, not a squeeze
  const cRow = (b.h - divH) / CIDS.length;
  const cn = {}; let cy = b.T, divY = 0;
  reach.forEach(o => { cn[o.ci] = cy + cRow / 2; cy += cRow; });
@@ -525,10 +528,15 @@ function draw(){
  }
 
  // ---- marker rows
+ // Everything in this column is right-aligned to one edge, 24px left of the
+ // dot. The 16px between that edge and the dot is a reserved gutter for the
+ // low/high arrow, so a label never shifts when a marker is marked.
+ const mEdge = L.xM - 24, mArrow = L.xM - 16;
  L.groups.forEach(g => {
-  h += '<text class="grphd" x="'+b.L.toFixed(0)+'" y="'+g.y.toFixed(0)+'">'+esc(g.label.toUpperCase())+'</text>';
+  h += '<text class="grphd" x="'+mEdge.toFixed(1)+'" y="'+g.y.toFixed(0)+'" text-anchor="end">'
+    +  esc(g.label.toUpperCase())+'</text>';
  });
- const mLabW = L.xM - b.L - 14;
+ const mLabW = mEdge - b.L;
  SLUGS.forEach(sl => {
   const y = L.mk[sl], v = st.val[sl];
   const cls = ['row','mkr', v<0?'lo':v>0?'hi':'', selM===sl?'sel':'', st.hot===sl?'hot':'',
@@ -536,21 +544,25 @@ function draw(){
   const nm = M[sl].name.split('[')[0].trim();
   const perM = Math.max(8, Math.floor(mLabW / (L.mFs * 0.56)));
   const canTwoM = L.mRow >= L.mFs * 2.3;
-  const ln = wrap(nm + (v !== 0 ? (v < 0 ? ' ▼' : ' ▲') : ''), perM, canTwoM ? 2 : 1);
+  const ln = wrap(nm, perM, canTwoM ? 2 : 1);
   const lh = L.mFs * 1.12, y0 = y + L.mFs * 0.34 - (ln.length - 1) * lh / 2;
   h += '<g class="'+cls+'" data-mk="'+sl+'"><title>'+esc(M[sl].name)+'</title>'
     +  '<rect class="hitbox" x="'+b.L.toFixed(0)+'" y="'+(y-L.mRow/2).toFixed(1)+'" width="'+(L.xM-b.L+9).toFixed(0)+'" height="'+L.mRow.toFixed(1)+'" rx="4"/>'
-    +  ln.map((t2, li) => '<text class="lb'+(v<0?' lo':v>0?' hi':'')+'" x="'+(L.xM-11).toFixed(1)
+    +  ln.map((t2, li) => '<text class="lb'+(v<0?' lo':v>0?' hi':'')+'" x="'+mEdge.toFixed(1)
         +'" y="'+(y0 + li*lh).toFixed(1)+'" text-anchor="end" style="font-size:'+L.mFs.toFixed(1)+'px">'
         +esc(t2)+'</text>').join('')
+    +  (v !== 0 ? '<text class="arw'+(v<0?' lo':' hi')+'" x="'+mArrow.toFixed(1)+'" y="'+(y+3.4).toFixed(1)
+        +'" text-anchor="middle">'+(v<0?'▼':'▲')+'</text>' : '')
     +  '<circle class="dot" cx="'+L.xM.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="5"/>'
     +  '</g>';
  });
 
  // ---- divider between reachable and unreachable concerns
- h += '<line class="rule dash" x1="'+(L.xC-8).toFixed(1)+'" y1="'+L.divY.toFixed(1)+'" x2="'+L.xCend.toFixed(1)+'" y2="'+L.divY.toFixed(1)+'"/>'
-   +  '<text class="divlab" x="'+(L.xC+11).toFixed(1)+'" y="'+(L.divY-5).toFixed(1)+'">'
-   +  '↓ '+L.nUnreach+' CONCERNS NO PANEL MARKER CAN REACH</text>';
+ // set in the same key as the column headers, with air above and below
+ h += '<text class="colhd" x="'+(L.xC-9).toFixed(1)+'" y="'+(L.divY-6).toFixed(1)+'">'
+   +  L.nUnreach+' CONCERNS NO PANEL MARKER CAN REACH</text>'
+   +  '<line class="rule dash" x1="'+(L.xC-9).toFixed(1)+'" y1="'+(L.divY+6).toFixed(1)
+   +  '" x2="'+L.xCend.toFixed(1)+'" y2="'+(L.divY+6).toFixed(1)+'"/>';
 
  // ---- concern rows
  // Reserve only what the count chip and the out-dot actually need, so the
