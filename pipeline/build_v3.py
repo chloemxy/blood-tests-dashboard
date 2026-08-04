@@ -65,15 +65,19 @@ def analyte(name):
 MPLUS = "MedlinePlus (NIH)"
 CLEVE = "Cleveland Clinic"
 
+LABCORP = "Labcorp test directory"
+QUEST   = "Quest Diagnostics"
+ARUP    = "ARUP Laboratories"
+
 PANEL_DEFS = [
- {"id":"CBC", "name":"Complete Blood Count", "short":"CBC", "src":MPLUS, "default":1,
+ {"id":"CBC", "name":"Complete Blood Count", "short":"CBC", "src":MPLUS, "default":1, "grp":"ANNUAL",
   "url":"https://medlineplus.gov/lab-tests/complete-blood-count-cbc/",
   "quote":"A complete blood count is often part of a routine checkup.",
   "comp":[("Red Blood Cell count","Red Blood Cell count"),("White Blood Cell count","White Blood Cell count"),
           ("Platelet count","Platelet count"),("Hemoglobin","Hemoglobin"),("Hematocrit","Hematocrit"),
           ("Red Blood Cell indices","Red Blood Cell indices"),("Complete Blood Count","Complete Blood Count")]},
 
- {"id":"CMP", "name":"Comprehensive Metabolic Panel", "short":"CMP", "src":MPLUS, "default":1,
+ {"id":"CMP", "name":"Comprehensive Metabolic Panel", "short":"CMP", "src":MPLUS, "default":1, "grp":"ANNUAL",
   "url":"https://medlineplus.gov/lab-tests/comprehensive-metabolic-panel-cmp/",
   "quote":"A comprehensive metabolic panel (CMP) is a group of routine blood tests that measures 14 different substances in a sample of your blood.",
   "comp":[("Blood glucose","Blood glucose"),("Calcium","Calcium"),("Sodium","Sodium"),("Potassium","Potassium"),
@@ -82,7 +86,7 @@ PANEL_DEFS = [
           ("Aspartate aminotransferase","Aspartate aminotransferase"),("Bilirubin","Bilirubin"),
           ("Blood Urea Nitrogen","Blood Urea Nitrogen"),("Creatinine","Creatinine")]},
 
- {"id":"LIPID", "name":"Cholesterol / lipid panel", "short":"Lipids", "src":MPLUS, "default":1,
+ {"id":"LIPID", "name":"Cholesterol / lipid panel", "short":"Lipids", "src":MPLUS, "default":1, "grp":"ANNUAL",
   "url":"https://medlineplus.gov/lab-tests/cholesterol-levels/",
   "quote":"Younger adults should have the test every 5 years. Men ages 45 to 65 and women ages 55 to 65 should have it every 1 to 2 years.",
   "comp":[("Total cholesterol","Total cholesterol"),("LDL cholesterol","LDL cholesterol"),
@@ -130,6 +134,39 @@ PANEL_DEFS = [
           ("Anti-RNP","Ribonucleoprotein extractable nuclear Ab"),
           ("Anti-Scl-70","SCL-70 extractable nuclear Ab"),
           ("Anti-Jo-1","Jo-1 extractable nuclear Ab")]},
+ {"id":"ANEMIA", "name":"Anemia Profile B", "short":"Anemia", "src":LABCORP, "default":0,
+  "url":"https://www.labcorp.com/tests/042077/anemia-profile-b",
+  "quote":"Test Includes: CBC with differential and platelet count; ferritin; folates (folic acid); iron; iron binding capacity; reticulocyte count; vitamin B12",
+  "comp":[("CBC with differential and platelet count","Complete Blood Count"),("Ferritin","Ferritin"),
+          ("Folates (folic acid)","Folate"),("Iron","Iron"),("Iron binding capacity","Iron binding capacity"),
+          ("Reticulocyte count","Reticulocytes"),("Vitamin B12","Cobalamin")]},
+
+ {"id":"HORMM", "name":"Testicular Function Profile I", "short":"Hormones (M)", "src":LABCORP, "default":0,
+  "url":"https://www.labcorp.com/tests/035741/testicular-function-profile-i",
+  "quote":"Test Includes: Follicle-stimulating hormone (FSH); luteinizing hormone (LH); prolactin; testosterone, total",
+  "comp":[("Follicle-stimulating hormone (FSH)","Follitropin"),("Luteinizing hormone (LH)","Luteinizing hormone"),
+          ("Prolactin","Prolactin"),("Testosterone, total","Testosterone")]},
+
+ {"id":"HORMF", "name":"ReproSURE ovarian reserve", "short":"Hormones (F)", "src":LABCORP, "default":0,
+  "url":"https://www.labcorp.com/tests/504295/reprosure-ovarian-reserve-profile",
+  "quote":"ReproSURE\u2122 is a blood test comprised of Anti-M\u00fcllerian Hormone (AMH), Follicle Stimulating Hormone (FSH), and Estradiol designed to provide information about ovarian reserve.",
+  "comp":[("Anti-Mullerian Hormone (AMH)","Mullerian inhibiting substance"),
+          ("Follicle Stimulating Hormone","Follitropin"),("Estradiol","Estradiol / Estrogen")]},
+
+ {"id":"AUTOI", "name":"Autoimmune and Inflammation Marker Panel", "short":"Inflammation", "src":QUEST, "default":0,
+  "url":"https://www.questhealth.com/product/autoimmune-and-inflammation-marker-test-panel/18359M.html",
+  "quote":"This blood test measures 7+ key markers related to autoimmune and inflammatory activity, including markers often considered in conditions such as rheumatoid arthritis, lupus, and psoriatic arthritis.",
+  "comp":[("Antinuclear antibodies (ANA)","Nuclear Ab"),("Rheumatoid factor (RF)","Rheumatoid factor"),
+          ("C-reactive protein (CRP)","C reactive protein"),
+          ("Erythrocyte sedimentation rate (ESR)","Erythrocyte Sedimentation Rate"),
+          ("Cyclic citrullinated peptides (CCP)",None),("Mutated citrullinated vimentin (MCV)",None),
+          ("14-3-3 eta protein",None)]},
+
+ {"id":"HCC", "name":"Hepatocellular Carcinoma Tumor Marker Panel", "short":"Cancer (HCC)", "src":ARUP, "default":0,
+  "url":"https://ltd.aruplab.com/Tests/Pub/0081326",
+  "quote":"Acceptable panel for surveillance and monitoring of hepatocellular carcinoma.",
+  "comp":[("Alpha Fetoprotein Total","Alpha-fetoprotein (tumor marker)"),
+          ("Alpha Fetoprotein L3 Pct",None),("Des-gamma-carboxy Prothrombin",None)]},
 ]
 
 ABBR_HINT = {
@@ -185,7 +222,8 @@ for pdef in PANEL_DEFS:
         slugs.append(sl)
     PANEL_ORDER.append({"id": pdef["id"], "name": pdef["name"], "short": pdef["short"],
                         "quote": pdef["quote"], "src": pdef["src"], "url": pdef["url"],
-                        "slugs": slugs, "nMissing": nmiss, "default": pdef["default"]})
+                        "grp": pdef.get("grp"), "slugs": slugs,
+                        "nMissing": nmiss, "default": pdef["default"]})
 
 
 base_idx = {k for k, t in enumerate(TESTS) if t.get("b")}

@@ -84,6 +84,7 @@ button{font-family:inherit;cursor:pointer}
 .grouphd{font-family:var(--font-mono);font-size:9px;letter-spacing:.07em;text-transform:uppercase;
  color:var(--dim);padding:16px 8px 8px;display:flex;align-items:baseline;gap:8px}
 .grouphd b{color:var(--slate);font-weight:600}
+.grouphd .dup{margin-left:auto;color:#b4c0c2;font-size:8.5px;text-transform:none;letter-spacing:0}
 /* Row highlights bleed to the panel edge: the row carries the horizontal
    padding and cancels its container's with a negative margin. Same pattern for
    every row-like component — marker rows, follow-up rows, family headers, the
@@ -91,8 +92,8 @@ button{font-family:inherit;cursor:pointer}
 .mrow{display:grid;grid-template-columns:1fr var(--tglW);gap:8px;align-items:center;height:32px;
  padding:0 16px;margin:0 -8px;border-radius:0;border:1px solid transparent;border-left:none;border-right:none}
 .mrow:hover{background:var(--aqua)}
-.mrow.sel{background:#fdf1ea;border-color:var(--accent);border-left:none;border-right:none}
-.mrow.foc{border-color:var(--teal);background:var(--aqua);border-left:none;border-right:none}
+.mrow.sel{background:#fdf1ea;border-color:transparent}
+.mrow.foc{background:var(--aqua);border-color:var(--teal);border-left:none;border-right:none}
 .mrow .nm{font-size:12px;color:var(--slate);font-weight:600;white-space:nowrap;overflow:hidden;
  text-overflow:ellipsis;cursor:pointer}
 .mrow.lo .nm{color:var(--low)}
@@ -194,9 +195,11 @@ button{font-family:inherit;cursor:pointer}
 .nl .n em{font-style:normal;font-family:var(--font-mono);font-size:9.5px;color:var(--dim);margin-left:8px}
 /* how many LOINC codes collapse into this one marker */
 .tlink{background:none;border:none;padding:0;font-family:inherit;font-size:12px;color:var(--teal);
- text-align:left;text-decoration:underline;text-underline-offset:2px;line-height:1.35}
-.tlink:hover{color:var(--accent)}
-.nl li.on{background:var(--aqua)}
+ text-align:left;text-decoration:none;line-height:1.35}
+.nl li{cursor:pointer}
+.nl li:hover .tlink{color:var(--accent)}
+.nl li.on{background:var(--aqua);border-bottom-color:transparent}
+.nl li.on + li{border-top:none}
 .nl li.on .tlink{font-weight:700;color:var(--accent);text-decoration:none}
 .tagchips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .tagchip{border:1px solid var(--line);background:#fff;color:var(--muted);font-size:10px;padding:4px 8px;
@@ -229,12 +232,14 @@ button{font-family:inherit;cursor:pointer}
    Three fixed columns. Nothing animates position; nothing moves on its own. */
 .map .edge{fill:none;stroke:#e3eaeb;stroke-width:1;transition:stroke .15s,stroke-width .15s}
 .map .edge.on{stroke:var(--teal);stroke-width:1.6}
+.map .edge.lo,.map .edge.hi{stroke-width:1.6}
 .map .edge.lo{stroke:var(--low)}
 .map .edge.hi{stroke:var(--high)}
-.map .edge.hot{stroke-width:2.6}
+.map .edge.hot{stroke-width:1.6;opacity:1}
 .map .e3{fill:none;stroke:var(--warm);stroke-width:1.4}
 
 .map .colhd{font-family:var(--font-mono);font-size:9px;fill:var(--dim);letter-spacing:.09em}
+.map .grpdup{font-family:var(--font-mono);font-size:8px;fill:#b4c0c2}
 .map .grphd{font-family:var(--font-mono);font-size:8.5px;fill:#a9b6b8;letter-spacing:.07em}
 /* the arrow lives in its own reserved gutter, so labels never move */
 .map .arw{font-family:var(--font-sans);font-size:9px;fill:var(--dim)}
@@ -392,7 +397,7 @@ const PANELS_ALL = D.panels;
 /* Which panels the reader has had. Everything downstream — the marker column,
    the concerns it can raise, the ripple — is derived from this, so adding a
    panel is a data change, not a code change. */
-let SLUGS = [];
+let SLUGS = [], PICKER_GROUPS = [];
 function activePanels(){ return PANELS_ALL.filter(p => st.panels[p.id]); }
 function refreshSlugs(){
  const seen = {}; SLUGS = [];
@@ -472,7 +477,15 @@ function buildLayout(){
  const perHead = Math.max(8, Math.floor((mEdgeX - b.L) / 5.7));   // 8.5px mono + tracking
  const AP = activePanels();
  const gLines = AP.map(p => wrap(p.name.replace(/\s*\(.*\)/, '').toUpperCase(), perHead, 3));
- const headTotal = gLines.reduce((a, l) => a + l.length * headLead + headPad, 0);
+ // A panel that is a subset of one already selected (BMP inside CMP) owns no
+ // rows of its own. It still gets a header, with a line saying where its
+ // markers went, rather than an empty gap.
+ const gSeen = {}, gDup = AP.map(p => {
+  const nMine = p.slugs.filter(sl => !gSeen[sl]).length;
+  p.slugs.forEach(sl => gSeen[sl] = 1);
+  return nMine === p.slugs.length ? '' : (nMine ? (p.slugs.length - nMine) + ' also above' : 'all also above');
+ });
+ const headTotal = gLines.reduce((a, l, gi) => a + (l.length + (gDup[gi] ? 1 : 0)) * headLead + headPad, 0);
  const nGrp = Math.max(1, AP.length);
  const mAvail = b.h - headTotal - (nGrp - 1) * grpGap;
  const mRow = mAvail / SLUGS.length;
@@ -482,8 +495,8 @@ function buildLayout(){
  // a marker shared by two selected panels is listed once, under the first
  const placed = {};
  AP.forEach((p, gi) => {
-  groups.push({ lines: gLines[gi], y: y + 8, n: p.slugs.length });
-  y += gLines[gi].length * headLead + headPad;
+  groups.push({ lines: gLines[gi], y: y + 8, n: p.slugs.length, dup: gDup[gi] });
+  y += (gLines[gi].length + (gDup[gi] ? 1 : 0)) * headLead + headPad;
   p.slugs.forEach(sl => { if(placed[sl]) return; placed[sl] = 1; mk[sl] = y + mRow / 2; y += mRow; });
   y += grpGap;
  });
@@ -656,6 +669,8 @@ function draw(){
   h += g.lines.map((t2, li) =>
     '<text class="grphd" x="'+mEdge.toFixed(1)+'" y="'+(g.y + li*L.headLead).toFixed(1)+'" text-anchor="end">'
     + esc(t2)+'</text>').join('');
+  if(g.dup) h += '<text class="grpdup" x="'+mEdge.toFixed(1)+'" y="'
+    + (g.y + g.lines.length*L.headLead).toFixed(1)+'" text-anchor="end">'+esc(g.dup)+'</text>';
  });
  const mLabW = mEdge - b.L;
  SLUGS.forEach(sl => {
@@ -744,9 +759,13 @@ function relayout(){ BOX = box(); LAYOUT = buildLayout(); draw(); }
 /* ---------- left rail ---------- */
 function drawRail(){
  let h = '';
- const seenRow = {};
+ const seenRow = {}, claimedBy = {};
  activePanels().forEach(p => {
-  h += '<div class="grouphd"><b>'+esc(p.name.replace(/\s*\(.*\)/,''))+'</b> '+p.slugs.length+' markers</div>';
+  const mine = p.slugs.filter(sl => !seenRow[sl]);
+  const dupe = p.slugs.length - mine.length;
+  h += '<div class="grouphd"><b>'+esc(p.name.replace(/\s*\(.*\)/,''))+'</b> '+p.slugs.length+' markers'
+    +  (dupe ? '<span class="dup">'+(mine.length ? dupe+' also above' : 'all also above')+'</span>' : '')
+    +  '</div>';
   p.slugs.forEach(s => {
    if(seenRow[s]) return; seenRow[s] = 1;
    const v = st.val[s];
@@ -766,9 +785,21 @@ function drawRail(){
  });
  $('rail').innerHTML = h;
 
- $('pChips').innerHTML = PANELS_ALL.map(p =>
-   '<button class="pchip'+(st.panels[p.id]?' on':'')+'" data-panel="'+p.id+'" title="'+esc(p.quote)+'">'
-   + esc(p.short) + '<i>' + p.slugs.length + '</i></button>').join('');
+ // Panels sharing a group get one toggle — the annual routine is CBC + CMP +
+ // lipids, and nobody has "a CMP" without the rest of the checkup.
+ const groups = [];
+ PANELS_ALL.forEach(p => {
+  const key = p.grp || p.id;
+  let g = groups.find(x => x.key === key);
+  if(!g) groups.push(g = { key: key, ids: [], slugs: {}, label: p.grp === 'ANNUAL' ? 'Annual panel' : p.short,
+                           tip: p.grp === 'ANNUAL' ? 'The routine checkup: CBC, CMP and lipids.' : p.quote });
+  g.ids.push(p.id);
+  p.slugs.forEach(sl => g.slugs[sl] = 1);
+ });
+ $('pChips').innerHTML = groups.map(g =>
+   '<button class="pchip'+(g.ids.every(id=>st.panels[id])?' on':'')+'" data-pgroup="'+esc(g.key)+'" title="'+esc(g.tip)+'">'
+   + esc(g.label) + '<i>' + Object.keys(g.slugs).length + '</i></button>').join('');
+ PICKER_GROUPS = groups;
 
  const act = activeConcerns();
  const reachSet = {}; SLUGS.forEach(sl => (M[sl].k || []).forEach(ci => reachSet[ci] = 1));
@@ -805,8 +836,8 @@ function drawNextList(ci, selIdx){
  // the catalogue's own ordering tier — and opens to the rest on demand. The
  // count on the header is the true total, not what is carried.
  const row = (t, i) =>
-   '<li'+(i===selIdx?' class="on"':'')+'><span class="n">'
-   + '<button class="tlink" data-test="'+ci+'" data-ti="'+i+'">'+esc(t.n)+'</button>'
+   '<li'+(i===selIdx?' class="on"':'')+' data-test="'+ci+'" data-ti="'+i+'" role="button" tabindex="-1"><span class="n">'
+   + '<span class="tlink">'+esc(t.n)+'</span>'
    + (t.a?'<em>'+esc(t.a)+'</em>':'')
    + (t.nv>1?'<i class="nv" title="'+t.nv+' LOINC codes for this marker — different units, specimens or methods">&times;'+t.nv+'</i>':'')
    + '</span><span class="tg '+(t.v?'q':'g')+'">'+(t.v?'quoted':'ai-written')+'</span></li>';
@@ -975,10 +1006,12 @@ function render(){ relayout(); drawRail(); drawDetail(); drawChrome(); }
 
 /* ---------- events ---------- */
 document.addEventListener('click', function(e){
- const pk = e.target.closest('[data-panel]');
- if(pk){ const id = pk.dataset.panel;
-   if(st.panels[id]){ if(activePanels().length > 1) delete st.panels[id]; }
-   else st.panels[id] = 1;
+ const pk = e.target.closest('[data-pgroup]');
+ if(pk){ const g = PICKER_GROUPS.find(x => x.key === pk.dataset.pgroup);
+   if(!g) return;
+   const on = g.ids.every(id => st.panels[id]);
+   if(on){ if(activePanels().length > g.ids.length) g.ids.forEach(id => delete st.panels[id]); }
+   else g.ids.forEach(id => st.panels[id] = 1);
    refreshSlugs(); st.sel = null; st.foc = null; save(); render(); return; }
  const set = e.target.closest('[data-set]');
  if(set){ st.val[set.dataset.set] = +set.dataset.v; st.focVia = 'select';

@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-04T21:42:32Z",
+ "generated": "2026-08-04T21:57:54Z",
  "live": "index.html",
  "constraints": [
   [
@@ -28,6 +28,91 @@
   ]
  ],
  "feedback": [
+  {
+   "id": "F28",
+   "date": "2026-08-04",
+   "who": "Chloe",
+   "title": "The whole row is the button",
+   "status": "addressed",
+   "versions": [
+    "v4.1"
+   ],
+   "quote": "make entire row clickable, no need to underscore, remove top and bottom border when row is selected",
+   "did": [
+    [
+     "Row is the click target",
+     "addressed",
+     "The follow-up row carries <code>data-test</code> itself instead of wrapping a link, so the whole row — name, unit chip, quoted/ai-written tag and the padding around them — responds to the click. The name inside is now a <code>span</code>, not a <code>button</code>."
+    ],
+    [
+     "No underline",
+     "addressed",
+     "<code>text-decoration</code> removed. The row is visibly interactive from its hover fill; an underline on top of that is a second signal for the same thing."
+    ],
+    [
+     "No rule on a selected row",
+     "addressed",
+     "A selected row is a fill, not a fill plus two hairlines: <code>.mrow.sel</code> drops to <code>border-color:transparent</code> and a selected follow-up row hides its own bottom rule and the next row’s top."
+    ]
+   ]
+  },
+  {
+   "id": "F27",
+   "date": "2026-08-04",
+   "who": "Chloe",
+   "title": "Blue edges read heavier than orange",
+   "status": "addressed",
+   "versions": [
+    "v4.1"
+   ],
+   "quote": "why is blue line so much thicker? make it same weight as the orange",
+   "did": [
+    [
+     "One weight for every marked edge",
+     "addressed",
+     "The cause was <code>.edge.hot</code>, which pushed a selected or hovered edge to 2.6px while a marked-low or marked-high edge stayed at 1.6px — so the teal selection always looked thicker than the orange marks. Every marked edge is now 1.6px and <code>.hot</code> raises opacity only."
+    ],
+    [
+     "State is colour, not geometry",
+     "rule",
+     "Written into the design rules: emphasis in the map is carried by colour and opacity. Line weight encodes nothing, so changing state never changes the shape of the drawing."
+    ]
+   ]
+  },
+  {
+   "id": "F26",
+   "date": "2026-08-04",
+   "who": "Chloe",
+   "title": "Accept lab-directory sourcing; fix the empty BMP; one annual toggle",
+   "status": "addressed",
+   "versions": [
+    "v4.1"
+   ],
+   "quote": "yes accept, also there’s nothing showing under basic metabolic panel, fix it. and have annual blood panel be in one toggle",
+   "did": [
+    [
+     "Five commercially sourced panels added",
+     "addressed",
+     "With lab-directory sourcing accepted, the library grows from 8 panels to 13: <b>Anemia Profile B</b> (Labcorp, 7 of 7 components mapped), <b>Testicular Function Profile I</b> (Labcorp, 4 of 4), <b>ReproSURE ovarian reserve</b> (Labcorp, 3 of 3), <b>Autoimmune and Inflammation Marker Panel</b> (Quest, 4 of 7) and <b>Hepatocellular Carcinoma Tumor Marker Panel</b> (ARUP, 1 of 3). 68 markers in total."
+    ],
+    [
+     "Celiac dropped, and why",
+     "addressed",
+     "Labcorp’s Celiac Antibodies Profile was investigated and not added: none of its four components exist in the 6,192-row catalogue, so the panel would have been four <i>not carried</i> rows and nothing else."
+    ],
+    [
+     "The empty Basic Metabolic Panel",
+     "addressed",
+     "Real bug, and a structural one. BMP is a strict subset of the CMP, and a marker shared by two selected panels is listed once under the first — so with the annual panel on, BMP had a header and zero rows. The header now states where its markers went (<i>all also above</i>), in the rail and in the map, and the space that line takes is measured rather than borrowed from the padding."
+    ],
+    [
+     "Annual panel is one toggle",
+     "addressed",
+     "CBC, CMP and lipids carry a shared <code>grp</code> and the picker renders one <b>Annual panel</b> chip for all three — nobody has had a CMP without the rest of the checkup. The marker column keeps the three sub-headings, so what came from where is still legible."
+    ]
+   ],
+   "open": "Eight components across the thyroid, inflammation and HCC panels are not in the catalogue and stay marked as such."
+  },
   {
    "id": "F25",
    "date": "2026-07-31",
@@ -1092,6 +1177,32 @@
   }
  ],
  "versions": [
+  {
+   "id": "v4.1",
+   "file": "v4.1-thirteen-panels.html",
+   "title": "Ripple atlas — thirteen panels, one annual toggle",
+   "date": "2026-08-04",
+   "source": "index-v3.html",
+   "status": "candidate",
+   "tag": "v4.1-thirteen-panels",
+   "gitpath": "index-v3.html",
+   "answers": [
+    "F26",
+    "F27",
+    "F28"
+   ],
+   "summary": "Lab-directory sourcing accepted, so anemia, hormone, inflammation and cancer panels join the library — 13 panels, 68 markers. The annual routine collapses to a single toggle, a subset panel says where its markers went instead of rendering empty, and edge weight stops encoding state.",
+   "changes": [
+    "<b>Five panels from commercial directories</b>: Anemia Profile B, Testicular Function Profile I and ReproSURE (Labcorp), Autoimmune and Inflammation Marker Panel (Quest), Hepatocellular Carcinoma Tumor Marker Panel (ARUP). Each with a verbatim description and link.",
+    "<b>One Annual panel chip</b> toggles CBC + CMP + lipids together; the marker column keeps all three sub-headings.",
+    "<b>Basic Metabolic Panel is no longer empty</b> — a panel whose markers all appear under an earlier one says <i>all also above</i>, in the rail and in the map, with the line measured into the layout.",
+    "<b>Every marked edge is 1.6px.</b> Selection and hover change opacity, never width.",
+    "<b>The follow-up row is the button</b>: no underline, whole row clickable, and a selected row is a fill with no hairline above or below it.",
+    "All 13 panels together reach 28 of 47 concerns; the annual three alone reach 18."
+   ],
+   "note": "Celiac Antibodies Profile was investigated and not added — none of its four components are in the catalogue.",
+   "mb": 0.58
+  },
   {
    "id": "v4.0",
    "file": "v4.0-panel-library.html",

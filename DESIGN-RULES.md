@@ -74,7 +74,32 @@ Nothing drifts, floats, breathes or animates on its own. Transitions are for
 colour and opacity on direct interaction, and are short. A diagram that moves is
 harder to read than one that does not.
 
-## 4. Reveal, don't clip
+## 4. State is colour, not geometry
+
+Selection, hover and focus change **colour and opacity only**. They never change
+a line's weight, a dot's radius, a row's height or a label's size.
+
+Two reasons. A drawing whose geometry moves with state is a different drawing
+each time you look at it, which is rule 2 in another guise. And weight is a
+scarce channel: if hovering makes a line thicker, thickness can no longer mean
+anything else — a reader comparing a teal edge to an orange one is reading a
+difference that isn't there.
+
+Every marked edge in the map is 1.6px, whatever its state.
+
+## 5. The row is the button
+
+Any row that does something is clickable across its whole width — label, badges,
+counts, and the padding around them. The interactive element carries the data
+attribute; text inside it is a `span`, not a nested button or link.
+
+A row that fills on hover needs no underline. One signal per meaning.
+
+A selected row is a fill, not a fill plus a border. Where rows are separated by
+hairlines, the selected row hides its own and its neighbour's so the fill reads
+as one uninterrupted block.
+
+## 6. Reveal, don't clip
 
 **Names are shown in full.** A label wraps onto as many rows as it needs; it is
 never cut with an ellipsis while there is a way to wrap it. Truncation is a last
@@ -95,13 +120,13 @@ acceptable.
 meaningful axis, show the commonly-relevant members by default, and put the true
 count on every group header so nothing is hidden without being counted.
 
-## 5. Sourcing
+## 7. Sourcing
 
 - No hallucination. Every claim carries a credible reference with a link.
 - Quote the source verbatim; do not paraphrase it.
 - Say what is quoted and what is generated, on the thing itself.
 - State true totals even when showing a subset.
 
-## 6. Style
+## 8. Style
 
 Follow `goinvo-style-guide.md`. Palette, type and tone come from there.
