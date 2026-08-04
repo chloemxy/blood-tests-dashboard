@@ -16,7 +16,7 @@
  --aqua:#EAF7F8;--paper:#F7F9F9;--ink:#1D1B1A;--muted:#5A6B70;
  --line:#D7E1E2;--panel:#fff;--dim:#8B9799;--ok:#2E7D5B;--warn:#B8860B;
  --low:#0E8496;--high:#B84A0E;
- --railW:320px;--detW:344px;--footH:72px;--gap:16px;--tglW:96px;
+ --railW:320px;--detW:344px;--footH:72px;--gap:16px;--tglW:72px;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;height:100%;overflow:hidden}
@@ -78,12 +78,14 @@ button{font-family:inherit;cursor:pointer}
  text-overflow:ellipsis;cursor:pointer}
 .mrow.lo .nm{color:var(--low)}
 .mrow.hi .nm{color:var(--high)}
-/* 8px system: 24px tall, 8px horizontal padding, so the words are not clipped */
+/* The column header names the three states, so the pill only needs a cue:
+   position (left/middle/right) plus a direction glyph. 24px tall, 24px per
+   segment — 72px total, a quarter narrower than the worded version. */
 .tri{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:12px;
  overflow:hidden;background:#fff;height:24px}
-.tri button{border:none;background:none;font-family:var(--font-mono);font-size:10px;color:var(--dim);
- padding:0 8px;border-right:1px solid var(--line);line-height:24px;text-align:center;
- white-space:nowrap;letter-spacing:.02em}
+.tri button{border:none;background:none;font-family:var(--font-sans);font-size:9px;color:#b4c0c2;
+ padding:0;border-right:1px solid var(--line);line-height:24px;text-align:center}
+.tri button.mid{font-size:11px;letter-spacing:-.05em}
 .tri button:last-child{border-right:none}
 .tri button:hover{background:var(--aqua)}
 .tri button.on[data-v="-1"]{background:var(--low);color:#fff}
@@ -119,10 +121,17 @@ button{font-family:inherit;cursor:pointer}
 /* "why it is on the map" grows to fit — it is never scrolled and never clipped */
 .slot.why{flex:0 0 auto}
 .slot.why > .c{overflow:visible}
-/* the relationship notes are the substance of the panel, so they take the
-   larger share of whatever height is left after the header and the explanation */
-.slot.fact{flex:1.6 1 0;min-height:264px}
-.slot.next{flex:1 1 0;min-height:160px;border-bottom:none}
+/* "what would follow it up" is anchored at the bottom of the panel and shows
+   its default eight rows in full, without scrolling. Expanding it turns it into
+   the flexible section instead, and it scrolls from there. */
+.slot.next{flex:0 0 auto;border-bottom:none;border-top:1px solid var(--line);margin-top:auto}
+.slot.next > .c{overflow:visible}
+.slot.next.exp{flex:1 1 0;min-height:160px}
+.slot.next.exp > .c{overflow-y:scroll;scrollbar-gutter:stable}
+.slot.next.exp > .c::-webkit-scrollbar{width:8px}
+.slot.next.exp > .c::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+/* the relationship notes take whatever is left above it */
+.slot.fact{flex:1 1 0;min-height:176px}
 .empty{font-size:11.5px;color:var(--dim);line-height:1.55;font-style:italic}
 .wl{list-style:none;margin:0;padding:0}
 .wl li{font-size:11.5px;color:var(--muted);padding:4px 0;line-height:1.45}
@@ -139,14 +148,14 @@ button{font-family:inherit;cursor:pointer}
  color:var(--accent);display:block;margin-bottom:4px;line-height:1.4}
 
 .nl{list-style:none;margin:0;padding:0}
-.nl li{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:8px 0;
+.nl li{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:4px 0;
  border-bottom:1px solid #eef2f2}
 .nl li:last-child{border-bottom:none}
-.more{display:block;width:100%;margin:8px 0 0;padding:8px;border:1px solid var(--line);background:#fff;
+.more{display:block;width:100%;margin:8px 0 0;padding:4px 8px;border:1px solid var(--line);background:#fff;
  border-radius:8px;font-family:var(--font-mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;
  color:var(--teal)}
 .more:hover{border-color:var(--teal);background:var(--aqua)}
-.morenote{font-size:11px;color:var(--dim);margin:8px 0 0;line-height:1.5}
+.morenote{font-size:10.5px;color:var(--dim);margin:8px 0 0;line-height:1.45}
 .nl .n{font-size:12px;color:var(--slate);line-height:1.35}
 .nl .n em{font-style:normal;font-family:var(--font-mono);font-size:9.5px;color:var(--dim);margin-left:8px}
 .tg{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.04em;text-transform:uppercase;
@@ -252,7 +261,7 @@ button{font-family:inherit;cursor:pointer}
   <div class="dhead" id="dHead"></div>
   <div class="slot why"><div class="h" id="whyH">why it is on the map</div><div class="c" id="why"></div></div>
   <div class="slot fact"><div class="h" id="factH">how these connect</div><div class="c scroll" id="fact"></div></div>
-  <div class="slot next"><div class="h" id="nextH">what would follow it up</div><div class="c scroll" id="next"></div></div>
+  <div class="slot next" id="nextSlot"><div class="h" id="nextH">what would follow it up</div><div class="c" id="next"></div></div>
  </section>
 
  <section class="pnl foot">
@@ -507,9 +516,9 @@ function drawRail(){
    h += '<div class="mrow'+(v<0?' lo':v>0?' hi':'')+(st.sel&&st.sel.t==='m'&&st.sel.v===s?' sel':'')+'" data-row="'+s+'">'
      +  '<span class="nm" data-mk="'+s+'" title="'+esc(M[s].name)+'">'+esc(M[s].name.split('[')[0].trim())+'</span>'
      +  '<span class="tri">'
-     +   '<button data-set="'+s+'" data-v="-1" class="'+(v<0?'on':'')+'" title="Mark low" aria-label="Mark low">low</button>'
-     +   '<button data-set="'+s+'" data-v="0" class="'+(v===0?'on':'')+'" title="Normal" aria-label="Normal">&mdash;</button>'
-     +   '<button data-set="'+s+'" data-v="1" class="'+(v>0?'on':'')+'" title="Mark high" aria-label="Mark high">high</button>'
+     +   '<button data-set="'+s+'" data-v="-1" class="'+(v<0?'on':'')+'" title="Mark low" aria-label="Mark low">&#9660;</button>'
+     +   '<button data-set="'+s+'" data-v="0" class="mid '+(v===0?'on':'')+'" title="Normal" aria-label="Normal">&ndash;</button>'
+     +   '<button data-set="'+s+'" data-v="1" class="'+(v>0?'on':'')+'" title="Mark high" aria-label="Mark high">&#9650;</button>'
      +  '</span></div>';
   });
  });
@@ -552,6 +561,7 @@ function drawDetail(){
   $('factH').textContent = 'how these connect';
   $('fact').innerHTML = '<p class="empty">Select a marker or a concern to see the sourced notes on how it '
    + 'relates to the rest of the panel.</p>';
+  $('nextSlot').classList.remove('exp');
   $('nextH').textContent = 'the shape of what is missing';
   $('next').innerHTML = '<p class="empty">Your annual panel reaches '+META.panelConcerns+' of '
    + META.nConcerns+' concerns in the catalogue. Across those '+META.panelConcerns+', <b>'
@@ -575,6 +585,7 @@ function drawDetail(){
   $('fact').innerHTML = fs.length ? fs.map(factHTML).join('')
    : '<p class="empty">No sourced relationship note for this marker yet — a gap in our data, not in physiology.</p>';
   const cs = m.k;
+  $('nextSlot').classList.remove('exp');
   $('nextH').innerHTML = 'concerns it can represent <b>'+cs.length+'</b>';
   $('next').innerHTML = cs.length ? '<ul class="nl">'+cs.map(ci =>
     '<li><span class="n">'+esc(C[ci].label)+'<em>'+nf(C[ci].nOutside)+' follow-ups outside the panel</em></span>'
@@ -606,6 +617,7 @@ function drawDetail(){
   : '<p class="empty">No sourced relationship note reaches this concern yet.</p>';
  const all = c.next || [], shown = st.expand ? all.length : Math.min(8, all.length);
  $('nextH').innerHTML = 'what would follow it up <b>'+nf(c.nOutside)+'</b>';
+ $('nextSlot').classList.toggle('exp', !!st.expand);
  $('next').innerHTML = all.length
   ? '<ul class="nl">'+all.slice(0, shown).map(t =>
      '<li><span class="n">'+(t.u?'<a href="'+t.u+'" target="_blank" rel="noopener">'+esc(t.n)+'</a>':esc(t.n))
@@ -615,12 +627,10 @@ function drawDetail(){
        ? '<button class="more" data-expand="1">'
          + (st.expand ? '\u2191 show the top 8 only' : '\u2193 show all '+all.length+' carried here')
          + '</button>' : '')
-    + '<p class="morenote">The first <b>8</b> are drawn on the map. '
-    + (c.nOutside > all.length
-       ? 'This panel carries the top <b>'+all.length+'</b> of <b>'+nf(c.nOutside)+'</b> markers tagged to this concern outside your panel.'
-       : 'All <b>'+nf(c.nOutside)+'</b> are here.')
-    + ' Ranked by how well sourced and how commonly ordered they are \u2014 these are markers '
-    + '<b>tagged to this concern</b>, not a confirmed diagnostic sequence.</p>'
+    + '<p class="morenote"><b>8</b> drawn on the map &middot; '
+    + (c.nOutside > all.length ? 'top <b>'+all.length+'</b> of <b>'+nf(c.nOutside)+'</b> carried here'
+                               : 'all <b>'+nf(c.nOutside)+'</b> carried here')
+    + '<br>Tagged to this concern and ranked \u2014 not a confirmed diagnostic sequence.</p>'
   : '<p class="empty">Nothing outside your panel is tagged to this concern.</p>';
 }
 

@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-04T17:27:02Z",
+ "generated": "2026-08-04T17:31:13Z",
  "live": "index.html",
  "constraints": [
   [
@@ -28,6 +28,59 @@
   ]
  ],
  "feedback": [
+  {
+   "id": "F14",
+   "date": "2026-07-31",
+   "who": "Chloe",
+   "title": "Glyph pill, and anchor the follow-up list at the bottom",
+   "status": "addressed",
+   "versions": [
+    "v2.7"
+   ],
+   "quote": "since we have labels, no need to show words again in the pill, we can use other visual cues to indicate low and high, and save some space on pill design",
+   "quotes": [
+    "since we have labels, no need to show words again in the pill, we can use other visual cues to indicate low and high, and save some space on pill design",
+    "always anchor this section in full (before expanding) at the bottom of the right panel"
+   ],
+   "did": [
+    [
+     "Words out of the pill",
+     "addressed",
+     "The column header already names the three states, so the segments carry a cue instead of a repeat: <b>▼</b> – <b>▲</b>. Position does the rest — left is low, right is high."
+    ],
+    [
+     "Glyphs match the map",
+     "addressed",
+     "▼ and ▲ are the same marks already used on flagged markers in the map, so the two views read the same way."
+    ],
+    [
+     "Pill narrowed 96px → 72px",
+     "addressed",
+     "Three 24px segments. The 24px saved goes back to the marker-name column, which now fits <i>Aspartate aminotransferase</i> without truncating."
+    ],
+    [
+     "Follow-up list anchored to the bottom",
+     "addressed",
+     "<code>margin-top:auto</code> pins it to the foot of the panel, and it sizes to its content so all eight rows, the expander and the note show in full without scrolling."
+    ],
+    [
+     "Expanding flips it to the flexible section",
+     "addressed",
+     "Collapsed it is fixed-height and unscrolled; expanded to 40 it takes the remaining space and scrolls inside itself. The relationship notes above take whatever is left, with a 176px floor."
+    ],
+    [
+     "Note shortened to two lines",
+     "addressed",
+     "<i>8 drawn on the map · top 40 of 386 carried here</i> over <i>tagged to this concern and ranked — not a confirmed diagnostic sequence</i>, so the honesty survives without eating the rows."
+    ],
+    [
+     "Still on the grid",
+     "addressed",
+     "72, 24, 8 and 4 throughout. Re-audited: zero off-grid spacing."
+    ]
+   ],
+   "open": null
+  },
   {
    "id": "F13",
    "date": "2026-07-31",
@@ -590,12 +643,35 @@
  ],
  "versions": [
   {
+   "id": "v2.7",
+   "file": "v2.7-glyph-pill.html",
+   "title": "Ripple atlas — glyph pill, anchored follow-ups",
+   "date": "2026-07-31",
+   "source": "index-v3.html",
+   "status": "candidate",
+   "tag": "v2.7-glyph-pill",
+   "gitpath": "index-v3.html",
+   "answers": [
+    "F14"
+   ],
+   "summary": "The low/normal/high pill drops its words for direction glyphs and narrows to 72px; the follow-up list pins to the bottom of the detail panel and shows its eight rows in full.",
+   "changes": [
+    "<b>Pill shows ▼ – ▲</b> instead of repeating the words already in the column header. Same glyphs the map uses for flagged markers.",
+    "<b>96px → 72px</b>, the saved width returned to the marker names.",
+    "<b>Follow-up list anchored to the panel foot</b> and sized to its content — eight rows, expander and note, no scrolling.",
+    "<b>Expanding flips it</b> to the flexible, scrolling section; the notes above keep a 176px floor.",
+    "Note compressed to two lines without losing the caveat.",
+    "Zero off-grid spacing."
+   ],
+   "mb": 0.23
+  },
+  {
    "id": "v2.6",
    "file": "v2.6-facts-space.html",
    "title": "Ripple atlas — roomier relationship notes",
    "date": "2026-07-31",
    "source": "index-v3.html",
-   "status": "candidate",
+   "status": "superseded",
    "tag": "v2.6-facts-space",
    "gitpath": "index-v3.html",
    "answers": [
