@@ -64,6 +64,17 @@ button{font-family:inherit;cursor:pointer}
    padding is 24 rather than 16 because the list below reserves an 8px scrollbar
    gutter plus 8px of row padding — without that the header sat 8px to the right
    of the pill it labels. Each label is centred over its own 24px segment. */
+.picker{flex:0 0 auto;padding:16px;border-bottom:1px solid var(--line)}
+.picker h3{font-family:var(--font-mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;
+ color:var(--dim);margin:0 0 8px}
+.pchips{display:flex;flex-wrap:wrap;gap:8px}
+.pchip{border:1px solid var(--line);background:#fff;color:var(--muted);font-size:11px;padding:4px 8px;
+ border-radius:12px;white-space:nowrap;display:inline-flex;align-items:baseline;gap:4px}
+.pchip i{font-style:normal;font-family:var(--font-mono);font-size:9px;color:var(--dim)}
+.pchip:hover{border-color:var(--teal);color:var(--teal)}
+.pchip.on{background:var(--aqua);border-color:var(--teal);color:var(--slate)}
+.pchip.on i{color:var(--teal)}
+.nocat{font-family:var(--font-mono);font-size:9px;color:#b4c0c2;text-align:center;cursor:help}
 .railhd{flex:0 0 auto;display:grid;grid-template-columns:1fr var(--tglW);gap:8px;align-items:center;
  padding:8px 24px 8px 16px;border-bottom:1px solid var(--line);background:rgba(247,249,249,.7)}
 .railhd span{font-family:var(--font-mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
@@ -339,6 +350,10 @@ button{font-family:inherit;cursor:pointer}
    <h1>Start with your annual panel</h1>
    <p>Mark anything that came back low or high. The ripple spreads outward into what it could mean.</p>
   </div>
+  <div class="picker">
+   <h3>Panels you have had</h3>
+   <div class="pchips" id="pChips"></div>
+  </div>
   <div class="railhd"><span>marker</span><span class="r"><i>low</i><i>norm</i><i>high</i></span></div>
   <div class="railbody scroll" id="rail"></div>
   <div class="layer">
@@ -373,17 +388,29 @@ const $ = id => document.getElementById(id);
 const esc = s => (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const nf = n => n.toLocaleString();
 const M = D.markers, C = D.concerns, REL = D.rel, OFF = D.off, META = D.meta;
-const SLUGS = D.panels.reduce((a,p)=>a.concat(p.slugs), []);
+const PANELS_ALL = D.panels;
+/* Which panels the reader has had. Everything downstream — the marker column,
+   the concerns it can raise, the ripple — is derived from this, so adding a
+   panel is a data change, not a code change. */
+let SLUGS = [];
+function activePanels(){ return PANELS_ALL.filter(p => st.panels[p.id]); }
+function refreshSlugs(){
+ const seen = {}; SLUGS = [];
+ activePanels().forEach(p => p.slugs.forEach(sl => { if(!seen[sl]){ seen[sl] = 1; SLUGS.push(sl); } }));
+}
 const CIDS = Object.keys(C).map(Number);
 
 /* ---------- state ---------- */
-const st = { val:{}, added:{}, sel:null, hot:null, expand:false, foc:null, focVia:'select', fam:{} };   // val: slug -> -1|0|1
-SLUGS.forEach(s => st.val[s] = 0);
+const st = { val:{}, added:{}, sel:null, hot:null, expand:false, foc:null, focVia:'select', fam:{}, panels:{} };
+PANELS_ALL.forEach(p => { if(p.default) st.panels[p.id] = 1; });   // val: slug -> -1|0|1
+PANELS_ALL.forEach(p => p.slugs.forEach(sl => { st.val[sl] = 0; }));
 try{ const raw = localStorage.getItem('v3.state');
      if(raw){ const o = JSON.parse(raw);
        Object.keys(o.val||{}).forEach(k=>{ if(k in st.val) st.val[k]=o.val[k]; });
-       Object.keys(o.added||{}).forEach(k=>{ st.added[k]=1; }); } }catch(e){}
-const save = () => { try{ localStorage.setItem('v3.state', JSON.stringify({val:st.val, added:st.added})); }catch(e){} };
+       Object.keys(o.added||{}).forEach(k=>{ st.added[k]=1; });
+       if(o.panels && Object.keys(o.panels).length){ st.panels = {}; Object.keys(o.panels).forEach(k=>{ st.panels[k]=1; }); } } }catch(e){}
+refreshSlugs();
+const save = () => { try{ localStorage.setItem('v3.state', JSON.stringify({val:st.val, added:st.added, panels:st.panels})); }catch(e){} };
 
 const flagged = () => SLUGS.filter(s => st.val[s] !== 0);
 function activeConcerns(){
@@ -443,18 +470,21 @@ function buildLayout(){
  const mEdgeX = xM - 24;                       // shared right edge for this column
  const headLead = 11, headPad = 4, grpGap = 12;
  const perHead = Math.max(8, Math.floor((mEdgeX - b.L) / 5.7));   // 8.5px mono + tracking
- const gLines = D.panels.map(p => wrap(p.name.replace(/\s*\(.*\)/, '').toUpperCase(), perHead, 3));
+ const AP = activePanels();
+ const gLines = AP.map(p => wrap(p.name.replace(/\s*\(.*\)/, '').toUpperCase(), perHead, 3));
  const headTotal = gLines.reduce((a, l) => a + l.length * headLead + headPad, 0);
- const nGrp = D.panels.length;
+ const nGrp = Math.max(1, AP.length);
  const mAvail = b.h - headTotal - (nGrp - 1) * grpGap;
  const mRow = mAvail / SLUGS.length;
  // only, never by size or weight.
  const mFs = Math.max(8, Math.min(12, (mRow - 2) / 1.06));
  const mk = {}; let y = b.T, groups = [];
- D.panels.forEach((p, gi) => {
+ // a marker shared by two selected panels is listed once, under the first
+ const placed = {};
+ AP.forEach((p, gi) => {
   groups.push({ lines: gLines[gi], y: y + 8, n: p.slugs.length });
   y += gLines[gi].length * headLead + headPad;
-  p.slugs.forEach(sl => { mk[sl] = y + mRow / 2; y += mRow; });
+  p.slugs.forEach(sl => { if(placed[sl]) return; placed[sl] = 1; mk[sl] = y + mRow / 2; y += mRow; });
   y += grpGap;
  });
 
@@ -714,27 +744,37 @@ function relayout(){ BOX = box(); LAYOUT = buildLayout(); draw(); }
 /* ---------- left rail ---------- */
 function drawRail(){
  let h = '';
- D.panels.forEach(p => {
+ const seenRow = {};
+ activePanels().forEach(p => {
   h += '<div class="grouphd"><b>'+esc(p.name.replace(/\s*\(.*\)/,''))+'</b> '+p.slugs.length+' markers</div>';
   p.slugs.forEach(s => {
+   if(seenRow[s]) return; seenRow[s] = 1;
    const v = st.val[s];
    const isFoc = kfoc(0, SLUGS.indexOf(s));
    h += '<div class="mrow'+(v<0?' lo':v>0?' hi':'')+(st.sel&&st.sel.t==='m'&&st.sel.v===s?' sel':'')
      +  (isFoc?' foc':'')+'" data-row="'+s+'" id="mrow-'+s+'">'
      +  '<span class="nm" data-mk="'+s+'" title="'+esc(M[s].name)+'">'+esc(M[s].name.split('[')[0].trim())+'</span>'
-     +  '<span class="tri">'
+     +  (M[s].missing
+         ? '<span class="nocat" title="This component of the panel is not in our catalogue, so we cannot show what it points at.">not carried</span>'
+         : '<span class="tri">'
      +   '<button data-set="'+s+'" data-v="-1" class="'+(v<0?'on':'')+'" title="Mark low" aria-label="Mark low">&#9660;</button>'
      +   '<button data-set="'+s+'" data-v="0" class="mid '+(v===0?'on':'')+'" title="Normal" aria-label="Normal">&ndash;</button>'
      +   '<button data-set="'+s+'" data-v="1" class="'+(v>0?'on':'')+'" title="Mark high" aria-label="Mark high">&#9650;</button>'
-     +  '</span></div>';
+     +  '</span>')
+     +  '</div>';
   });
  });
  $('rail').innerHTML = h;
 
+ $('pChips').innerHTML = PANELS_ALL.map(p =>
+   '<button class="pchip'+(st.panels[p.id]?' on':'')+'" data-panel="'+p.id+'" title="'+esc(p.quote)+'">'
+   + esc(p.short) + '<i>' + p.slugs.length + '</i></button>').join('');
+
  const act = activeConcerns();
- $('layerSub').innerHTML = 'Your panel can raise <b>'+META.panelConcerns+'</b> of '+META.nConcerns
-  +' concerns. The rest need bloodwork you have not had.';
- $('chips').innerHTML = CIDS.filter(ci => !C[ci].inPanel).map(ci =>
+ const reachSet = {}; SLUGS.forEach(sl => (M[sl].k || []).forEach(ci => reachSet[ci] = 1));
+ $('layerSub').innerHTML = 'The panels you have selected reach <b>'+Object.keys(reachSet).length+'</b> of '
+  +META.nConcerns+' concerns. The rest need bloodwork you have not had.';
+ $('chips').innerHTML = CIDS.filter(ci => !reachSet[ci]).map(ci =>
    '<button class="chip'+(st.added[ci]?' on':'')+'" data-add="'+ci+'">'+esc(C[ci].label)+'</button>').join('');
 }
 
@@ -908,10 +948,15 @@ function drawDetail(){
 }
 
 /* ---------- chrome ---------- */
+function reachableNow(){
+ const r = {}; SLUGS.forEach(sl => (M[sl].k || []).forEach(ci => r[ci] = 1));
+ return Object.keys(r).length;
+}
 function drawChrome(){
  const act = activeConcerns(), nFlag = flagged().length;
- $('hdrStat').textContent = nf(META.base)+' panel markers · '+META.nConcerns+' concerns · '
-  + nf(META.total)+' markers in the catalogue';
+ const reachable = reachableNow();
+ $('hdrStat').textContent = activePanels().length+' of '+PANELS_ALL.length+' panels · '
+  + SLUGS.length+' markers · '+reachable+' of '+META.nConcerns+' concerns reachable';
  const nOn = Object.keys(act).length;
  $('mapNote').textContent = nFlag
   ? nOn + ' OF ' + META.nConcerns + ' CONCERNS RAISED BY WHAT YOU MARKED'
@@ -920,15 +965,21 @@ function drawChrome(){
  $('fnote').innerHTML = nFlag
   ? 'You marked <b>'+nFlag+'</b> marker'+(nFlag===1?'':'s')+', raising <b>'+Object.keys(act).length
     +'</b> concern'+(Object.keys(act).length===1?'':'s')+'. <b>'+nf(off)+'</b> tests related to them sit outside '
-    +'your annual panel and have never been ordered — that absence is information too.'
-  : 'A routine annual panel measures <b>'+META.base+'</b> of '+nf(META.total)+' things measurable in blood, and can '
-    +'raise <b>'+META.panelConcerns+'</b> of '+META.nConcerns+' concerns. Mark something low or high to see the ripple.';
+    +'the panels you have selected and have never been ordered — that absence is information too.'
+  : activePanels().map(p=>p.short).join(' + ')+' measure <b>'+SLUGS.length+'</b> of '+nf(META.total)
+    +' things measurable in blood, and can raise <b>'+reachable+'</b> of '+META.nConcerns
+    +' concerns. Mark something low or high to see the ripple.';
 }
 
 function render(){ relayout(); drawRail(); drawDetail(); drawChrome(); }
 
 /* ---------- events ---------- */
 document.addEventListener('click', function(e){
+ const pk = e.target.closest('[data-panel]');
+ if(pk){ const id = pk.dataset.panel;
+   if(st.panels[id]){ if(activePanels().length > 1) delete st.panels[id]; }
+   else st.panels[id] = 1;
+   refreshSlugs(); st.sel = null; st.foc = null; save(); render(); return; }
  const set = e.target.closest('[data-set]');
  if(set){ st.val[set.dataset.set] = +set.dataset.v; st.focVia = 'select';
    st.foc = {c:0, i:Math.max(0, SLUGS.indexOf(set.dataset.set))};
@@ -1071,7 +1122,8 @@ document.addEventListener('keydown', function(e){
  }
  if(st.foc.c === 1 && low === 'x'){
   const ci = String(LAYOUT.cOrder[st.foc.i]);
-  if(C[ci].inPanel) return;                       // only the personal layer is addable
+  const rs = {}; SLUGS.forEach(sl => (M[sl].k || []).forEach(x => rs[x] = 1));
+  if(rs[ci]) return;                              // only unreachable concerns are addable
   if(st.added[ci]) delete st.added[ci]; else st.added[ci] = 1;
   save(); render(); return;
  }

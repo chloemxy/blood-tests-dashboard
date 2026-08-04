@@ -36,49 +36,6 @@ def unquote(t):
 
 
 # ---------------------------------------------------------------------------
-# 1. the 26 annual-panel markers, with a stable slug each
-# ---------------------------------------------------------------------------
-SLUG = {
- "Red Blood Cell count":"rbc", "White Blood Cell count":"wbc", "Platelet count":"plt",
- "Hemoglobin":"hgb", "Hematocrit":"hct", "Red Blood Cell indices":"mcv",
- "Complete Blood Count":"cbc",
- "Blood glucose":"glucose", "Calcium":"calcium",
- "Sodium [Moles/volume] in Serum or Plasma":"sodium",
- "Potassium [Mass/volume] in Serum or Plasma":"potassium",
- "Bicarbonate [Moles/volume] in Serum or Plasma":"bicarb",
- "Chloride [Moles/volume] in Serum or Plasma":"chloride",
- "Albumin":"albumin", "Total protein":"tp", "Alkaline phosphatase":"alp",
- "Alanine aminotransferase":"alt", "Aspartate aminotransferase":"ast",
- "Bilirubin":"bili", "Blood Urea Nitrogen":"bun", "Creatinine":"creat",
- "Total cholesterol":"tc", "LDL cholesterol":"ldl", "HDL cholesterol":"hdl",
- "Triglycerides":"trig", "Lipid panel (cholesterol)":"lipid",
-}
-ABBR = {"rbc":"RBC","wbc":"WBC","plt":"PLT","hgb":"Hgb","hct":"Hct","mcv":"MCV","cbc":"CBC",
- "glucose":"Glu","calcium":"Ca","sodium":"Na","potassium":"K","bicarb":"HCO₃","chloride":"Cl",
- "albumin":"Alb","tp":"TP","alp":"ALP","alt":"ALT","ast":"AST","bili":"TBIL","bun":"BUN",
- "creat":"Cr","tc":"TC","ldl":"LDL","hdl":"HDL","trig":"TG","lipid":"Lipids"}
-
-idx_by_slug, markers = {}, {}
-for k, t in enumerate(TESTS):
-    if t.get("b") and t["n"] in SLUG:
-        sl = SLUG[t["n"]]
-        idx_by_slug[sl] = k
-        markers[sl] = {
-            "slug": sl, "name": t["n"], "abbr": ABBR[sl], "grp": GROUPS[t["g"]],
-            "k": t.get("k") or [], "q": unquote(t.get("q")),
-            "qs": t.get("qs") or "", "v": 1 if t.get("v") else 0,
-            "url": (t.get("r") or [["", ""]])[0][0],
-        }
-missing = set(SLUG.values()) - set(markers)
-assert not missing, "unmapped panel markers: %s" % missing
-
-PANEL_ORDER = []
-for p in PANELS:
-    slugs = [SLUG[TESTS[l["i"]]["n"]] for l in p["linked"] if TESTS[l["i"]]["n"] in SLUG]
-    PANEL_ORDER.append({"id": p["id"], "name": p["name"], "quote": p["quote"],
-                        "src": p["src"], "url": p["url"], "slugs": slugs})
-
-# ---------------------------------------------------------------------------
 # 2. concerns, and the tests that would follow each one up
 # ---------------------------------------------------------------------------
 def analyte(name):
@@ -95,6 +52,140 @@ def analyte(name):
     n = re.sub(r"\s+by\s+.*$", "", n, flags=re.I)
     n = re.sub(r"\s+in\s+(?:the\s+)?[A-Z].*$", "", n)
     return n.strip(" /,") or name.strip()
+
+
+# ---------------------------------------------------------------------------
+# PANEL LIBRARY
+#
+# Each panel carries a verbatim description and component list from a named
+# source. Components are matched to the catalogue by LOINC analyte name; a
+# component the catalogue does not carry is kept with missing=1 and shown as
+# such, because a panel we cannot fully model is itself worth knowing about.
+# ---------------------------------------------------------------------------
+MPLUS = "MedlinePlus (NIH)"
+CLEVE = "Cleveland Clinic"
+
+PANEL_DEFS = [
+ {"id":"CBC", "name":"Complete Blood Count", "short":"CBC", "src":MPLUS, "default":1,
+  "url":"https://medlineplus.gov/lab-tests/complete-blood-count-cbc/",
+  "quote":"A complete blood count is often part of a routine checkup.",
+  "comp":[("Red Blood Cell count","Red Blood Cell count"),("White Blood Cell count","White Blood Cell count"),
+          ("Platelet count","Platelet count"),("Hemoglobin","Hemoglobin"),("Hematocrit","Hematocrit"),
+          ("Red Blood Cell indices","Red Blood Cell indices"),("Complete Blood Count","Complete Blood Count")]},
+
+ {"id":"CMP", "name":"Comprehensive Metabolic Panel", "short":"CMP", "src":MPLUS, "default":1,
+  "url":"https://medlineplus.gov/lab-tests/comprehensive-metabolic-panel-cmp/",
+  "quote":"A comprehensive metabolic panel (CMP) is a group of routine blood tests that measures 14 different substances in a sample of your blood.",
+  "comp":[("Blood glucose","Blood glucose"),("Calcium","Calcium"),("Sodium","Sodium"),("Potassium","Potassium"),
+          ("Bicarbonate","Bicarbonate"),("Chloride","Chloride"),("Albumin","Albumin"),("Total protein","Total protein"),
+          ("Alkaline phosphatase","Alkaline phosphatase"),("Alanine aminotransferase","Alanine aminotransferase"),
+          ("Aspartate aminotransferase","Aspartate aminotransferase"),("Bilirubin","Bilirubin"),
+          ("Blood Urea Nitrogen","Blood Urea Nitrogen"),("Creatinine","Creatinine")]},
+
+ {"id":"LIPID", "name":"Cholesterol / lipid panel", "short":"Lipids", "src":MPLUS, "default":1,
+  "url":"https://medlineplus.gov/lab-tests/cholesterol-levels/",
+  "quote":"Younger adults should have the test every 5 years. Men ages 45 to 65 and women ages 55 to 65 should have it every 1 to 2 years.",
+  "comp":[("Total cholesterol","Total cholesterol"),("LDL cholesterol","LDL cholesterol"),
+          ("HDL cholesterol","HDL cholesterol"),("Triglycerides","Triglycerides"),
+          ("Lipid panel (cholesterol)","Lipid panel (cholesterol)")]},
+
+ {"id":"BMP", "name":"Basic Metabolic Panel", "short":"BMP", "src":MPLUS, "default":0,
+  "url":"https://medlineplus.gov/lab-tests/basic-metabolic-panel-bmp/",
+  "quote":"A basic metabolic panel (BMP) measures eight different substances in your blood. It provides important information about your body's fluid balance, your metabolism (the process your body uses to make energy from food you eat), and how well your kidneys are working.",
+  "comp":[("Blood glucose","Blood glucose"),("Calcium","Calcium"),("Sodium","Sodium"),("Potassium","Potassium"),
+          ("Bicarbonate","Bicarbonate"),("Chloride","Chloride"),
+          ("Blood Urea Nitrogen","Blood Urea Nitrogen"),("Creatinine","Creatinine")]},
+
+ {"id":"LIVER", "name":"Liver function panel", "short":"Liver", "src":MPLUS, "default":0,
+  "url":"https://medlineplus.gov/lab-tests/liver-function-tests/",
+  "quote":"Liver function tests (also called a liver panel) use a sample of your blood to measure several substances made by your liver.",
+  "comp":[("Albumin","Albumin"),("Total protein","Total protein"),("Alkaline phosphatase","Alkaline phosphatase"),
+          ("Alanine aminotransferase","Alanine aminotransferase"),("Aspartate aminotransferase","Aspartate aminotransferase"),
+          ("Gamma-glutamyl transferase","Gamma-glutamyl transferase"),("Bilirubin","Bilirubin"),
+          ("Lactate dehydrogenase","Lactate dehydrogenase"),("Prothrombin Time / INR","Prothrombin Time / INR")]},
+
+ {"id":"IRON", "name":"Iron studies", "short":"Iron", "src":MPLUS, "default":0,
+  "url":"https://medlineplus.gov/lab-tests/iron-tests/",
+  "quote":"Iron tests measure different substances in the blood to check iron levels in your body.",
+  "comp":[("Serum iron","Iron"),("Transferrin","Transferrin"),
+          ("Total iron-binding capacity","Iron binding capacity"),("Ferritin","Ferritin")]},
+
+ {"id":"THYROID", "name":"Thyroid panel", "short":"Thyroid", "src":CLEVE, "default":0,
+  "url":"https://my.clevelandclinic.org/health/diagnostics/thyroid-panel",
+  "quote":"A thyroid panel measures the hormones made by your thyroid gland and antibodies that might affect thyroid function.",
+  "comp":[("TSH (thyroid-stimulating hormone)","Thyrotropin"),
+          ("T3 or free T3 (triiodothyronine)","Triiodothyronine (Free T3)"),
+          ("T4 or free T4 (thyroxine)","Thyroxine (Free T4)"),
+          ("Tg (thyroglobulin)","Thyroglobulin"),
+          ("TPO (thyroid peroxidase antibodies)",None),
+          ("Tg Ab (thyroglobulin antibodies)",None),
+          ("TSI (thyroid-stimulating immunoglobulin)",None)]},
+
+ {"id":"ENA", "name":"ENA panel (autoimmune)", "short":"ENA", "src":CLEVE, "default":0,
+  "url":"https://my.clevelandclinic.org/health/diagnostics/ena-panel",
+  "quote":"An ENA (extractable nuclear antigen) panel is a blood test that looks for antibodies that cause your immune system to attack healthy parts of your body. It can help your healthcare provider diagnose or rule out autoimmune diseases.",
+  "comp":[("Anti-SSA","Sjogrens syndrome-A extractable nuclear Ab"),
+          ("Anti-SSB","Sjogrens syndrome-B extractable nuclear Ab"),
+          ("Anti-Smith","Smith extractable nuclear Ab"),
+          ("Anti-RNP","Ribonucleoprotein extractable nuclear Ab"),
+          ("Anti-Scl-70","SCL-70 extractable nuclear Ab"),
+          ("Anti-Jo-1","Jo-1 extractable nuclear Ab")]},
+]
+
+ABBR_HINT = {
+ "redbloodcellcount":"RBC","whitebloodcellcount":"WBC","plateletcount":"PLT","hemoglobin":"Hgb",
+ "hematocrit":"Hct","redbloodcellindices":"MCV","completebloodcount":"CBC","bloodglucose":"Glu",
+ "calcium":"Ca","sodium":"Na","potassium":"K","bicarbonate":"HCO₃","chloride":"Cl","albumin":"Alb",
+ "totalprotein":"TP","alkalinephosphatase":"ALP","alanineaminotransfe":"ALT","aspartateaminotran":"AST",
+ "bilirubin":"TBIL","bloodureanitrogen":"BUN","creatinine":"Cr","totalcholesterol":"TC",
+ "ldlcholesterol":"LDL","hdlcholesterol":"HDL","triglycerides":"TG","lipidpanelcholester":"Lipids",
+ "gammaglutamyltransf":"GGT","lactatedehydrogenas":"LDH","prothrombintimeinr":"PT/INR",
+ "serumiron":"Fe","transferrin":"Tf","totalironbindingcap":"TIBC","ferritin":"Ferr",
+}
+
+def slugify(t):
+    return re.sub(r"[^a-z0-9]+", "", t.lower())[:19]
+
+def pick(match):
+    """Best catalogue row whose analyte name is `match`: source-quoted first,
+    then the more commonly ordered, then the shortest name."""
+    ml = match.lower()
+    hits = [k for k, t in enumerate(TESTS) if analyte(t["n"]).lower() == ml]
+    if not hits:
+        hits = [k for k, t in enumerate(TESTS) if analyte(t["n"]).lower().startswith(ml)]
+    if not hits:
+        return None
+    hits.sort(key=lambda k: (-(TESTS[k].get("v") or 0), -(TESTS[k].get("t") or 0), len(TESTS[k]["n"])))
+    return hits[0]
+
+markers, PANEL_ORDER = {}, []
+for pdef in PANEL_DEFS:
+    slugs, nmiss = [], 0
+    for disp, match in pdef["comp"]:
+        sl = slugify(disp)
+        if sl not in markers:
+            if match is None:
+                nmiss += 1
+                markers[sl] = {"slug": sl, "name": disp, "abbr": ABBR_HINT.get(sl, disp[:5]),
+                               "grp": "not in our catalogue", "k": [], "q": "", "qs": "",
+                               "v": 0, "url": "", "missing": 1, "panels": []}
+            else:
+                k = pick(match)
+                assert k is not None, "no catalogue row for %r (%s)" % (match, pdef["id"])
+                t = TESTS[k]
+                markers[sl] = {"slug": sl, "name": disp,
+                               "abbr": ABBR_HINT.get(sl, (t.get("a") or disp)[:5]),
+                               "grp": GROUPS[t["g"]], "k": t.get("k") or [], "q": unquote(t.get("q")),
+                               "qs": t.get("qs") or "", "v": 1 if t.get("v") else 0,
+                               "url": (t.get("r") or [["", ""]])[0][0], "loinc": t["n"],
+                               "missing": 0, "panels": []}
+        elif match is None:
+            nmiss += 1
+        markers[sl]["panels"].append(pdef["id"])
+        slugs.append(sl)
+    PANEL_ORDER.append({"id": pdef["id"], "name": pdef["name"], "short": pdef["short"],
+                        "quote": pdef["quote"], "src": pdef["src"], "url": pdef["url"],
+                        "slugs": slugs, "nMissing": nmiss, "default": pdef["default"]})
 
 
 base_idx = {k for k, t in enumerate(TESTS) if t.get("b")}
@@ -164,7 +255,7 @@ for ci, c in enumerate(CONCERNS):
 def R(a, b, when, quote, src, url, kind="relationship"):
     return {"a": a, "b": b, "when": when, "q": quote, "s": src, "u": url, "k": kind}
 
-MP = "MedlinePlus (NIH)"
+MP = MPLUS
 REL = [
  R("hgb","hct","any",
    "Abnormal levels of red blood cells, hemoglobin, or hematocrit may be a sign of dehydration, anemia, heart disease, or too little iron in your body.",
@@ -261,8 +352,22 @@ OFFPANEL = {
  "a1c":"Hemoglobin A1c", "vldl":"VLDL cholesterol", "apob":"Apolipoprotein B",
  "liverpanel":"Liver function tests", "kidney":"Further kidney tests", "panel":"Your annual panel",
 }
+# The relationship table was written against the old short slugs; map them onto
+# the panel-library slugs so the notes keep their readable names in source.
+ALIAS = {k: slugify(v) for k, v in {
+ "rbc":"Red Blood Cell count", "wbc":"White Blood Cell count", "plt":"Platelet count",
+ "hgb":"Hemoglobin", "hct":"Hematocrit", "mcv":"Red Blood Cell indices",
+ "cbc":"Complete Blood Count", "glucose":"Blood glucose", "calcium":"Calcium",
+ "sodium":"Sodium", "potassium":"Potassium", "bicarb":"Bicarbonate", "chloride":"Chloride",
+ "albumin":"Albumin", "tp":"Total protein", "alp":"Alkaline phosphatase",
+ "alt":"Alanine aminotransferase", "ast":"Aspartate aminotransferase", "bili":"Bilirubin",
+ "bun":"Blood Urea Nitrogen", "creat":"Creatinine", "tc":"Total cholesterol",
+ "ldl":"LDL cholesterol", "hdl":"HDL cholesterol", "trig":"Triglycerides",
+ "lipid":"Lipid panel (cholesterol)",
+}.items()}
 for r in REL:
     for side in ("a", "b"):
+        r[side] = ALIAS.get(r[side], r[side])
         assert r[side] in markers or r[side] in OFFPANEL, "unknown marker %r" % r[side]
 
 # ---------------------------------------------------------------------------
@@ -287,7 +392,8 @@ io.open(DST, "w", encoding="utf8").write(out)
 
 m = PAY["meta"]
 print("index-v3.html  %.0f KB" % (len(out) / 1024.0))
-print("  %d panel markers · %d panels" % (len(markers), len(PANEL_ORDER)))
+print("  %d markers across %d panels (%d components not in the catalogue)"
+      % (len(markers), len(PANEL_ORDER), sum(p["nMissing"] for p in PANEL_ORDER)))
 print("  %d concerns (%d reachable from the annual panel)" % (m["nConcerns"], m["panelConcerns"]))
 print("  %d sourced relationship notes" % len(REL))
 print("  %s follow-up tests sit outside the panel for those concerns" % format(m["offPanelForPanelConcerns"], ","))
