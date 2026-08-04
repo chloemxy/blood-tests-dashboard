@@ -43,6 +43,33 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F20",
+  "date": "2026-07-31",
+  "who": "Chloe",
+  "title": "Divider alignment, wrapped concern names, one type style",
+  "status": "addressed",
+  "versions": ["v3.3"],
+  "quote": "use the same text style as the left column, tell me the size and typography",
+  "quotes": [
+   "align 29 with heart and cholesterol, use the same bottom spacing [what they can point at] has to [29 concerns no panel marker can reach]",
+   "these names are still missing full name, put in multiple rows if needed",
+   "use the same text style as the left column, tell me the size and typography",
+  ],
+  "did": [
+   ("Divider aligned to the concern names", "addressed",
+    "It was starting at the dot rather than the label, 21px left of <i>Heart &amp; cholesterol</i>. Both now start at the same x."),
+   ("Same bottom spacing as a column header", "addressed",
+    "Column headers sit 16px above their first row; the divider band now closes 16px after its last baseline, with the rule halfway through. Measured identical at every width."),
+   ("Concern rows can be two lines", "addressed",
+    "Row heights are no longer uniform \u2014 a name that will not fit on one line gets a taller row and the height is borrowed from the rest of the column. The wrapping decision always reserves room for the marker-count chip, so nothing reflows when you mark a marker."),
+   ("Type and wrapping settled together", "addressed",
+    "Narrowing the column makes more names wrap, which needs height, which can force the type down, which changes the wrapping again. Settled by iteration instead of a fixed multiplier, with a one-line truncated fallback if two lines cannot fit at the 8px floor \u2014 so rows can never run past the bottom of the map."),
+   ("One type style across all three columns", "addressed",
+    "Open Sans regular at a single size chosen per render from the tightest column budget \u2014 markers, concerns and follow-ups always match. State is carried by colour alone; the bold on live concerns and marked markers is gone, matching the rule already applied to the dots."),
+  ],
+  "open": None,
+ },
+ {
   "id": "F19",
   "date": "2026-07-31",
   "who": "Chloe",
@@ -521,12 +548,31 @@ FEEDBACK = [
 # ===========================================================================
 VERSIONS = [
  {
+  "id": "v3.3",
+  "file": "v3.3-type-system.html",
+  "title": "Ripple atlas \u2014 one type system",
+  "date": "2026-07-31",
+  "source": "index-v3.html",
+  "status": "candidate",
+  "tag": "v3.3-type-system",
+  "gitpath": "index-v3.html",
+  "answers": ["F20"],
+  "summary": "One text style across all three columns, concern rows that can take two lines, and the divider aligned to the names it sits among.",
+  "changes": [
+   "<b>Open Sans regular, one size per render</b>, shared by all three columns. State is colour only \u2014 no size or weight changes.",
+   "<b>Variable concern row heights</b>: a name that needs two lines gets a taller row, borrowed from the rest of the column.",
+   "<b>Type and wrapping fitted by iteration</b>, with a truncated single-line fallback so rows never overflow the map.",
+   "<b>Divider aligned</b> to the concern labels, with the same 16px it would get from a column header.",
+   "Zero label overlaps at six window sizes; nothing runs past the bottom.",
+  ],
+ },
+ {
   "id": "v3.2",
   "file": "v3.2-narrow-safe.html",
   "title": "Ripple atlas \u2014 narrow-screen safe",
   "date": "2026-07-31",
   "source": "index-v3.html",
-  "status": "candidate",
+  "status": "superseded",
   "tag": "v3.2-narrow-safe",
   "gitpath": "index-v3.html",
   "answers": ["F19"],

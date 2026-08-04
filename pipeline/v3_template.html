@@ -236,12 +236,15 @@ button{font-family:inherit;cursor:pointer}
 .map .row.sel .dot,.map .row.hot .dot{stroke-width:2.5}
 .map .row.sel .dot{stroke:var(--accent)}
 
-.map .lb{font-family:var(--font-sans);font-size:11px;fill:var(--slate)}
-.map .lb.mut{fill:#93a2a4;font-size:10px}
-.map .lb.on{font-weight:700;fill:var(--slate)}
-.map .lb.acc{fill:var(--accent);font-weight:700}
-.map .lb.lo{fill:var(--low);font-weight:700}
-.map .lb.hi{fill:var(--high);font-weight:700}
+/* One text style for all three columns: Open Sans, regular, size set per
+   render from the tightest column budget. State is colour only \u2014 never a
+   different size or weight. */
+.map .lb{font-family:var(--font-sans);font-size:11px;font-weight:400;fill:var(--slate)}
+.map .lb.mut{fill:#93a2a4}
+.map .lb.on{fill:var(--slate)}
+.map .lb.acc{fill:var(--accent)}
+.map .lb.lo{fill:var(--low)}
+.map .lb.hi{fill:var(--high)}
 .map .cnt{font-family:var(--font-mono);font-size:8.5px;fill:#a9b6b8}
 .map .hint{font-family:var(--font-sans);font-size:11px;fill:#a9b6b8;font-style:italic}
 .map .slot{fill:none;stroke:#dfe6e7;stroke-width:1;stroke-dasharray:1.6 2}
@@ -446,17 +449,57 @@ function buildLayout(){
  // The divider is a section header: it wraps to fit the column, and the band
  // is sized from the number of lines so the space above and below is equal.
  const divTxt = unreach.length + ' CONCERNS NO PANEL MARKER CAN REACH';
- const divPer = Math.max(12, Math.floor((xCend - xC + 9) / 6.2));   // 9px mono + tracking
+ const divPer = Math.max(12, Math.floor((xCend - xC - 12) / 6.2));   // 9px mono + tracking
  const divLines = wrap(divTxt, divPer, 2);
- // 24 above the first baseline, 16 below the rule — the extra 8 on top pays for
- // the cap height, so the white space reads as equal above and below
- const divPad = 24, divPadBot = 16, divLead = 12, divGap = 8;
- const divH = divPad + divLines.length * divLead + divGap + divPadBot;
- const cRow = (b.h - divH) / CIDS.length;
+ // 24 above the first baseline; below the last baseline the band closes at 16,
+ // exactly the gap a column header leaves before its first row, with the rule
+ // sitting halfway through it.
+ const divPad = 24, divLead = 12, divGap = 8, divTail = 16;
+ const divH = divPad + (divLines.length - 1) * divLead + divTail;
+ // Concern rows are not uniform: a name that will not fit on one line gets two,
+ // and the extra height is borrowed from the rest of the column. The wrapping
+ // decision always reserves room for the marker-count chip, whether or not the
+ // concern currently has one, so nothing reflows when you mark a marker.
+ // Fit the type and the wrapping together. Narrowing the column makes more
+ // names wrap, which needs more height, which may force the type down, which
+ // changes the wrapping again — so settle it by iteration rather than by a
+ // fixed multiplier. Stops as soon as everything fits, or at the 8px floor.
+ const cAvail = b.h - divH;
+ const LEAD = 1.06, PAD = 4;
+ let cFs = 11, cLines = {}, nTwo = 0;
+ for(let pass = 0; pass < 16; pass++){
+  const per = Math.max(8, Math.floor((xCend - xC - 52) / (cFs * 0.56)));
+  cLines = {}; nTwo = 0;
+  CIDS.forEach(ci => {
+   const ln = wrap(C[ci].label, per, 2);
+   cLines[ci] = ln;
+   if(ln.length > 1) nTwo++;
+  });
+  const need = (CIDS.length - nTwo) * (cFs * LEAD + PAD)
+             + nTwo * (2 * cFs * LEAD + PAD);
+  if(need <= cAvail || cFs <= 8) break;
+  cFs = Math.max(8, cFs - 0.25);
+ }
+ // If two lines still will not fit at the 8px floor, the column is simply too
+ // short for 47 wrapped rows — fall back to one truncated line rather than
+ // letting the rows run past the bottom of the map.
+ const perFinal = Math.max(8, Math.floor((xCend - xC - 52) / (cFs * 0.56)));
+ let rowOne = cFs * LEAD + PAD, rowTwo = 2 * cFs * LEAD + PAD;
+ if((CIDS.length - nTwo) * rowOne + nTwo * rowTwo > cAvail){
+  CIDS.forEach(ci => { cLines[ci] = [clip(C[ci].label, perFinal)]; });
+  nTwo = 0;
+ }
+ const needTot = (CIDS.length - nTwo) * rowOne + nTwo * rowTwo;
+ const slack = cAvail / needTot;                   // exact fill, never overflow
+ const cH = {};
+ CIDS.forEach(ci => { cH[ci] = (cLines[ci].length > 1 ? rowTwo : rowOne) * slack; });
+ const cUnit = rowOne * slack;
+
  const cn = {}; let cy = b.T, divY = 0;
- reach.forEach(o => { cn[o.ci] = cy + cRow / 2; cy += cRow; });
+ reach.forEach(o => { cn[o.ci] = cy + cH[o.ci] / 2; cy += cH[o.ci]; });
  divY = cy + divH / 2; cy += divH;
- unreach.forEach(o => { cn[o.ci] = cy + cRow / 2; cy += cRow; });
+ unreach.forEach(o => { cn[o.ci] = cy + cH[o.ci] / 2; cy += cH[o.ci]; });
+ const cRow = cUnit;
 
  // ---- follow-up tests: one tight block, vertically centred on the concern row
  // it belongs to, so the fan of edges is symmetric about the connector dot.
@@ -470,16 +513,19 @@ function buildLayout(){
   list.forEach((t, j) => ts.push({ t: t, y: y0 + T_ROW * j + T_ROW / 2 }));
  }
 
- // type scales with the row height so nothing collides on a short window
- const mFs = Math.max(8.5, Math.min(11.5, mRow * 0.58));
- const cFs = Math.max(8,   Math.min(11,   cRow * 0.72));
+ // One type size for all three columns — the tightest of the three budgets, so
+ // the columns read as one system rather than three. State is carried by colour
+ // only, never by size or weight.
+ const mFs = Math.max(8.5, Math.min(11, mRow * 0.58));
  const cOrder = reach.map(o => o.ci).concat(unreach.map(o => o.ci));
  const headLeadOut = headLead;
+ const FS = Math.max(8, Math.min(mFs, cFs));      // one size, every column
  const divTop = divY - divH / 2;
  return { xM:xM, xC:xC, xT:xT, xCend:xCend, mk:mk, cn:cn, ts:ts, groups:groups, cOrder:cOrder,
           divLines:divLines, divTop:divTop, divPad:divPad, divLead:divLead, divGap:divGap,
+          divTail:divTail, cLines:cLines, cH:cH,
           headLead:headLeadOut,
-          mRow:mRow, cRow:cRow, mFs:mFs, cFs:cFs, divY:divY, open:open,
+          mRow:mRow, cRow:cRow, mFs:FS, cFs:FS, FS:FS, divY:divY, open:open,
           nReach:reach.length, nUnreach:unreach.length };
 }
 
@@ -509,9 +555,9 @@ function draw(){
  let h = '';
 
  // ---- column headers
- h += '<text class="colhd" x="'+(b.L).toFixed(0)+'" y="'+(b.T-13)+'">YOUR ANNUAL PANEL &middot; '+SLUGS.length+'</text>'
-   +  '<text class="colhd" x="'+(L.xC+11).toFixed(0)+'" y="'+(b.T-13)+'">WHAT THEY CAN POINT AT &middot; '+CIDS.length+'</text>'
-   +  '<text class="colhd" x="'+(L.xT+11).toFixed(0)+'" y="'+(b.T-13)+'">WOULD FOLLOW IT UP</text>';
+ h += '<text class="colhd" x="'+(b.L).toFixed(0)+'" y="'+(b.T-16)+'">YOUR ANNUAL PANEL &middot; '+SLUGS.length+'</text>'
+   +  '<text class="colhd" x="'+(L.xC+11).toFixed(0)+'" y="'+(b.T-16)+'">WHAT THEY CAN POINT AT &middot; '+CIDS.length+'</text>'
+   +  '<text class="colhd" x="'+(L.xT+11).toFixed(0)+'" y="'+(b.T-16)+'">WOULD FOLLOW IT UP</text>';
  if(L.open === null){
   const hy = b.T + b.h / 2;
   h += '<line class="rule dash" x1="'+L.xT.toFixed(1)+'" y1="'+(b.T+4).toFixed(1)+'" x2="'+L.xT.toFixed(1)+'" y2="'+(b.B-4).toFixed(1)+'"/>'
@@ -586,32 +632,31 @@ function draw(){
  // ---- divider between reachable and unreachable concerns
  // Section header: equal air above the first line and below the rule, wrapping
  // to a second line rather than running past the column.
- const dY = L.divTop + L.divPad;
+ // left edge matches the concern labels, not the dots
+ const dY = L.divTop + L.divPad, dLast = dY + (L.divLines.length - 1) * L.divLead;
  h += L.divLines.map((t2, li) =>
-        '<text class="colhd" x="'+(L.xC-9).toFixed(1)+'" y="'+(dY + li*L.divLead).toFixed(1)+'">'
+        '<text class="colhd" x="'+(L.xC + 12).toFixed(1)+'" y="'+(dY + li*L.divLead).toFixed(1)+'">'
         + esc(t2) + '</text>').join('')
-   +  '<line class="rule dash" x1="'+(L.xC-9).toFixed(1)
-   +  '" y1="'+(dY + (L.divLines.length-1)*L.divLead + L.divGap).toFixed(1)
-   +  '" x2="'+L.xCend.toFixed(1)
-   +  '" y2="'+(dY + (L.divLines.length-1)*L.divLead + L.divGap).toFixed(1)+'"/>';
+   +  '<line class="rule dash" x1="'+(L.xC-9).toFixed(1)+'" y1="'+(dLast + L.divGap).toFixed(1)
+   +  '" x2="'+L.xCend.toFixed(1)+'" y2="'+(dLast + L.divGap).toFixed(1)+'"/>';
 
  // ---- concern rows
  // Reserve only what the count chip and the out-dot actually need, so the
  // full concern names fit on one line instead of being cut short.
- const cLabPlain = Math.max(8, Math.floor((L.xCend - L.xC - 20) / (L.cFs * 0.56)));
- const cLabChip  = Math.max(8, Math.floor((L.xCend - L.xC - 52) / (L.cFs * 0.56)));
+ const cLead = L.cFs * 1.06;
  CIDS.forEach(ci => {
   const y = L.cn[ci], from = act[ci], added = !!st.added[ci];
   const cls = ['row','cnc', from?'on':'', added?'added':'', selC===ci?'sel':'',
                st.hot===('c'+ci)?'hot':'',
                (st.foc&&st.foc.c===1&&L.cOrder[st.foc.i]===ci)?'foc':''].filter(Boolean).join(' ');
   const lab = ['lb', from?'on':'mut', added?'acc':''].filter(Boolean).join(' ');
+  const cln = L.cLines[ci], ch = L.cH[ci];
+  const cy0 = y + L.cFs * 0.34 - (cln.length - 1) * cLead / 2;
   h += '<g class="'+cls+'" data-cn="'+ci+'"><title>'+esc(C[ci].label)+' — '+nf(C[ci].nDistinct)+' markers outside the panel</title>'
-    +  '<rect class="hitbox" x="'+(L.xC-9).toFixed(1)+'" y="'+(y-L.cRow/2).toFixed(1)+'" width="'+(L.xCend-L.xC+9).toFixed(1)+'" height="'+L.cRow.toFixed(1)+'" rx="4"/>'
+    +  '<rect class="hitbox" x="'+(L.xC-9).toFixed(1)+'" y="'+(y-ch/2).toFixed(1)+'" width="'+(L.xCend-L.xC+9).toFixed(1)+'" height="'+ch.toFixed(1)+'" rx="4"/>'
     +  '<circle class="dot" cx="'+L.xC.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="5"/>'
-    +  '<text class="'+lab+'" x="'+(L.xC+12).toFixed(1)+'" y="'+(y+L.cFs*0.34).toFixed(1)
-    +  '" style="font-size:'+L.cFs.toFixed(1)+'px">'
-    +  esc(clip(C[ci].label, (from && from.length) ? cLabChip : cLabPlain))+'</text>';
+    +  cln.map((t2, li) => '<text class="'+lab+'" x="'+(L.xC+12).toFixed(1)+'" y="'+(cy0 + li*cLead).toFixed(1)
+        +'" style="font-size:'+L.cFs.toFixed(1)+'px">'+esc(t2)+'</text>').join('');
   if(from && from.length)
    h += '<text class="cnt on" x="'+(L.xCend-14).toFixed(1)+'" y="'+(y+L.cFs*0.34).toFixed(1)
      +  '" text-anchor="end">'+from.length+'&#215;</text>';
@@ -627,8 +672,7 @@ function draw(){
  // block taller than it can be while staying centred.
  const tw = b.R - L.xT - 13;
  // when any label needs two lines, the type tightens so both fit the 24px pitch
- const tWraps = L.ts.some(o => o.t.n.length > Math.floor(tw / (11 * 0.56)));
- const tFs = tWraps ? Math.max(8.5, Math.min(10, tw / 16)) : Math.max(9, Math.min(11, tw / 15));
+ const tFs = L.FS;
  L.ts.forEach((o, j) => {
   const perT = Math.max(8, Math.floor(tw / (tFs * 0.56)));
   const lnT = wrap(o.t.n, perT, 2);
