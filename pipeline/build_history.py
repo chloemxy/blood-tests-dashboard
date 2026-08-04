@@ -43,6 +43,26 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F24",
+  "date": "2026-07-31",
+  "who": "Chloe",
+  "title": "Arrows select; the dashed state belongs to Tab",
+  "status": "addressed",
+  "versions": ["v3.7"],
+  "quote": "and when arrow keys pressed, it acts as a click, so directly show the selected panel. the dash line status is only used when tab is pressed, when hovering, the current status is good",
+  "did": [
+   ("Arrows now act like a click", "addressed",
+    "They move <i>and</i> select, so the detail panel follows as you go rather than needing Enter. Same code path as a mouse click, so a row reached by arrow looks identical to one reached by pointer."),
+   ("Dashed state reserved for Tab", "addressed",
+    "Tab steps a dashed preview through every row in all three columns without changing the selection; Shift+Tab goes back; Enter commits whatever the preview is on. Focus records how it was moved, so the two never mix."),
+   ("Hover left alone", "addressed",
+    "Unchanged, as asked."),
+   ("Shortcut sheet updated", "addressed",
+    "The <code>?</code> panel now describes arrows as selecting and Tab as previewing."),
+  ],
+  "open": None,
+ },
+ {
   "id": "F23",
   "date": "2026-07-31",
   "who": "Chloe",
@@ -623,12 +643,29 @@ FEEDBACK = [
 # ===========================================================================
 VERSIONS = [
  {
+  "id": "v3.7",
+  "file": "v3.7-arrow-selects.html",
+  "title": "Ripple atlas \u2014 arrows select, Tab previews",
+  "date": "2026-07-31",
+  "source": "index-v3.html",
+  "status": "candidate",
+  "tag": "v3.7-arrow-selects",
+  "gitpath": "index-v3.html",
+  "answers": ["F24"],
+  "summary": "Arrow keys select as they move so the panel follows; the dashed state belongs to Tab alone; hover is unchanged.",
+  "changes": [
+   "<b>Arrows select</b> \u2014 same path as a mouse click, panel follows immediately.",
+   "<b>Tab previews</b> with the dashed ring across all three columns; Shift+Tab reverses; Enter commits.",
+   "Shortcut sheet updated.",
+  ],
+ },
+ {
   "id": "v3.6",
   "file": "v3.6-fixed-section.html",
   "title": "Ripple atlas \u2014 stable panel, click vs keyboard",
   "date": "2026-07-31",
   "source": "index-v3.html",
-  "status": "candidate",
+  "status": "superseded",
   "tag": "v3.6-fixed-section",
   "gitpath": "index-v3.html",
   "answers": ["F23"],
