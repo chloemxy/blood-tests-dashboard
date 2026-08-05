@@ -112,7 +112,7 @@ button{font-family:inherit;cursor:pointer}
    every row-like component — marker rows, follow-up rows, family headers, the
    why-list — so a hover or a selection always covers the whole row. */
 .mrow{display:grid;grid-template-columns:1fr var(--tglW);gap:8px;align-items:center;min-height:32px;
- padding:4px 16px;margin:0 -8px;border-radius:0;border:1px solid transparent;border-left:none;border-right:none}
+ padding:8px 16px;margin:0 -8px;border-radius:0;border:1px solid transparent;border-left:none;border-right:none}
 .mrow:hover{background:var(--aqua)}
 .mrow.sel{background:#fdf1ea;border-color:transparent}
 .mrow.foc{background:var(--aqua);border-color:var(--teal);border-left:none;border-right:none}
@@ -185,7 +185,7 @@ button{font-family:inherit;cursor:pointer}
 .slot.fact{flex:1 1 0;min-height:176px}
 .empty{font-size:12px;color:var(--dim);line-height:1.55;font-style:italic}
 .wl{list-style:none;margin:0;padding:0}
-.wl li{font-size:12px;color:var(--muted);padding:4px 16px;margin:0 -16px;line-height:1.45}
+.wl li{font-size:12px;color:var(--muted);padding:8px 16px;margin:0 -16px;line-height:1.45}
 .wl li b{color:var(--slate)}
 .wl li i{font-style:normal;font-family:var(--font-mono);font-size:10px;padding:0 4px;border-radius:8px;margin-right:8px}
 .wl li i.lo{background:#e2f2f5;color:var(--low)}
@@ -199,14 +199,14 @@ button{font-family:inherit;cursor:pointer}
  color:var(--accent);display:block;margin-bottom:4px;line-height:1.4}
 
 .nl{list-style:none;margin:0;padding:0}
-.nl li{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:4px 16px;
+.nl li{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:8px 16px;
  margin:0 -16px;border-bottom:1px solid #eef2f2}
 .nl li:hover{background:var(--aqua)}
 .nl li:last-child{border-bottom:none}
 .famhd{margin:8px 0 4px}
 .famhd:first-child{margin-top:0}
 .famtog{display:grid;grid-template-columns:16px 1fr auto;gap:8px;align-items:baseline;width:auto;
- background:none;border:none;padding:4px 16px;margin:0 -16px;border-bottom:1px solid var(--line);text-align:left}
+ background:none;border:none;padding:8px 16px;margin:0 -16px;border-bottom:1px solid var(--line);text-align:left}
 .famtog:hover{background:var(--aqua)}
 .famtog .fx{font-family:var(--font-mono);font-size:10px;color:var(--teal);text-align:center}
 .famtog .fn{font-family:var(--font-mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--slate)}
@@ -520,7 +520,12 @@ function buildLayout(){
  // height. The mono uppercase component labels — column titles, group heads,
  // the divider band — are 10px on a 12px lead: they are labels for what is
  // below them, not part of it.
- const FSZ = 12, LINE = 16, MIN_ROW = 16, HEADLINE = 12;
+ //
+ // ROW() is the one row box, shared by all three columns: the lines a name
+ // takes plus 8px above and below. A row is never shorter than its own
+ // highlight — that is what stopped the boxes overlapping in a dense column.
+ const FSZ = 12, LINE = 16, HEADLINE = 12, ROWPAD = 8;
+ const ROW = n => n * LINE + ROWPAD * 2;
 
  // Three columns of equal width with an equal gap between them, so the two
  // runs of edges — markers to concerns, concerns to follow-ups — span exactly
@@ -557,7 +562,7 @@ function buildLayout(){
  let cTotal = divH;
  CIDS.forEach(ci => {
   cLines[ci] = wrap(C[ci].label, cPer, 0);
-  cNeed[ci] = Math.max(MIN_ROW, cLines[ci].length * LINE);
+  cNeed[ci] = ROW(cLines[ci].length);
   cTotal += cNeed[ci];
  });
 
@@ -592,7 +597,7 @@ function buildLayout(){
   headTotal += (gLines[gi].length + (gDup[gi] ? 1 : 0)) * headLead + headPad;
   pOwn[gi].forEach(sl => {
    mLn[sl] = wrap(M[sl].name.split('[')[0].trim(), mPer, 0);
-   mNeed += Math.max(MIN_ROW, mLn[sl].length * LINE);
+   mNeed += ROW(mLn[sl].length);
   });
  });
  const mChrome = headTotal + (Math.max(1, AP.length) - 1) * grpGap;
@@ -608,7 +613,7 @@ function buildLayout(){
  const mSlugs = Object.keys(mLn);
  const mSlack = (mAvail - mNeed) / Math.max(1, mSlugs.length);
  const mH = {};
- mSlugs.forEach(sl => { mH[sl] = Math.max(MIN_ROW, mLn[sl].length * LINE) + mSlack; });
+ mSlugs.forEach(sl => { mH[sl] = ROW(mLn[sl].length) + mSlack; });
  const mk = {}; let y = b.T, groups = [];
  AP.forEach((p, gi) => {
   groups.push({ lines: gLines[gi], y: y + 8, n: p.slugs.length, dup: gDup[gi] });
@@ -641,7 +646,7 @@ function buildLayout(){
  cReach.forEach(ci => { cn[ci] = cy + cH[ci] / 2; cy += cH[ci]; });
  divY = cy + divH / 2; cy += divH;
  cUnreach.forEach(ci => { cn[ci] = cy + cH[ci] / 2; cy += cH[ci]; });
- const cFs = FSZ, cRow = MIN_ROW, FS = FSZ;
+ const cFs = FSZ, cRow = ROW(1), FS = FSZ;
 
  // ---- follow-up tests: one block, centred on the concern row it belongs to.
  // Full names, never truncated — each wraps to as many lines as it needs, and
@@ -683,7 +688,7 @@ function buildLayout(){
           divLines:divLines, divTop:divTop, divPad:divPad, divLead:divLead, divGap:divGap,
           divTail:divTail, cLines:cLines, cH:cH, mH:mH, mLn:mLn, H:H,
           headLead:headLeadOut,
-          mRow:MIN_ROW, cRow:cRow, mFs:FSZ, cFs:FSZ, FS:FSZ, LINE:LINE, divY:divY, open:open,
+          mRow:ROW(1), cRow:cRow, mFs:FSZ, cFs:FSZ, FS:FSZ, LINE:LINE, divY:divY, open:open,
           nReach:reach.length, nUnreach:unreach.length };
 }
 

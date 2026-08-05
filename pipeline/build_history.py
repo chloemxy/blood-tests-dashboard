@@ -43,6 +43,21 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F45",
+  "date": "2026-08-04",
+  "who": "Chloe",
+  "title": "The rows themselves, not just their highlights",
+  "status": "addressed",
+  "versions": ["v4.11"],
+  "quote": "these should have the same padding as mentioned above",
+  "did": [
+   ("A row is never shorter than its own highlight", "addressed",
+    "v4.10 gave every highlight the same box but left the row <i>pitch</i> free to be shorter than it \u2014 16px in a dense column against a 32px box \u2014 so in the marker column the highlights overlapped their neighbours. Row height is now the same <code>ROW(lines) = lines &times; 16 + 16</code> the highlight uses, in all three columns. Checked with all 13 panels on: 68 marker boxes, 47 concern boxes, no overlap at any of three window sizes."),
+   ("The same 8px in the panels", "addressed",
+    "The rail\u2019s marker rows, the why-list, the follow-up list and the family headers were all on 4px. They are on 8px above and below now, so a row reads the same whether it is drawn in the map or listed in a panel."),
+  ],
+ },
+ {
   "id": "F44",
   "date": "2026-08-04",
   "who": "Chloe",
@@ -983,6 +998,23 @@ FEEDBACK = [
 # VERSIONS — newest first
 # ===========================================================================
 VERSIONS = [
+ {
+  "id": "v4.11",
+  "file": "v4.11-row-pitch.html",
+  "title": "Ripple atlas \u2014 row pitch follows the row box",
+  "date": "2026-08-04",
+  "source": "index-v3.html",
+  "status": "candidate",
+  "tag": "v4.11-row-pitch",
+  "gitpath": "index-v3.html",
+  "answers": ["F45"],
+  "summary": "One formula now sets both the highlight and the row it sits in, so highlights can no longer overlap in a dense column, and the panels use the same 8px.",
+  "changes": [
+   "<b><code>ROW(lines) = lines &times; 16 + 16</code></b> for row height and highlight alike, in all three columns.",
+   "<b>No overlapping highlights</b> with all 13 panels on \u2014 68 marker boxes and 47 concern boxes clear at three window sizes.",
+   "<b>8px above and below</b> in the rail rows, the why-list, the follow-up list and the family headers, replacing 4px.",
+  ],
+ },
  {
   "id": "v4.10",
   "file": "v4.10-one-row-box.html",
