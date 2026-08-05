@@ -24,7 +24,7 @@ Every check here is a mistake that shipped once:
 | `scrolling-canvas` | canvas grows past the window, 68 markers drawn | content hidden instead of scrolled |
 | `column-band` | titles live in the fixed band, no inline font sizes in the SVG | headings scrolling away |
 | `header-parity` | one 56px header on all four screens; identical `id \| nav \| act` grid shape and nav labels; current marked; every bound id intact; in-place route switch | headers drifting apart, nav pills landing at a different x per screen, or a rebuilt header orphaning the JS that binds to it |
-| `legend-and-band` | legend hidden at boot, band opaque and above the canvas | a background painted with an undefined variable |
+| `title-band` | band opaque and above the canvas, three titles in it, legend fully removed, counts moved to the header | a background painted with an undefined variable; dead layout reserved for a deleted panel |
 
 The window size is stubbed through `clientWidth` / `clientHeight`, so these are
 geometry checks, not screenshots — they fail with a number, not a judgement.

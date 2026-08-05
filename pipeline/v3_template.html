@@ -16,7 +16,7 @@
  --aqua:#EAF7F8;--paper:#F7F9F9;--ink:#1D1B1A;--muted:#5A6B70;
  --line:#D7E1E2;--panel:#fff;--dim:#8B9799;--ok:#2E7D5B;--warn:#B8860B;
  --low:#0E8496;--high:#B84A0E;
- --railW:320px;--detW:344px;--footH:72px;--gap:16px;--tglW:96px;
+ --railW:320px;--detW:344px;--gap:16px;--tglW:96px;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;height:100%;overflow:hidden}
@@ -45,8 +45,6 @@ button{font-family:inherit;cursor:pointer}
 .sitehd .logo{font-family:var(--font-serif);font-size:18px;color:var(--slate);font-weight:700;
  white-space:nowrap;text-decoration:none;flex:0 0 auto}
 .sitehd .logo b{color:var(--teal)}
-.sitehd .tag{font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;
- color:var(--dim);white-space:nowrap;flex:0 0 auto}
 .sitehd .sp{display:none}          /* the grid does the spacing now */
 .sitehd nav{display:flex;gap:8px;flex:0 0 auto}
 .sitehd .nv{border:1px solid var(--line);background:#fff;color:var(--slate);font-size:12px;font-weight:600;
@@ -56,6 +54,17 @@ button{font-family:inherit;cursor:pointer}
 /* where you are is a state, so it is carried by colour — never by size */
 .sitehd .nv.on{border-color:var(--teal);background:var(--aqua);color:var(--teal)}
 .sitehd .act{display:flex;gap:8px;align-items:center;flex:0 0 auto;justify-self:end}
+/* Page actions are pills, whatever they were before: the catalogue's two
+   underlined links and its round "i" are the same component as the atlas's
+   Reset. One header, one button. */
+.sitehd .act .resetlink,.sitehd .act .fblink,.sitehd .act .discbtn,.sitehd .act .cxmenu{
+ border:1px solid var(--line);background:#fff;color:var(--slate);font-family:var(--font-sans);
+ font-size:12px;font-weight:600;padding:4px 12px;border-radius:16px;line-height:20px;
+ text-decoration:none;white-space:nowrap;display:inline-block;cursor:pointer}
+.sitehd .act .resetlink:hover,.sitehd .act .fblink:hover,.sitehd .act .discbtn:hover,
+.sitehd .act .cxmenu:hover{border-color:var(--accent);color:var(--accent)}
+.sitehd .act .discbtn{padding:4px 0;width:28px;text-align:center;font-family:var(--font-mono)}
+
 /* the counts read as one quiet line, not as a scoreboard */
 .sitehd .stat,.sitehd #rollup .stat{font-family:var(--font-mono);font-size:10px;color:var(--dim);
  white-space:nowrap;display:flex;align-items:baseline;gap:4px;padding:0;border:none;cursor:help}
@@ -67,10 +76,11 @@ button{font-family:inherit;cursor:pointer}
 .sitehd #rollup .stat .num small{font-family:var(--font-mono);font-size:10px;font-weight:400}
 .sitehd #rollup .stat .lab,.sitehd #rollup .stat span:not(.num){font-family:var(--font-mono);font-size:10px;
  color:var(--dim);text-transform:none;letter-spacing:.04em}
-.sitehd #sysbarwrap{display:none}          /* a colour ribbon is decoration; §5c */
+.sitehd #sysbarwrap{display:none}
+.sitehd .viewtog{display:none}   /* the two tabs are this control now */
+          /* a colour ribbon is decoration; §5c */
 /* Narrow: the counts go, the navigation stays. Hidden, never clipped. */
 @media(max-width:1200px){.sitehd .stat,.sitehd #rollup{display:none}}
-@media(max-width:900px){.sitehd .tag{display:none}}
 
 /* ---------------- chrome ---------------- */
 .top{position:absolute;top:0;left:0;right:0;height:56px;display:flex;align-items:center;gap:16px;
@@ -102,7 +112,7 @@ button{font-family:inherit;cursor:pointer}
 .pnl > header .sp{flex:1}
 
 /* ---------------- left rail ---------------- */
-.rail{top:0;left:0;bottom:var(--footH);width:var(--railW);border-radius:0;border-left:none;border-top:none}
+.rail{top:0;left:0;bottom:0;width:var(--railW);border-radius:0;border-left:none;border-top:none}
 /* Both panel headers are the same object: a mono kicker, a serif title, a
    short line under it, in a box of the same height. That is also what puts
    the two kicker lines on one baseline across the screen. */
@@ -196,7 +206,7 @@ button{font-family:inherit;cursor:pointer}
 .chip.inpanel{color:var(--dim);border-style:dashed}
 
 /* ---------------- right detail ---------------- */
-.det{top:0;right:0;bottom:var(--footH);width:var(--detW);border-radius:0;border-right:none;border-top:none}
+.det{top:0;right:0;bottom:0;width:var(--detW);border-radius:0;border-right:none;border-top:none}
 .dhead{flex:0 0 auto;padding:16px;border-bottom:1px solid var(--line);min-height:96px;
  display:flex;flex-direction:column;justify-content:flex-start;gap:4px}
 .dhead .k{font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
@@ -287,19 +297,6 @@ button{font-family:inherit;cursor:pointer}
 .tg.g{background:#f0f3f3;color:var(--dim)}
 .tg.src{background:#fdf1ea;color:var(--accent)}
 
-/* ---------------- footer ---------------- */
-/* The legend is reference, not working surface: off until asked for, and the
-   three panels take back its height when it is. */
-body:not(.legend) .foot{display:none}
-body:not(.legend) .rail, body:not(.legend) .det{bottom:0}
-.foot{left:0;right:0;bottom:0;height:var(--footH);flex-direction:row;
- align-items:center;gap:16px;padding:0 16px;border-radius:0;border-left:none;border-right:none;border-bottom:none}
-.leg{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);flex:0 0 auto}
-.leg i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:-1px}
-.fnote{font-size:12px;color:var(--muted);margin:0;line-height:1.5;border-left:1px solid var(--line);
- padding-left:16px;flex:1;min-width:0}
-.fnote b{color:var(--accent)}
-@media(max-width:1240px){.fnote{display:none}}
 
 /* ---------------- map ----------------
    Three fixed columns. Nothing animates position; nothing moves on its own. */
@@ -393,18 +390,16 @@ body:not(.legend) .rail, body:not(.legend) .det{bottom:0}
 
 @media(max-width:1080px){
  .det{display:none}
- .foot{display:none}
- .rail{bottom:var(--gap)}
+ .rail{bottom:0}
 }
 </style>
 </head>
 <body>
 
 <div class="top sitehd">
- <span class="id"><span class="logo">What is your blood telling you<b>?</b></span><span class="tag">the ripple atlas</span><span class="stat" id="hdrStat"></span></span>
- <nav><a class="nv on" href="index.html">Atlas</a><a class="nv" href="catalogue.html#feel">How you feel</a><a class="nv" href="catalogue.html#tests">Test catalogue</a></nav>
+ <span class="id"><span class="logo">What is your blood telling you<b>?</b></span><span class="stat" id="hdrStat"></span></span>
+ <nav><a class="nv on" href="index.html">Atlas</a><a class="nv" href="catalogue.html#feel">How you feel</a><a class="nv" href="catalogue.html#tests">Guided tests</a><a class="nv" href="catalogue.html#table">All tests</a></nav>
  <span class="act">
-  <button class="btn" id="btnFoot">Legend</button>
   <button class="btn" id="btnReset">Reset</button>
  </span>
 </div>
@@ -467,16 +462,7 @@ body:not(.legend) .rail, body:not(.legend) .det{bottom:0}
   <div class="slot next" id="nextSlot"><div class="h" id="nextH">what would follow it up</div><div class="c" id="next"></div></div>
  </section>
 
- <section class="pnl foot">
-  <div class="leg">
-   <span><i style="background:#dff0f3;border:2px solid var(--low)"></i>marked low</span>
-   <span><i style="background:#fbe6da;border:2px solid var(--high)"></i>marked high</span>
-   <span><i style="background:var(--aqua);border:2px solid var(--teal)"></i>concern raised</span>
-   <span><i style="background:#fdf1ea;border:2px dashed var(--accent)"></i>concern you added</span>
-  </div>
-  <p class="fnote" id="fnote"></p>
- </section>
-</div>
+ </div>
 
 <script>
 "use strict";
@@ -500,7 +486,7 @@ const CIDS = Object.keys(C).map(Number);
 
 /* ---------- state ---------- */
 const st = { val:{}, added:{}, sel:null, hot:null, expand:false, foc:null, focVia:'select',
-             fam:{}, panels:{}, legend:0 };
+             fam:{}, panels:{} };
 PANELS_ALL.forEach(p => { if(p.default) st.panels[p.id] = 1; });   // val: slug -> -1|0|1
 PANELS_ALL.forEach(p => p.slugs.forEach(sl => { st.val[sl] = 0; }));
 try{ const raw = localStorage.getItem('v3.state');
@@ -508,11 +494,10 @@ try{ const raw = localStorage.getItem('v3.state');
        Object.keys(o.val||{}).forEach(k=>{ if(k in st.val) st.val[k]=o.val[k]; });
        Object.keys(o.added||{}).forEach(k=>{ st.added[k]=1; });
        if(o.panels && Object.keys(o.panels).length){ st.panels = {}; Object.keys(o.panels).forEach(k=>{ st.panels[k]=1; }); }
-       st.legend = o.legend ? 1 : 0; } }catch(e){}
-document.body.classList.toggle('legend', !!st.legend);
+       } }catch(e){}
 refreshSlugs();
 const save = () => { try{ localStorage.setItem('v3.state',
-  JSON.stringify({val:st.val, added:st.added, panels:st.panels, legend:st.legend})); }catch(e){} };
+  JSON.stringify({val:st.val, added:st.added, panels:st.panels})); }catch(e){} };
 
 const flagged = () => SLUGS.filter(s => st.val[s] !== 0);
 function activeConcerns(){
@@ -536,17 +521,17 @@ let BOX = null, LAYOUT = null;
 
 function box(){
  const stg = $('canvas'), W = stg.clientWidth, H = stg.clientHeight;
- const g = 16, railW = 320, detW = 344, footH = 72;
+ const g = 16, railW = 320, detW = 344;
  // The left rail is always on screen; only the detail panel and the footer are
  // dropped on a narrow window. Counting the rail only when "wide" was what let
  // the marker column slide under it. Padding between a panel and the nearest
  // text is a constant 16px on every edge, at every size.
  // Panels are docked to the window edges, so the map's margin is measured from
  // the panel edge, not the window: a constant 16px on every side.
- const hasDet = W > 1080, hasFoot = st.legend && W > 1080;
+ const hasDet = W > 1080;
  const L = railW + g;
  const R = W - (hasDet ? detW + g : g);
- const T = 56, B = H - (hasFoot ? footH + g : g) - 24;
+ const T = 56, B = H - g - 24;
  return { W:W, H:H, L:L, R:R, T:T, B:B, w:R-L, h:B-T };
 }
 
@@ -1183,7 +1168,7 @@ function drawChrome(){
   ? nOn + ' OF ' + META.nConcerns + ' CONCERNS RAISED BY WHAT YOU MARKED'
   : 'MARK A MARKER LOW OR HIGH TO LIGHT UP WHAT IT CAN POINT AT';
  const off = Object.keys(act).reduce((a,ci)=>a+C[ci].nOutside, 0);
- $('fnote').innerHTML = nFlag
+ $('hdrStat').innerHTML = nFlag
   ? 'You marked <b>'+nFlag+'</b> marker'+(nFlag===1?'':'s')+', raising <b>'+Object.keys(act).length
     +'</b> concern'+(Object.keys(act).length===1?'':'s')+'. <b>'+nf(off)+'</b> tests related to them sit outside '
     +'the panels you have selected and have never been ordered — that absence is information too.'
@@ -1261,12 +1246,6 @@ $('map').addEventListener('mouseover', function(e){
  if(v !== st.hot){ st.hot = v; draw(); }
 });
 $('map').addEventListener('mouseleave', function(){ if(st.hot){ st.hot = null; draw(); } });
-$('btnFoot').addEventListener('click', function(){
- st.legend = st.legend ? 0 : 1;
- document.body.classList.toggle('legend', !!st.legend);
- this.classList.toggle('on', !!st.legend);
- save(); render();
-});
 $('btnReset').addEventListener('click', function(){
  SLUGS.forEach(s => st.val[s] = 0); st.added = {}; st.sel = null; save(); render();
 });

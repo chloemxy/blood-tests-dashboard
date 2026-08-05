@@ -336,8 +336,6 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
 .sitehd .logo{font-family:var(--font-serif);font-size:18px;color:var(--slate);font-weight:700;
  white-space:nowrap;text-decoration:none;flex:0 0 auto}
 .sitehd .logo b{color:var(--teal)}
-.sitehd .tag{font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;
- color:var(--dim);white-space:nowrap;flex:0 0 auto}
 .sitehd .sp{display:none}          /* the grid does the spacing now */
 .sitehd nav{display:flex;gap:8px;flex:0 0 auto}
 .sitehd .nv{border:1px solid var(--line);background:#fff;color:var(--slate);font-size:12px;font-weight:600;
@@ -347,6 +345,17 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
 /* where you are is a state, so it is carried by colour — never by size */
 .sitehd .nv.on{border-color:var(--teal);background:var(--aqua);color:var(--teal)}
 .sitehd .act{display:flex;gap:8px;align-items:center;flex:0 0 auto;justify-self:end}
+/* Page actions are pills, whatever they were before: the catalogue's two
+   underlined links and its round "i" are the same component as the atlas's
+   Reset. One header, one button. */
+.sitehd .act .resetlink,.sitehd .act .fblink,.sitehd .act .discbtn,.sitehd .act .cxmenu{
+ border:1px solid var(--line);background:#fff;color:var(--slate);font-family:var(--font-sans);
+ font-size:12px;font-weight:600;padding:4px 12px;border-radius:16px;line-height:20px;
+ text-decoration:none;white-space:nowrap;display:inline-block;cursor:pointer}
+.sitehd .act .resetlink:hover,.sitehd .act .fblink:hover,.sitehd .act .discbtn:hover,
+.sitehd .act .cxmenu:hover{border-color:var(--accent);color:var(--accent)}
+.sitehd .act .discbtn{padding:4px 0;width:28px;text-align:center;font-family:var(--font-mono)}
+
 /* the counts read as one quiet line, not as a scoreboard */
 .sitehd .stat,.sitehd #rollup .stat{font-family:var(--font-mono);font-size:10px;color:var(--dim);
  white-space:nowrap;display:flex;align-items:baseline;gap:4px;padding:0;border:none;cursor:help}
@@ -358,10 +367,11 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
 .sitehd #rollup .stat .num small{font-family:var(--font-mono);font-size:10px;font-weight:400}
 .sitehd #rollup .stat .lab,.sitehd #rollup .stat span:not(.num){font-family:var(--font-mono);font-size:10px;
  color:var(--dim);text-transform:none;letter-spacing:.04em}
-.sitehd #sysbarwrap{display:none}          /* a colour ribbon is decoration; §5c */
+.sitehd #sysbarwrap{display:none}
+.sitehd .viewtog{display:none}   /* the two tabs are this control now */
+          /* a colour ribbon is decoration; §5c */
 /* Narrow: the counts go, the navigation stays. Hidden, never clipped. */
 @media(max-width:1200px){.sitehd .stat,.sitehd #rollup{display:none}}
-@media(max-width:900px){.sitehd .tag{display:none}}
 
 /* ==== injected: condition explorer ==== */
 /* ===== Condition Explorer + route landing (scoped, cx-*) ===== */
@@ -611,7 +621,7 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
 <body>
 <!-- ===== Route landing ===== -->
 <div id="cxRoute">
- <div class="cxtop sitehd"><span class="id"><span class="logo">What is your blood telling you<b>?</b></span><span class="tag">choose your route</span></span><nav><a class="nv" href="index.html">Atlas</a><a class="nv" href="catalogue.html#feel" data-go="feel">How you feel</a><a class="nv" href="catalogue.html#tests" data-go="tests">Test catalogue</a></nav><span class="act"></span></div>
+ <div class="cxtop sitehd"><span class="id"><span class="logo">What is your blood telling you<b>?</b></span></span><nav><a class="nv" href="index.html">Atlas</a><a class="nv" href="catalogue.html#feel" data-go="feel">How you feel</a><a class="nv" href="catalogue.html#tests" data-go="tests">Guided tests</a><a class="nv" href="catalogue.html#table" data-go="table">All tests</a></nav><span class="act"></span></div>
  <div class="cxwrap">
   <h1 class="cxhero">Where do you want to start?</h1>
   <svg class="cxecg" viewBox="0 0 600 40" aria-hidden="true"><path d="M0 20 H218 l8 -5 8 5 h14 l5 -13 7 26 5 -13 h16 l9 -7 11 7 H600"/></svg>
@@ -732,8 +742,8 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
 <!-- ===== Condition explorer ===== -->
 <div id="cxApp">
  <div class="cxtop sitehd">
-  <span class="id"><span class="logo">What is your blood telling you<b>?</b></span><span class="tag">how you feel</span></span>
-  <nav><a class="nv" href="index.html">Atlas</a><a class="nv on" href="catalogue.html#feel" data-go="feel">How you feel</a><a class="nv" href="catalogue.html#tests" data-go="tests">Test catalogue</a></nav>
+  <span class="id"><span class="logo">What is your blood telling you<b>?</b></span></span>
+  <nav><a class="nv" href="index.html">Atlas</a><a class="nv on" href="catalogue.html#feel" data-go="feel">How you feel</a><a class="nv" href="catalogue.html#tests" data-go="tests">Guided tests</a><a class="nv" href="catalogue.html#table" data-go="table">All tests</a></nav>
   <span class="act"><button class="cxmenu" id="cxMenuBtn">Routes</button></span>
  </div>
  <div class="cxwrap">
@@ -831,7 +841,7 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
  <header class="top sitehd">
   <span class="id">
   <span class="logo">What is your blood telling you<b>?</b></span>
-  <span class="tag" id="hdrTag"></span>
+  <span class="stat" id="hdrTag"></span>
   <div class="viewtog" id="viewTog">
    <button type="button" data-view="guided" class="on">Guided</button>
    <button type="button" data-view="table">All tests</button>
@@ -846,7 +856,7 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
    </div>
   </div>
   </span>
-  <nav><a class="nv" href="index.html">Atlas</a><a class="nv" href="catalogue.html#feel" data-go="feel">How you feel</a><a class="nv on" href="catalogue.html#tests" data-go="tests">Test catalogue</a></nav>
+  <nav><a class="nv" href="index.html">Atlas</a><a class="nv" href="catalogue.html#feel" data-go="feel">How you feel</a><a class="nv on" href="catalogue.html#tests" data-go="tests">Guided tests</a><a class="nv" href="catalogue.html#table" data-go="table">All tests</a></nav>
   <span class="act"><button class="resetlink" id="resetBtn">Clear all answers</button><a class="fblink" href="mailto:blood@goinvo.com" title="Send feedback to blood@goinvo.com">feedback</a><button class="discbtn" id="discBtn" title="About this guide">i</button></span>
  </header>
 
@@ -2155,16 +2165,29 @@ drawConcerns();
    The two catalogue routes switch in place — no reload of a 2.9 MB page —
    and still push history, so the browser's own back button keeps working.
    The Atlas link is left alone: that one is a real navigation. */
+/* Four tabs, three of them inside this document. "Guided tests" and "All tests"
+   are the dashboard's own two views, so the nav switches them by clicking the
+   original toggle — the view logic still lives in exactly one place. */
+function cxGo(to, push){
+ if(!window.__cxSetMode) return;
+ window.__cxSetMode(to === 'table' ? 'tests' : to);
+ if(to === 'tests' || to === 'table'){
+  const b = document.querySelector('#viewTog button[data-view="'
+            + (to === 'table' ? 'table' : 'guided') + '"]');
+  if(b && !b.classList.contains('on')) b.click();
+ }
+ if(push){ try{ history.pushState({cx:{m:to,s:'home',c:null}}, '', '#' + to); }catch(err){} }
+ Array.prototype.forEach.call(document.querySelectorAll('.sitehd [data-go]'),
+   function(x){ x.classList.toggle('on', x.dataset.go === to); });
+}
 document.addEventListener('click', function(e){
  const a = e.target.closest('.sitehd [data-go]');
  if(!a || !window.__cxSetMode) return;
  e.preventDefault();
- const to = a.dataset.go;
- window.__cxSetMode(to);
- try{ history.pushState({cx:{m:to,s:'home',c:null}}, '', '#' + to); }catch(err){}
- Array.prototype.forEach.call(document.querySelectorAll('.sitehd [data-go]'),
-   function(x){ x.classList.toggle('on', x.dataset.go === to); });
+ cxGo(a.dataset.go, true);
 }, true);
+/* #table is ours, not the app's router's, so honour it on a cold load. */
+if((location.hash || '').replace(/^#/, '') === 'table') cxGo('table', false);
 </script>
 </body>
 </html>

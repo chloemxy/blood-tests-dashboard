@@ -18,7 +18,7 @@ function shape(bar){
  const labels = [...bar.querySelectorAll('.nv')].map(a => a.textContent).join('>');
  return kids.join('|') + ' :: ' + labels;
 }
-const SHAPE = 'id|nav|act :: Atlas>How you feel>Test catalogue';
+const SHAPE = 'id|nav|act :: Atlas>How you feel>Guided tests>All tests';
 
 function load(file, cb){
  const errs=[];
@@ -43,7 +43,7 @@ load('index.html',(w,d,errs)=>{
  const sh=shape(hd);
  console.log('   shape:', sh);
  if(sh!==SHAPE) fail.push('atlas: header shape is "'+sh+'", expected "'+SHAPE+'"');
- if(nv.length!==3) fail.push('atlas: '+nv.length+' nav items');
+ if(nv.length!==4) fail.push('atlas: '+nv.length+' nav items');
  if(!/Atlas\*/.test(nv.join())) fail.push('atlas: current screen not marked');
  load('catalogue.html',(w2,d2,errs2)=>{
   console.log('\n== catalogue.html');
@@ -56,12 +56,16 @@ load('index.html',(w,d,errs)=>{
    const nv2=[...b.querySelectorAll('.nv')].map(a=>a.textContent+(a.classList.contains('on')?'*':''));
    const tag=(b.querySelector('.tag')||{}).textContent||'(dynamic)';
    console.log('     bar '+(i+1)+' tag "'+tag+'" nav: '+nv2.join(' , '));
-   if(nv2.length!==3) fail.push('catalogue bar '+(i+1)+': '+nv2.length+' nav items');
+   if(nv2.length!==4) fail.push('catalogue bar '+(i+1)+': '+nv2.length+' nav items');
    const sh2=shape(b);
    if(sh2!==SHAPE) fail.push('catalogue bar '+(i+1)+' shape is "'+sh2+'", expected "'+SHAPE+'"');
    console.log('       shape: '+sh2);
   });
   // ids the existing JS binds to must survive
+  // the screen-title tags are gone: the lit nav pill already says where you are
+  const tags = d2.querySelectorAll('.sitehd .tag').length + d.querySelectorAll('.sitehd .tag').length;
+  console.log('   repeated screen titles left:', tags);
+  if(tags) fail.push(tags + ' .tag screen titles left in the headers');
   ['viewTog','rollup','rollgrid','sysbar','hdrTag','resetBtn','discBtn','cxMenuBtn','app','cxRoute','cxApp']
    .forEach(id=>{ if(!d2.getElementById(id)) fail.push('catalogue: #'+id+' was removed'); });
   console.log('   all bound ids present:', !fail.some(f=>f.includes('was removed')));
@@ -69,11 +73,18 @@ load('index.html',(w,d,errs)=>{
   if(d2.getElementById('cxToMenu')) fail.push('catalogue: duplicate Menu button still injected');
   console.log('   __cxSetMode exposed:', typeof w2.__cxSetMode);
   // in-place route switch
-  const t=d2.querySelector('.sitehd [data-go="tests"]');
-  t.dispatchEvent(new w2.MouseEvent('click',{bubbles:true,cancelable:true}));
-  console.log('   after clicking Test catalogue -> #app display:', d2.getElementById('app').style.display,
+  d2.querySelector('.sitehd [data-go="tests"]').dispatchEvent(new w2.MouseEvent('click',{bubbles:true,cancelable:true}));
+  const guided = d2.querySelector('#viewTog button[data-view="guided"]').classList.contains('on');
+  console.log('   Guided tests -> #app', d2.getElementById('app').style.display, '| guided view on:', guided,
               '| hash', w2.location.hash);
-  if(d2.getElementById('app').style.display!=='grid') fail.push('catalogue: nav did not switch to the tests view');
+  if(d2.getElementById('app').style.display!=='grid') fail.push('catalogue: nav did not open the dashboard');
+  if(!guided) fail.push('catalogue: Guided tests tab did not select the guided view');
+  d2.querySelector('.sitehd [data-go="table"]').dispatchEvent(new w2.MouseEvent('click',{bubbles:true,cancelable:true}));
+  const tbl = d2.querySelector('#viewTog button[data-view="table"]').classList.contains('on');
+  const tblShown = d2.getElementById('tableSection').style.display !== 'none';
+  console.log('   All tests   -> table view on:', tbl, '| table section shown:', tblShown, '| hash', w2.location.hash);
+  if(!tbl) fail.push('catalogue: All tests tab did not select the table view');
+  if(!tblShown) fail.push('catalogue: All tests tab did not reveal the table');
   console.log('\n'+(fail.length?'FAIL:\n - '+fail.join('\n - '):'ALL PASS'));
   if(fail.length) process.exitCode=1;
  });

@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-05T18:51:19Z",
+ "generated": "2026-08-05T19:00:47Z",
  "live": "index.html",
  "constraints": [
   [
@@ -28,6 +28,103 @@
   ]
  ],
  "feedback": [
+  {
+   "id": "F53",
+   "date": "2026-08-05",
+   "who": "Chloe",
+   "title": "The table needs its own tab",
+   "status": "addressed",
+   "versions": [
+    "v5.3"
+   ],
+   "quote": "we are also missing the table page tab, add it",
+   "did": [
+    [
+     "Four tabs",
+     "addressed",
+     "<b>Atlas &middot; How you feel &middot; Guided tests &middot; All tests.</b> The full table was reachable only through a Guided / All-tests toggle inside the dashboard header — a second navigation control, in a different style, on one screen out of four."
+    ],
+    [
+     "One place still switches the view",
+     "addressed",
+     "The two new tabs are the app’s own two view names, so the toggle has nothing left to say and is hidden. It stays in the DOM and the tabs drive it by dispatching a click on its buttons, so the view logic is not reimplemented — there is still exactly one function that switches views."
+    ],
+    [
+     "A route the app did not have",
+     "addressed",
+     "<code>#table</code> is ours, not the original router’s, so it is honoured on a cold load as well as on a click. The check now asserts both tabs reach their view and that the table section is actually revealed."
+    ]
+   ]
+  },
+  {
+   "id": "F52",
+   "date": "2026-08-05",
+   "who": "Chloe",
+   "title": "Header actions as pills",
+   "status": "addressed",
+   "versions": [
+    "v5.3"
+   ],
+   "quote": "put these in pill format like the second img",
+   "did": [
+    [
+     "Same component, both headers",
+     "addressed",
+     "The catalogue’s <i>Clear all answers</i> and <i>feedback</i> were underlined links and its <i>i</i> was a bare round letter. All three are now the same pill as the atlas’s Reset — one border, one radius, one hover — defined once in the shared header block."
+    ]
+   ]
+  },
+  {
+   "id": "F51",
+   "date": "2026-08-05",
+   "who": "Chloe",
+   "title": "Remove the legend",
+   "status": "addressed",
+   "versions": [
+    "v5.3"
+   ],
+   "quote": "remove legend from atlas page",
+   "did": [
+    [
+     "Gone, and everything it dragged with it",
+     "addressed",
+     "The four swatches restated what the marker toggle and the dot colours say in place. Deleted: the panel, its button, its handler, the stored preference, the body class, the <code>--footH</code> variable, the footer CSS and the branch in <code>box()</code> that reserved 72px for it. The atlas is one state and one branch simpler."
+    ],
+    [
+     "What was worth keeping moved",
+     "addressed",
+     "The sentence under the swatches — <i>&ldquo;CBC + CMP + Lipids measure 26 of 6,192 things measurable in blood&hellip;&rdquo;</i> — is a count, not decoration, so it moved to the header’s counts line where every other count on the page already lives."
+    ],
+    [
+     "The check followed",
+     "addressed",
+     "<code>legend-and-band</code> became <code>title-band</code>: it still guards the opaque title band, and now also asserts the legend is gone, that no layout is reserved for it, and that the counts sentence arrived in the header."
+    ]
+   ]
+  },
+  {
+   "id": "F50",
+   "date": "2026-08-05",
+   "who": "Chloe",
+   "title": "Drop the repeated screen titles",
+   "status": "addressed",
+   "versions": [
+    "v5.3"
+   ],
+   "quote": "don’t think we need these little repeated titles",
+   "did": [
+    [
+     "One signal per meaning",
+     "addressed",
+     "THE RIPPLE ATLAS / HOW YOU FEEL / CHOOSE YOUR ROUTE said the same thing as the lit nav pill two inches to the right. Removed from all four headers, along with the <code>.tag</code> rule and its breakpoint."
+    ],
+    [
+     "One of them was not a title",
+     "addressed",
+     "The dashboard’s <code>#hdrTag</code> holds counts — <i>6,192 tests mapped &middot; 216 source-quoted</i> — not a screen name. It kept its id and its text and moved to the <code>.stat</code> class, so it is styled as what it is."
+    ]
+   ]
+  },
   {
    "id": "F49",
    "date": "2026-08-05",
@@ -1756,12 +1853,37 @@
  ],
  "versions": [
   {
+   "id": "v5.3",
+   "file": "v5.3-four-tabs.html",
+   "title": "Four tabs, no legend, no repeated titles",
+   "date": "2026-08-05",
+   "source": "index.html",
+   "status": "live",
+   "tag": "v5.3-four-tabs",
+   "gitpath": "index.html",
+   "answers": [
+    "F50",
+    "F51",
+    "F52",
+    "F53"
+   ],
+   "summary": "The table becomes a tab, the legend and the per-screen titles are deleted, and every header action is the same pill.",
+   "changes": [
+    "<b>Atlas &middot; How you feel &middot; Guided tests &middot; All tests</b> in every header; the dashboard’s own toggle is hidden and driven by the tabs, so one function still switches views.",
+    "<b>Legend deleted</b> — panel, button, handler, stored preference, body class, <code>--footH</code>, footer CSS and the reserving branch in <code>box()</code>. Its one useful sentence moved to the header counts.",
+    "<b>Screen titles deleted</b>: the lit tab already says where you are. The dashboard’s counts line kept its id and became a <code>.stat</code>.",
+    "<b>Header actions are pills</b> in both documents, defined once.",
+    "13 checks pass; <code>legend-and-band</code> became <code>title-band</code> and <code>header-parity</code> now covers four tabs and the table route."
+   ],
+   "mb": 0.59
+  },
+  {
    "id": "v5.2",
    "file": "v5.2-pinned-nav.html",
    "title": "Navigation pinned to one position",
    "date": "2026-08-05",
    "source": "index.html",
-   "status": "live",
+   "status": "superseded",
    "tag": "v5.2-pinned-nav",
    "gitpath": "index.html",
    "answers": [
