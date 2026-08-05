@@ -9,6 +9,17 @@
 const fs=require('fs'),path=require('path'),{JSDOM,VirtualConsole}=require('jsdom');
 const R = path.join(__dirname, '..', '..') + path.sep;
 let fail=[];
+/* jsdom does no real layout, so "the pills sit in the same place" is checked
+   structurally instead: every header must be the same three-column grid with
+   the same three children in the same order — identity, nav, actions — and the
+   nav must hold the same three labels. Same structure, same CSS, same x. */
+function shape(bar){
+ const kids = [...bar.children].map(el => el.tagName === 'NAV' ? 'nav' : (el.className || el.tagName));
+ const labels = [...bar.querySelectorAll('.nv')].map(a => a.textContent).join('>');
+ return kids.join('|') + ' :: ' + labels;
+}
+const SHAPE = 'id|nav|act :: Atlas>How you feel>Test catalogue';
+
 function load(file, cb){
  const errs=[];
  const vc=new VirtualConsole();
@@ -29,6 +40,9 @@ load('index.html',(w,d,errs)=>{
  const nv=[...d.querySelectorAll('.sitehd .nv')].map(a=>a.textContent+(a.classList.contains('on')?'*':''));
  console.log('   header .sitehd:', !!hd, '| nav:', nv.join(' , '));
  console.log('   actions:', [...d.querySelectorAll('.sitehd .act button')].map(b=>b.textContent).join(' , '));
+ const sh=shape(hd);
+ console.log('   shape:', sh);
+ if(sh!==SHAPE) fail.push('atlas: header shape is "'+sh+'", expected "'+SHAPE+'"');
  if(nv.length!==3) fail.push('atlas: '+nv.length+' nav items');
  if(!/Atlas\*/.test(nv.join())) fail.push('atlas: current screen not marked');
  load('catalogue.html',(w2,d2,errs2)=>{
@@ -43,6 +57,9 @@ load('index.html',(w,d,errs)=>{
    const tag=(b.querySelector('.tag')||{}).textContent||'(dynamic)';
    console.log('     bar '+(i+1)+' tag "'+tag+'" nav: '+nv2.join(' , '));
    if(nv2.length!==3) fail.push('catalogue bar '+(i+1)+': '+nv2.length+' nav items');
+   const sh2=shape(b);
+   if(sh2!==SHAPE) fail.push('catalogue bar '+(i+1)+' shape is "'+sh2+'", expected "'+SHAPE+'"');
+   console.log('       shape: '+sh2);
   });
   // ids the existing JS binds to must survive
   ['viewTog','rollup','rollgrid','sysbar','hdrTag','resetBtn','discBtn','cxMenuBtn','app','cxRoute','cxApp']

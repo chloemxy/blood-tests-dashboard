@@ -43,6 +43,25 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F49",
+  "date": "2026-08-05",
+  "who": "Chloe",
+  "title": "The nav pills must not move between screens",
+  "status": "addressed",
+  "versions": ["v5.2"],
+  "quote": "I want these to always stay at the same location across different tabs",
+  "did": [
+   ("Why they moved", "addressed",
+    "The header was a flex row with a flexible spacer, so the pills were pushed by whatever sat to their right \u2014 Legend and Reset on the atlas, Routes on the feel screen, Clear all answers + feedback + i on the dashboard, nothing at all on the landing. Four screens, four positions."),
+   ("A three-column grid instead", "addressed",
+    "<code>minmax(0,1fr) auto minmax(0,1fr)</code>: identity, navigation, actions. The nav is the same three pills on every screen, so its width is the same, and an equal share either side puts it at the same x everywhere \u2014 no offset to keep in sync, and grid columns cannot overlap the way an absolute centre can."),
+   ("What gives instead", "addressed",
+    "The identity column. The counts hide below 1200px and the tag below 900px \u2014 hidden, never clipped, per \u00a76. The navigation never moves and never hides."),
+   ("Checked structurally", "addressed",
+    "jsdom does no layout, so the check asserts the thing that guarantees the position: all four headers must have exactly the children <code>id | nav | act</code> in that order, and the same three nav labels. Same structure plus one shared CSS block means the same x. 13 checks pass."),
+  ],
+ },
+ {
   "id": "F48",
   "date": "2026-08-05",
   "who": "Chloe",
@@ -1066,12 +1085,29 @@ FEEDBACK = [
 # ===========================================================================
 VERSIONS = [
  {
+  "id": "v5.2",
+  "file": "v5.2-pinned-nav.html",
+  "title": "Navigation pinned to one position",
+  "date": "2026-08-05",
+  "source": "index.html",
+  "status": "live",
+  "tag": "v5.2-pinned-nav",
+  "gitpath": "index.html",
+  "answers": ["F49"],
+  "summary": "The header becomes a three-column grid so the three nav pills land at the same x on all four screens, whatever page actions sit beside them.",
+  "changes": [
+   "<b>identity | nav | actions</b> as <code>minmax(0,1fr) auto minmax(0,1fr)</code>; the flexible spacer is gone.",
+   "<b>The nav never moves and never hides.</b> The identity column gives way instead: counts below 1200px, tag below 900px.",
+   "<b>header-parity extended</b> to assert the same three grid children in the same order, and the same nav labels, on every screen.",
+  ],
+ },
+ {
   "id": "v5.1",
   "file": "v5.1-one-header.html",
   "title": "One header, every screen",
   "date": "2026-08-05",
   "source": "index.html",
-  "status": "live",
+  "status": "superseded",
   "tag": "v5.1-one-header",
   "gitpath": "index.html",
   "answers": ["F48"],

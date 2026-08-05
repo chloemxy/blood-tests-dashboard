@@ -325,14 +325,20 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
    56px, one row, always in the same order: identity, where you are, the
    counts, the three ways out, then whatever that page can do. Same rules in
    index.html and catalogue.html — if this block changes, it changes in both. */
-.sitehd{display:flex!important;align-items:center;gap:16px;height:56px;padding:0 16px!important;
+.sitehd{display:grid!important;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+ align-items:center;gap:16px;height:56px;padding:0 16px!important;
  border-bottom:1px solid var(--line);background:var(--panel);z-index:6}
+/* Identity left, actions right, navigation dead centre. The nav is identical on
+   every screen, so an equal share either side of it puts it at the same x on
+   every screen — no offset to keep in sync, and columns cannot overlap. */
+.sitehd .id{display:flex;align-items:center;gap:16px;min-width:0;overflow:hidden}
+.sitehd .act{justify-self:end}
 .sitehd .logo{font-family:var(--font-serif);font-size:18px;color:var(--slate);font-weight:700;
  white-space:nowrap;text-decoration:none;flex:0 0 auto}
 .sitehd .logo b{color:var(--teal)}
 .sitehd .tag{font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;
  color:var(--dim);white-space:nowrap;flex:0 0 auto}
-.sitehd .sp{flex:1 1 auto;min-width:8px}
+.sitehd .sp{display:none}          /* the grid does the spacing now */
 .sitehd nav{display:flex;gap:8px;flex:0 0 auto}
 .sitehd .nv{border:1px solid var(--line);background:#fff;color:var(--slate);font-size:12px;font-weight:600;
  padding:4px 12px;border-radius:16px;text-decoration:none;line-height:20px;white-space:nowrap;
@@ -340,7 +346,7 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
 .sitehd .nv:hover{border-color:var(--accent);color:var(--accent)}
 /* where you are is a state, so it is carried by colour — never by size */
 .sitehd .nv.on{border-color:var(--teal);background:var(--aqua);color:var(--teal)}
-.sitehd .act{display:flex;gap:8px;align-items:center;flex:0 0 auto}
+.sitehd .act{display:flex;gap:8px;align-items:center;flex:0 0 auto;justify-self:end}
 /* the counts read as one quiet line, not as a scoreboard */
 .sitehd .stat,.sitehd #rollup .stat{font-family:var(--font-mono);font-size:10px;color:var(--dim);
  white-space:nowrap;display:flex;align-items:baseline;gap:4px;padding:0;border:none;cursor:help}
@@ -605,7 +611,7 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
 <body>
 <!-- ===== Route landing ===== -->
 <div id="cxRoute">
- <div class="cxtop sitehd"><span class="logo">What is your blood telling you<b>?</b></span><span class="tag">choose your route</span><span class="sp"></span><nav><a class="nv" href="index.html">Atlas</a><a class="nv" href="catalogue.html#feel" data-go="feel">How you feel</a><a class="nv" href="catalogue.html#tests" data-go="tests">Test catalogue</a></nav></div>
+ <div class="cxtop sitehd"><span class="id"><span class="logo">What is your blood telling you<b>?</b></span><span class="tag">choose your route</span></span><nav><a class="nv" href="index.html">Atlas</a><a class="nv" href="catalogue.html#feel" data-go="feel">How you feel</a><a class="nv" href="catalogue.html#tests" data-go="tests">Test catalogue</a></nav><span class="act"></span></div>
  <div class="cxwrap">
   <h1 class="cxhero">Where do you want to start?</h1>
   <svg class="cxecg" viewBox="0 0 600 40" aria-hidden="true"><path d="M0 20 H218 l8 -5 8 5 h14 l5 -13 7 26 5 -13 h16 l9 -7 11 7 H600"/></svg>
@@ -726,9 +732,7 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
 <!-- ===== Condition explorer ===== -->
 <div id="cxApp">
  <div class="cxtop sitehd">
-  <span class="logo">What is your blood telling you<b>?</b></span>
-  <span class="tag">how you feel</span>
-  <span class="sp"></span>
+  <span class="id"><span class="logo">What is your blood telling you<b>?</b></span><span class="tag">how you feel</span></span>
   <nav><a class="nv" href="index.html">Atlas</a><a class="nv on" href="catalogue.html#feel" data-go="feel">How you feel</a><a class="nv" href="catalogue.html#tests" data-go="tests">Test catalogue</a></nav>
   <span class="act"><button class="cxmenu" id="cxMenuBtn">Routes</button></span>
  </div>
@@ -825,6 +829,7 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
 
 <div id="app">
  <header class="top sitehd">
+  <span class="id">
   <span class="logo">What is your blood telling you<b>?</b></span>
   <span class="tag" id="hdrTag"></span>
   <div class="viewtog" id="viewTog">
@@ -840,7 +845,7 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
     </div>
    </div>
   </div>
-  <span class="sp"></span>
+  </span>
   <nav><a class="nv" href="index.html">Atlas</a><a class="nv" href="catalogue.html#feel" data-go="feel">How you feel</a><a class="nv on" href="catalogue.html#tests" data-go="tests">Test catalogue</a></nav>
   <span class="act"><button class="resetlink" id="resetBtn">Clear all answers</button><a class="fblink" href="mailto:blood@goinvo.com" title="Send feedback to blood@goinvo.com">feedback</a><button class="discbtn" id="discBtn" title="About this guide">i</button></span>
  </header>

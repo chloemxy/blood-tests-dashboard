@@ -34,14 +34,20 @@ button{font-family:inherit;cursor:pointer}
    56px, one row, always in the same order: identity, where you are, the
    counts, the three ways out, then whatever that page can do. Same rules in
    index.html and catalogue.html — if this block changes, it changes in both. */
-.sitehd{display:flex!important;align-items:center;gap:16px;height:56px;padding:0 16px!important;
+.sitehd{display:grid!important;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+ align-items:center;gap:16px;height:56px;padding:0 16px!important;
  border-bottom:1px solid var(--line);background:var(--panel);z-index:6}
+/* Identity left, actions right, navigation dead centre. The nav is identical on
+   every screen, so an equal share either side of it puts it at the same x on
+   every screen — no offset to keep in sync, and columns cannot overlap. */
+.sitehd .id{display:flex;align-items:center;gap:16px;min-width:0;overflow:hidden}
+.sitehd .act{justify-self:end}
 .sitehd .logo{font-family:var(--font-serif);font-size:18px;color:var(--slate);font-weight:700;
  white-space:nowrap;text-decoration:none;flex:0 0 auto}
 .sitehd .logo b{color:var(--teal)}
 .sitehd .tag{font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;
  color:var(--dim);white-space:nowrap;flex:0 0 auto}
-.sitehd .sp{flex:1 1 auto;min-width:8px}
+.sitehd .sp{display:none}          /* the grid does the spacing now */
 .sitehd nav{display:flex;gap:8px;flex:0 0 auto}
 .sitehd .nv{border:1px solid var(--line);background:#fff;color:var(--slate);font-size:12px;font-weight:600;
  padding:4px 12px;border-radius:16px;text-decoration:none;line-height:20px;white-space:nowrap;
@@ -49,7 +55,7 @@ button{font-family:inherit;cursor:pointer}
 .sitehd .nv:hover{border-color:var(--accent);color:var(--accent)}
 /* where you are is a state, so it is carried by colour — never by size */
 .sitehd .nv.on{border-color:var(--teal);background:var(--aqua);color:var(--teal)}
-.sitehd .act{display:flex;gap:8px;align-items:center;flex:0 0 auto}
+.sitehd .act{display:flex;gap:8px;align-items:center;flex:0 0 auto;justify-self:end}
 /* the counts read as one quiet line, not as a scoreboard */
 .sitehd .stat,.sitehd #rollup .stat{font-family:var(--font-mono);font-size:10px;color:var(--dim);
  white-space:nowrap;display:flex;align-items:baseline;gap:4px;padding:0;border:none;cursor:help}
@@ -395,10 +401,7 @@ body:not(.legend) .rail, body:not(.legend) .det{bottom:0}
 <body>
 
 <div class="top sitehd">
- <span class="logo">What is your blood telling you<b>?</b></span>
- <span class="tag">the ripple atlas</span>
- <span class="stat" id="hdrStat"></span>
- <span class="sp"></span>
+ <span class="id"><span class="logo">What is your blood telling you<b>?</b></span><span class="tag">the ripple atlas</span><span class="stat" id="hdrStat"></span></span>
  <nav><a class="nv on" href="index.html">Atlas</a><a class="nv" href="catalogue.html#feel">How you feel</a><a class="nv" href="catalogue.html#tests">Test catalogue</a></nav>
  <span class="act">
   <button class="btn" id="btnFoot">Legend</button>

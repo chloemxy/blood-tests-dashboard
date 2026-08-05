@@ -23,7 +23,7 @@ Every check here is a mistake that shipped once:
 | `no-overlapping-highlights` | highlight boxes never overlap, all 13 panels on | a row pitch shorter than its own highlight |
 | `scrolling-canvas` | canvas grows past the window, 68 markers drawn | content hidden instead of scrolled |
 | `column-band` | titles live in the fixed band, no inline font sizes in the SVG | headings scrolling away |
-| `header-parity` | one 56px header on all four screens, three nav items each, current marked, every bound id intact, in-place route switch | headers drifting apart, or a rebuilt header orphaning the JS that binds to it |
+| `header-parity` | one 56px header on all four screens; identical `id \| nav \| act` grid shape and nav labels; current marked; every bound id intact; in-place route switch | headers drifting apart, nav pills landing at a different x per screen, or a rebuilt header orphaning the JS that binds to it |
 | `legend-and-band` | legend hidden at boot, band opaque and above the canvas | a background painted with an undefined variable |
 
 The window size is stubbed through `clientWidth` / `clientHeight`, so these are
