@@ -149,6 +149,19 @@ size. Measuring a column at 12px and drawing it at 11px silently reintroduces
 uneven gaps, because the wrapping that was budgeted for is not the wrapping that
 gets drawn.
 
+**Columns are equal, and so are the gaps between them.** Three columns divide
+the free width into thirds separated by one constant gap (40px). A consequence
+worth stating on its own: the two runs of edges then span the same distance, and
+the dots that begin and end each run are evenly spaced.
+
+**Headings share one baseline across the whole screen**, panel and canvas alike.
+A column title on the map sits on the same baseline as the panel kicker beside
+it. This only holds if the panel's own heading is pinned to the top of its box
+rather than centred in it — centred text moves with its content.
+
+Titles are short. A heading competes with the names below it for the same
+column width, and the names need it more.
+
 ## 7. Sourcing
 
 - No hallucination. Every claim carries a credible reference with a link.

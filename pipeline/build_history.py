@@ -43,6 +43,36 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F33",
+  "date": "2026-08-04",
+  "who": "Chloe",
+  "title": "Both runs of dots, one spacing",
+  "status": "addressed",
+  "versions": ["v4.3"],
+  "quote": "the 2 sets of dots should have the same spacing in between",
+  "did": [
+   ("A consequence of equal columns", "addressed",
+    "Marker dot to concern dot, and concern out-dot to follow-up dot, are both exactly one 40px column gap \u2014 so the two runs of edges span the same distance. Verified at four window sizes: 40.0 and 40.0 at every one."),
+  ],
+ },
+ {
+  "id": "F32",
+  "date": "2026-08-04",
+  "who": "Chloe",
+  "title": "One baseline for the titles, equal thirds for the columns",
+  "status": "addressed",
+  "versions": ["v4.3"],
+  "quote": "align the text to [concern exposure and lifestyle] - bottom aligned. make all titles shorter, so [would follow up] section have wider column to make all 3 columns and gaps the same",
+  "did": [
+   ("Titles on the panel\u2019s baseline", "addressed",
+    "The three column titles now sit on the same baseline as the detail panel\u2019s kicker line. That needed the panel\u2019s own header pinned to the top of its box instead of centred in it \u2014 centred text moves with its content, so there was no stable line to align to."),
+   ("Shorter titles", "addressed",
+    "<i>YOUR ANNUAL PANEL &middot; 26</i> \u2192 <b>YOUR PANEL &middot; 26</b>, <i>WHAT THEY CAN POINT AT &middot; 47</i> \u2192 <b>CAN POINT AT &middot; 47</b>, <i>WOULD FOLLOW IT UP</i> \u2192 <b>WOULD FOLLOW UP</b>. A heading competes with the names below it for the same width, and the names need it more."),
+   ("Equal thirds", "addressed",
+    "The columns were 21.5% / 38% / 22.5% of the free width with uneven gaps. They are now exact thirds separated by one 40px gap. At 1600px that takes the marker column from 101px of label width to 250px and the follow-up column from 191px to 261px \u2014 enough that no marker name wraps at any tested window size."),
+  ],
+ },
+ {
   "id": "F31",
   "date": "2026-08-04",
   "who": "Chloe",
@@ -775,6 +805,25 @@ FEEDBACK = [
 # VERSIONS — newest first
 # ===========================================================================
 VERSIONS = [
+ {
+  "id": "v4.3",
+  "file": "v4.3-equal-thirds.html",
+  "title": "Ripple atlas \u2014 equal thirds, one baseline",
+  "date": "2026-08-04",
+  "source": "index-v3.html",
+  "status": "candidate",
+  "tag": "v4.3-equal-thirds",
+  "gitpath": "index-v3.html",
+  "answers": ["F32", "F33"],
+  "summary": "The map\u2019s three columns become exact thirds separated by one constant gap, and the column titles share a baseline with the detail panel beside them.",
+  "changes": [
+   "<b>Equal thirds</b>, 40px apart. Marker label width goes from 101px to 250px at 1600px wide; the follow-up column from 191px to 261px.",
+   "<b>Both runs of dots span the same distance</b> \u2014 a direct consequence of the equal gaps, measured at 40.0 / 40.0 across four window sizes.",
+   "<b>One baseline</b> for the three column titles and the detail panel\u2019s kicker line; the panel header is pinned to the top of its box so the line does not move with its content.",
+   "<b>Shorter titles</b>: YOUR PANEL &middot; 26 / CAN POINT AT &middot; 47 / WOULD FOLLOW UP.",
+   "Side effect worth having: with the wider column, no marker name wraps at any tested size.",
+  ],
+ },
  {
   "id": "v4.2",
   "file": "v4.2-even-columns.html",
