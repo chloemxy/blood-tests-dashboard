@@ -87,8 +87,13 @@ Interacting with the page must not move anything already on screen.
   so a scrollbar appearing never nudges content sideways.
 - Layout is a pure function of state and window size — same inputs, same pixels.
 
-The one deliberate exception: a section explicitly labelled as expandable, where
-the user asked for the growth.
+The map is the exception that proves it: it is a box that scrolls its own
+content. It can be taller than the window, but its edges never move, its column
+titles are pinned in a band above it, and the panels around it do not travel
+with it.
+
+The other deliberate exception: a section explicitly labelled as expandable,
+where the user asked for the growth.
 
 ## 3. No ambient motion
 
@@ -151,10 +156,15 @@ overflow its column and slide under the panel beside it. Verify by measurement,
 not by eye: the regression checks the right edge of the widest label against the
 gutter at six window sizes.
 
-**When it will not fit, spend type size first, then fold — never truncate.**
-Step the type down to the 8px floor before giving up any content. Only then
-group the least relevant rows into a single row that states its true count, and
-keep the full list somewhere on screen (in our case, the rail).
+**When it will not fit, the canvas grows and scrolls.** Not smaller type, not
+fewer rows, not a roll-up. Every marker and every concern has its own row at
+every window size; when there are more of them than the window is tall, the map
+becomes taller than the window and scrolls inside its own box. Rolling content
+up to save space hides it behind a gesture nobody knows to make.
+
+The panels do not scroll with it — the map is the box that scrolls, and its
+column titles sit in a fixed band above it so scrolling never takes the headings
+away.
 
 ## 5b. Even spacing within a column
 

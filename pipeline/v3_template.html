@@ -43,7 +43,11 @@ button{font-family:inherit;cursor:pointer}
 @media(max-width:1000px){.top .stat{display:none}}
 
 .stage{position:absolute;top:56px;left:0;right:0;bottom:0;overflow:hidden}
-.map{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* The map is the only thing that scrolls. The panels are its siblings, not its
+   children, so they stay where they are while it moves. The gutter is reserved
+   whether or not the bar is there, so the right-hand column never shifts. */
+.canvas{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;z-index:1;scrollbar-gutter:stable}
+.map{display:block;width:100%}
 
 .pnl{position:absolute;background:#fff;border:1px solid var(--line);border-radius:14px;
  z-index:3;display:flex;flex-direction:column}
@@ -260,10 +264,14 @@ button{font-family:inherit;cursor:pointer}
 .map .e3{fill:none;stroke:var(--warm);stroke-width:1.4}
 
 .map .colhd{font-family:var(--font-mono);font-size:10px;fill:var(--dim);letter-spacing:.09em}
-/* Column titles are centred on their y rather than sitting on it, so they can
-   be aligned to a measured CSS box without guessing where its baseline is. */
-.map .colttl{font-family:var(--font-mono);font-size:10px;fill:var(--dim);letter-spacing:.09em;
- dominant-baseline:central}
+/* The column titles sit above the canvas rather than inside it, so scrolling
+   the map does not take its headings away. They are HTML in the same box shape
+   as a panel header, which is what puts them on the same line as the two panel
+   kickers without anything having to be measured. */
+.colbar{position:absolute;top:0;height:40px;z-index:2;background:var(--bg);
+ border-bottom:1px solid var(--line);pointer-events:none}
+.colbar span{position:absolute;top:16px;font-family:var(--font-mono);font-size:10px;
+ letter-spacing:.09em;color:var(--dim);white-space:nowrap;line-height:1}
 .map .fold .lb{fill:var(--dim)}
 .map .foldn{font-family:var(--font-mono);font-size:10px;fill:#b4c0c2}
 .map .grpdup{font-family:var(--font-mono);font-size:10px;fill:#b4c0c2}
@@ -353,7 +361,8 @@ button{font-family:inherit;cursor:pointer}
 </div>
 
 <div class="stage" id="stage">
- <svg class="map" id="map" role="img" aria-label="Ripple map: annual panel markers, the concerns they can represent, and the tests that would follow up"></svg>
+ <div class="colbar" id="colBar"></div>
+ <div class="canvas" id="canvas"><svg class="map" id="map" role="img" aria-label="Ripple map: annual panel markers, the concerns they can represent, and the tests that would follow up"></svg></div>
  <p class="mapnote" id="mapNote"></p>
  <button class="kbdhint" id="kbdHint">? shortcuts</button>
  <div class="kbdwrap" id="kbdWrap"><div class="kbd">
@@ -473,7 +482,7 @@ function activeConcerns(){
 let BOX = null, LAYOUT = null;
 
 function box(){
- const stg = $('stage'), W = stg.clientWidth, H = stg.clientHeight;
+ const stg = $('canvas'), W = stg.clientWidth, H = stg.clientHeight;
  const g = 16, railW = 320, detW = 344, footH = 72;
  // The left rail is always on screen; only the detail panel and the footer are
  // dropped on a narrow window. Counting the rail only when "wide" was what let
@@ -484,7 +493,7 @@ function box(){
  const hasDet = W > 1080, hasFoot = W > 1080;
  const L = railW + g;
  const R = W - (hasDet ? detW + g : g);
- const T = 40, B = H - (hasFoot ? footH + g : g) - 24;
+ const T = 56, B = H - (hasFoot ? footH + g : g) - 24;
  return { W:W, H:H, L:L, R:R, T:T, B:B, w:R-L, h:B-T };
 }
 
@@ -528,19 +537,18 @@ function buildLayout(){
  // exactly the gap a column header leaves before its first row, with the rule
  // sitting halfway through it.
  const divPad = 24, divLead = HEADLINE, divGap = 8, divTail = 16;
- const mkDiv = txt => {
-  const l = wrap(txt, divPer, 0);
-  return { lines: l, h: divPad + (l.length - 1) * divLead + divTail };
- };
- let div = mkDiv(divTxt), divLines = div.lines, divH = div.h, cAvail = b.h - divH;
+ const divL = wrap(divTxt, divPer, 0);
+ const divLines = divL, divH = divPad + (divL.length - 1) * divLead + divTail;
  // One size for every label on the map, and one line height. Nothing scales
  // with the window: when a column runs out of room it shows fewer rows, and
  // says how many it is not showing.
  const cPer = Math.max(8, Math.floor((xCend - xC - 52) / (FSZ * 0.6)));
  const cLines = {}, cNeed = {};
+ let cTotal = divH;
  CIDS.forEach(ci => {
   cLines[ci] = wrap(C[ci].label, cPer, 0);
   cNeed[ci] = Math.max(MIN_ROW, cLines[ci].length * LINE);
+  cTotal += cNeed[ci];
  });
 
  // ---- markers: three panel groups stacked down the full height. The group
@@ -563,76 +571,39 @@ function buildLayout(){
   const d = p.slugs.length - pOwn[gi].length;
   return d ? (pOwn[gi].length ? d + ' also above' : 'all also above') : '';
  });
- // All thirteen panels is 68 markers — more rows than this column can give a
- // readable line to. Rather than shrink the type below reading size, a panel
- // with nothing marked in it folds to a single row carrying its true count,
- // and its edges bundle there. A panel you have marked never folds, and the
- // rail always lists every marker in full.
- // A folded row carries two lines — the panel and its count — so it is given
- // 32px of its own rather than one marker row's worth.
- const FOLD_H = 32;
- const fold = {};
- const foldable = AP.map((p, gi) => gi)
-   .filter(gi => pOwn[gi].length > 1 && !AP[gi].slugs.some(sl => st.val[sl]))
-   .reverse();
- // Type size and row heights are solved together. Each row is as tall as its
- // name needs — two or three lines if that is what the full name takes — and
- // folding a panel is what buys the room. A name is never cut to make it fit.
+ // Every marker in every selected panel gets its own row. When that is more
+ // than the window can hold, the map grows and the canvas scrolls — nothing is
+ // rolled up out of reach.
  const mLabW0 = mEdgeX - b.L;
- const solve = () => {
-  let heads = 0, nRows = 0, nFold = 0;
-  AP.forEach((p, gi) => {
-   if(fold[gi]){ if(pOwn[gi].length) nFold++; return; }
-   heads += (gLines[gi].length + (gDup[gi] ? 1 : 0)) * headLead + headPad;
-   nRows += pOwn[gi].length;
+ const mPer = Math.max(8, Math.floor(mLabW0 / (FSZ * 0.6)));
+ let headTotal = 0, mNeed = 0;
+ const mLn = {};
+ AP.forEach((p, gi) => {
+  headTotal += (gLines[gi].length + (gDup[gi] ? 1 : 0)) * headLead + headPad;
+  pOwn[gi].forEach(sl => {
+   mLn[sl] = wrap(M[sl].name.split('[')[0].trim(), mPer, 0);
+   mNeed += Math.max(MIN_ROW, mLn[sl].length * LINE);
   });
-  const per = Math.max(8, Math.floor(mLabW0 / (FSZ * 0.6)));
-  // A folded row's own name wraps too, so its height is measured, not assumed.
-  const fLn = {}; let foldH = 0;
-  AP.forEach((p, gi) => {
-   if(!fold[gi] || !pOwn[gi].length) return;
-   fLn[gi] = wrap(p.short.toUpperCase(), per, 0);
-   foldH += Math.max(FOLD_H, fLn[gi].length * LINE + 16);
-  });
-  const avail = b.h - heads - (Math.max(1, AP.length) - 1) * grpGap - foldH;
-  const ln = {}; let need = 0;
-  AP.forEach((p, gi) => {
-   if(fold[gi]) return;
-   pOwn[gi].forEach(sl => {
-    ln[sl] = wrap(M[sl].name.split('[')[0].trim(), per, 0);
-    need += Math.max(MIN_ROW, ln[sl].length * LINE);
-   });
-  });
-  return { heads: heads, avail: avail, ln: ln, fLn: fLn, need: need, fits: need <= avail };
- };
- let sv = solve();
- for(let i = 0; i < foldable.length && !sv.fits; i++){ fold[foldable[i]] = 1; sv = solve(); }
- const headTotal = sv.heads, mAvail = sv.avail, mLn = sv.ln, fLn = sv.fLn;
+ });
+ const mChrome = headTotal + (Math.max(1, AP.length) - 1) * grpGap;
+ // One height for the whole canvas: the taller of the window and what either
+ // column needs. Below that the columns share the spare space; above it the
+ // page scrolls.
+ const H = Math.max(b.h, mChrome + mNeed, cTotal);
+ const mAvail = H - mChrome, cAvail = H - divH;
  // Spare height is shared equally between rows — the same constant added to
  // each — so the gap between one marker name and the next is identical all the
  // way down whatever the line counts. If nothing fits even folded, the same
  // constant comes off every row instead.
  const mSlugs = Object.keys(mLn);
- const mSlack = (mAvail - sv.need) / Math.max(1, mSlugs.length);
+ const mSlack = (mAvail - mNeed) / Math.max(1, mSlugs.length);
  const mH = {};
  mSlugs.forEach(sl => { mH[sl] = Math.max(MIN_ROW, mLn[sl].length * LINE) + mSlack; });
- const mRow = sv.avail / Math.max(1, Object.keys(mLn).length);
- const mk = {}, shown = {}; let y = b.T, groups = [], folds = [];
+ const mk = {}; let y = b.T, groups = [];
  AP.forEach((p, gi) => {
-  if(fold[gi]){
-   if(pOwn[gi].length){
-    const fh = Math.max(FOLD_H, (fLn[gi] || ['']).length * LINE + 16);
-    const cy = y + fh / 2;
-    pOwn[gi].forEach(sl => mk[sl] = cy);
-    folds.push({ id: p.id, lines: fLn[gi] || [p.short.toUpperCase()], n: pOwn[gi].length,
-                 name: p.name.replace(/\s*\(.*\)/, ''), slugs: pOwn[gi], y: cy, h: fh });
-    y += fh;
-   }
-  } else {
-   groups.push({ lines: gLines[gi], y: y + 8, n: p.slugs.length, dup: gDup[gi] });
-   y += (gLines[gi].length + (gDup[gi] ? 1 : 0)) * headLead + headPad;
-   pOwn[gi].forEach(sl => { shown[sl] = 1; mk[sl] = y + mH[sl] / 2; y += mH[sl]; });
-  }
+  groups.push({ lines: gLines[gi], y: y + 8, n: p.slugs.length, dup: gDup[gi] });
+  y += (gLines[gi].length + (gDup[gi] ? 1 : 0)) * headLead + headPad;
+  pOwn[gi].forEach(sl => { mk[sl] = y + mH[sl] / 2; y += mH[sl]; });
   y += grpGap;
  });
 
@@ -648,42 +619,18 @@ function buildLayout(){
  reach.sort((a, c) => a.bary - c.bary || a.ci - c.ci);
  unreach.sort((a, c) => C[a.ci].label.localeCompare(C[c.ci].label));
 
- // At a 12px floor the column cannot always hold 47 rows. Rather than shrink
- // the type, it places what fits and states what it is not placing: the
- // unreachable block goes first, since the divider above it already carries
- // its true count and the rail lists every one of them as a chip.
+ // Every concern gets a row. Spare height is shared as the SAME number of
+ // pixels for every row, not in proportion to it — an equal share means the
+ // gap between one name and the next is a constant down the column.
  const cReach = reach.map(o => o.ci), cUnreach = unreach.map(o => o.ci);
- const sum = list => list.reduce((a, ci) => a + cNeed[ci], 0);
- let show = cReach.concat(cUnreach), hidUnreach = 0, hidReach = 0;
- if(sum(show) > cAvail){
-  show = cReach.slice(); hidUnreach = cUnreach.length;
-  // The band is the only thing left standing for them, so it says where they
-  // are: every one is a chip in the rail's personal-concern layer.
-  div = mkDiv(divTxt + ' \u00b7 ADD ANY OF THEM IN THE PANEL');
-  divLines = div.lines; divH = div.h; cAvail = b.h - divH;
- }
- if(sum(show) > cAvail){
-  // Keep the concerns the most markers point at; one row states the remainder.
-  const rank = cReach.slice().sort((a, c) => C[c].from.length - C[a].from.length || a - c);
-  const keep = {}; let used = MIN_ROW;   // the "+N more" row's own height
-  rank.forEach(ci => { if(used + cNeed[ci] <= cAvail){ keep[ci] = 1; used += cNeed[ci]; } });
-  show = cReach.filter(ci => keep[ci]);
-  hidReach = cReach.length - show.length;
- }
- const cShow = {}; show.forEach(ci => cShow[ci] = 1);
- const moreH = hidReach ? MIN_ROW : 0;
- // Spare height is shared as the SAME number of pixels for every row, not in
- // proportion to it — an equal share means the gap between one name and the
- // next is a constant down the whole column.
- const cSlack = (cAvail - sum(show) - moreH) / Math.max(1, show.length);
+ const cSlack = (cAvail - (cTotal - divH)) / Math.max(1, CIDS.length);
  const cH = {};
- show.forEach(ci => { cH[ci] = cNeed[ci] + cSlack; });
+ CIDS.forEach(ci => { cH[ci] = cNeed[ci] + cSlack; });
 
- const cn = {}; let cy = b.T, divY = 0, moreY = 0;
- cReach.forEach(ci => { if(!cShow[ci]) return; cn[ci] = cy + cH[ci] / 2; cy += cH[ci]; });
- if(hidReach){ moreY = cy + moreH / 2; cy += moreH; }
+ const cn = {}; let cy = b.T, divY = 0;
+ cReach.forEach(ci => { cn[ci] = cy + cH[ci] / 2; cy += cH[ci]; });
  divY = cy + divH / 2; cy += divH;
- cUnreach.forEach(ci => { if(!cShow[ci]) return; cn[ci] = cy + cH[ci] / 2; cy += cH[ci]; });
+ cUnreach.forEach(ci => { cn[ci] = cy + cH[ci] / 2; cy += cH[ci]; });
  const cFs = FSZ, cRow = MIN_ROW, FS = FSZ;
 
  // ---- follow-up tests: one block, centred on the concern row it belongs to.
@@ -708,12 +655,12 @@ function buildLayout(){
   // Names wrap freely, so the block's height is not known in advance. Show
   // fewer of them rather than squeezing any one of them.
   let nShow = 8, items = mkItems(nShow);
-  while(nShow > 3 && items.reduce(function(a, it){ return a + it.h; }, 0) > b.h){
+  while(nShow > 3 && items.reduce(function(a, it){ return a + it.h; }, 0) > H){
    nShow--; items = mkItems(nShow);
   }
   const blockH = items.reduce((a, it) => a + it.h, 0);
   const anchor = cn[open];
-  let y = Math.max(b.T, Math.min(b.B - blockH, anchor - blockH / 2));
+  let y = Math.max(b.T, Math.min(b.T + H - blockH, anchor - blockH / 2));
   items.forEach(it => { ts.push({ t: it.t, lines: it.lines, h: it.h, y: y + it.h / 2 }); y += it.h; });
  }
 
@@ -724,8 +671,7 @@ function buildLayout(){
  const divTop = divY - divH / 2;
  return { xM:xM, xC:xC, xT:xT, xCend:xCend, mk:mk, cn:cn, ts:ts, groups:groups, cOrder:cOrder,
           divLines:divLines, divTop:divTop, divPad:divPad, divLead:divLead, divGap:divGap,
-          divTail:divTail, cLines:cLines, cH:cH, folds:folds, shown:shown, mH:mH, mLn:mLn,
-          hidReach:hidReach, hidUnreach:hidUnreach, moreY:moreY, cShow:cShow,
+          divTail:divTail, cLines:cLines, cH:cH, mH:mH, mLn:mLn, H:H,
           headLead:headLeadOut,
           mRow:MIN_ROW, cRow:cRow, mFs:FSZ, cFs:FSZ, FS:FSZ, LINE:LINE, divY:divY, open:open,
           nReach:reach.length, nUnreach:unreach.length };
@@ -775,14 +721,7 @@ function draw(){
  let h = '';
 
  // ---- column headers
- // Column titles sit on the same baseline as the detail panel's kicker line
- // (CONCERN · EXPOSURE & LIFESTYLE), which is pinned 16px below the panel top.
- // Short titles: they have to live inside one column's width, and the width is
- // worth more to the names underneath than to the heading above them.
- const hdY = headCentre().toFixed(1);
- h += '<text class="colttl" x="'+(b.L).toFixed(0)+'" y="'+hdY+'">YOUR PANEL &middot; '+SLUGS.length+'</text>'
-   +  '<text class="colttl" x="'+(L.xC+11).toFixed(0)+'" y="'+hdY+'">CAN POINT AT &middot; '+CIDS.length+'</text>'
-   +  '<text class="colttl" x="'+(L.xT+11).toFixed(0)+'" y="'+hdY+'">WOULD FOLLOW UP</text>';
+ // Column titles are drawn in the band above, not here — see drawColBar().
  if(L.open === null){
   const hy = b.T + b.h / 2;
   h += '<line class="rule dash" x1="'+L.xT.toFixed(1)+'" y1="'+(b.T+4).toFixed(1)+'" x2="'+L.xT.toFixed(1)+'" y2="'+(b.B-4).toFixed(1)+'"/>'
@@ -836,21 +775,7 @@ function draw(){
     + (g.y + g.lines.length*L.headLead).toFixed(1)+'" text-anchor="end">'+esc(g.dup)+'</text>';
  });
  const mLabW = mEdge - b.L;
- // A folded panel: one dot, one row, the true count. Its markers keep their
- // edges — they all leave from this row, which is what a bundle should look
- // like — and the rail beside it still lists every one of them by name.
- L.folds.forEach(f => {
-  const ln = f.lines;
-  const lh = L.LINE, y0 = f.y - f.h / 2 + 12;
-  h += '<g class="row fold"><title>'+esc(f.name + ' — ' + f.n + ' markers, listed in full in the panel on the left')+'</title>'
-    +  ln.map((t2, li) => '<text class="lb" x="'+mEdge.toFixed(1)+'" y="'+(y0 + li*lh).toFixed(1)
-        +'" text-anchor="end">'+esc(t2)+'</text>').join('')
-    +  '<text class="foldn" x="'+mEdge.toFixed(1)+'" y="'+(y0 + ln.length * lh).toFixed(1)
-    +  '" text-anchor="end">'+f.n+' markers</text>'
-    +  '<circle class="dot" cx="'+L.xM.toFixed(1)+'" cy="'+f.y.toFixed(1)+'" r="5"/></g>';
- });
  SLUGS.forEach(sl => {
-  if(!L.shown[sl]) return;
   const y = L.mk[sl], v = st.val[sl];
   const cls = ['row','mkr', v<0?'lo':v>0?'hi':'', selM===sl?'sel':'', st.hot===sl?'hot':'',
                kfoc(0, SLUGS.indexOf(sl))?'foc':''].filter(Boolean).join(' ');
@@ -884,9 +809,6 @@ function draw(){
  // Reserve only what the count chip and the out-dot actually need, so the
  // full concern names fit on one line instead of being cut short.
  const cLead = L.LINE;
- if(L.hidReach)
-  h += '<text class="colhd" x="'+(L.xC + 12).toFixed(1)+'" y="'+L.moreY.toFixed(1)
-    +  '" dominant-baseline="central">+ '+L.hidReach+' MORE THESE MARKERS REACH &middot; IN THE PANEL</text>';
  CIDS.forEach(ci => {
   const y = L.cn[ci]; if(y == null) return;
   const from = act[ci], added = !!st.added[ci];
@@ -929,24 +851,29 @@ function draw(){
     +  '</g>';
  });
 
- const m = $('map');
- m.setAttribute('viewBox', '0 0 ' + b.W + ' ' + b.H);
+ // The canvas is as tall as the map needs: equal to the window when everything
+ // fits, taller when it does not, and the 24px below the last row is the same
+ // 24px the layout leaves above the first.
+ const m = $('map'), mapH = Math.round(b.T + L.H + 24);
+ m.setAttribute('viewBox', '0 0 ' + b.W + ' ' + mapH);
+ m.setAttribute('height', mapH);
+ m.style.height = mapH + 'px';
  m.innerHTML = h;
 }
 
-/* The column titles sit on the detail panel's kicker line. Two things were
-   wrong with computing that from padding and line-height: where a baseline
-   falls depends on the font's own metrics, and an SVG y is a baseline while a
-   CSS box is not. So measure the kicker's box against the stage, and align
-   centre to centre — the titles are the same size and face as the kicker, so
-   equal centres means equal baselines without having to know the metrics.
-   Falls back to the line centre when the panel is hidden on a narrow window. */
-function headCentre(){
- const k = $('dHead').querySelector('.k'), stg = $('stage');
- if(!k || !k.getBoundingClientRect) return 22;
- const r = k.getBoundingClientRect(), sr = stg.getBoundingClientRect();
- if(!r.height) return 22;
- return r.top - sr.top + r.height / 2;
+/* The band spans the map area between the two panels and carries the three
+   column titles. Both it and the panel headers pad 16px from the top of their
+   box at the same size, so the four labels share a line by construction —
+   nothing is measured and nothing can drift. */
+function drawColBar(){
+ const b = BOX, L = LAYOUT, bar = $('colBar');
+ bar.style.left = (b.L - 16) + 'px';
+ bar.style.width = (b.R - b.L + 32) + 'px';
+ const at = x => (x - (b.L - 16)).toFixed(0) + 'px';
+ bar.innerHTML =
+   '<span style="left:' + at(b.L) + '">YOUR PANEL &middot; ' + SLUGS.length + '</span>'
+ + '<span style="left:' + at(L.xC + 11) + '">CAN POINT AT &middot; ' + CIDS.length + '</span>'
+ + '<span style="left:' + at(L.xT + 11) + '">WOULD FOLLOW UP</span>';
 }
 
 function relayout(){ BOX = box(); LAYOUT = buildLayout(); draw(); }
@@ -1205,13 +1132,21 @@ function drawChrome(){
 /* The map is drawn before the detail panel, so on the first paint there is no
    kicker line to measure yet. Re-apply the measured y once the panel has its
    content: it moves three <text> nodes and touches nothing else. */
-function alignTitles(){
- const y = headCentre().toFixed(1);
- Array.prototype.forEach.call(document.querySelectorAll('.map .colttl'),
-   function(t){ t.setAttribute('y', y); });
+/* Arrow keys can now walk past the bottom of the window, so the canvas follows
+   the focused row instead of leaving it off screen. */
+function scrollToFocus(){
+ if(!LAYOUT || !st.foc) return;
+ const c = $('canvas'), f = st.foc;
+ const y = f.c === 0 ? LAYOUT.mk[SLUGS[f.i]]
+         : f.c === 1 ? LAYOUT.cn[LAYOUT.cOrder[f.i]]
+         : (LAYOUT.ts[f.i] || {}).y;
+ if(y == null) return;
+ const pad = 48;
+ if(y - pad < c.scrollTop) c.scrollTop = Math.max(0, y - pad);
+ else if(y + pad > c.scrollTop + c.clientHeight) c.scrollTop = y + pad - c.clientHeight;
 }
 
-function render(){ relayout(); drawRail(); drawDetail(); drawChrome(); alignTitles(); }
+function render(){ relayout(); drawColBar(); drawRail(); drawDetail(); drawChrome(); scrollToFocus(); }
 
 /* ---------- events ---------- */
 document.addEventListener('click', function(e){
