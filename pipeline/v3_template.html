@@ -114,7 +114,12 @@ button{font-family:inherit;cursor:pointer}
  overflow:hidden;background:#fff;height:24px}
 .tri button{border:none;background:none;font-family:var(--font-sans);font-size:9px;color:#b4c0c2;
  padding:0;border-right:1px solid var(--line);line-height:24px;text-align:center}
-.tri button.mid{font-size:11px;letter-spacing:-.05em}
+/* Normal is an icon, not a dash character: a bar drawn at the same optical
+   weight as the two triangles, so the three states read as one set. It takes
+   its colour from the button, so the selected state needs no extra rule. */
+.tri button.mid{font-size:0;display:flex;align-items:center;justify-content:center}
+.tri button.mid::before{content:'';display:block;width:9px;height:2px;border-radius:1px;
+ background:currentColor}
 .tri button:last-child{border-right:none}
 .tri button:hover{background:var(--aqua)}
 .tri button.on[data-v="-1"]{background:var(--low);color:#fff}
@@ -248,6 +253,10 @@ button{font-family:inherit;cursor:pointer}
 .map .e3{fill:none;stroke:var(--warm);stroke-width:1.4}
 
 .map .colhd{font-family:var(--font-mono);font-size:9px;fill:var(--dim);letter-spacing:.09em}
+/* Column titles are centred on their y rather than sitting on it, so they can
+   be aligned to a measured CSS box without guessing where its baseline is. */
+.map .colttl{font-family:var(--font-mono);font-size:9px;fill:var(--dim);letter-spacing:.09em;
+ dominant-baseline:central}
 .map .fold .lb{fill:var(--dim)}
 .map .foldn{font-family:var(--font-mono);font-size:8px;fill:#b4c0c2}
 .map .grpdup{font-family:var(--font-mono);font-size:8px;fill:#b4c0c2}
@@ -761,10 +770,10 @@ function draw(){
  // (CONCERN · EXPOSURE & LIFESTYLE), which is pinned 16px below the panel top.
  // Short titles: they have to live inside one column's width, and the width is
  // worth more to the names underneath than to the heading above them.
- const hdY = 24;
- h += '<text class="colhd" x="'+(b.L).toFixed(0)+'" y="'+hdY+'">YOUR PANEL &middot; '+SLUGS.length+'</text>'
-   +  '<text class="colhd" x="'+(L.xC+11).toFixed(0)+'" y="'+hdY+'">CAN POINT AT &middot; '+CIDS.length+'</text>'
-   +  '<text class="colhd" x="'+(L.xT+11).toFixed(0)+'" y="'+hdY+'">WOULD FOLLOW UP</text>';
+ const hdY = headCentre().toFixed(1);
+ h += '<text class="colttl" x="'+(b.L).toFixed(0)+'" y="'+hdY+'">YOUR PANEL &middot; '+SLUGS.length+'</text>'
+   +  '<text class="colttl" x="'+(L.xC+11).toFixed(0)+'" y="'+hdY+'">CAN POINT AT &middot; '+CIDS.length+'</text>'
+   +  '<text class="colttl" x="'+(L.xT+11).toFixed(0)+'" y="'+hdY+'">WOULD FOLLOW UP</text>';
  if(L.open === null){
   const hy = b.T + b.h / 2;
   h += '<line class="rule dash" x1="'+L.xT.toFixed(1)+'" y1="'+(b.T+4).toFixed(1)+'" x2="'+L.xT.toFixed(1)+'" y2="'+(b.B-4).toFixed(1)+'"/>'
@@ -912,6 +921,21 @@ function draw(){
  m.innerHTML = h;
 }
 
+/* The column titles sit on the detail panel's kicker line. Two things were
+   wrong with computing that from padding and line-height: where a baseline
+   falls depends on the font's own metrics, and an SVG y is a baseline while a
+   CSS box is not. So measure the kicker's box against the stage, and align
+   centre to centre — the titles are the same size and face as the kicker, so
+   equal centres means equal baselines without having to know the metrics.
+   Falls back to the line centre when the panel is hidden on a narrow window. */
+function headCentre(){
+ const k = $('dHead').querySelector('.k'), stg = $('stage');
+ if(!k || !k.getBoundingClientRect) return 22;
+ const r = k.getBoundingClientRect(), sr = stg.getBoundingClientRect();
+ if(!r.height) return 22;
+ return r.top - sr.top + r.height / 2;
+}
+
 function relayout(){ BOX = box(); LAYOUT = buildLayout(); draw(); }
 
 /* ---------- left rail ---------- */
@@ -935,7 +959,7 @@ function drawRail(){
          ? '<span class="nocat" title="This component of the panel is not in our catalogue, so we cannot show what it points at.">not carried</span>'
          : '<span class="tri">'
      +   '<button data-set="'+s+'" data-v="-1" class="'+(v<0?'on':'')+'" title="Mark low" aria-label="Mark low">&#9660;</button>'
-     +   '<button data-set="'+s+'" data-v="0" class="mid '+(v===0?'on':'')+'" title="Normal" aria-label="Normal">&ndash;</button>'
+     +   '<button data-set="'+s+'" data-v="0" class="mid '+(v===0?'on':'')+'" title="Normal" aria-label="Normal"></button>'
      +   '<button data-set="'+s+'" data-v="1" class="'+(v>0?'on':'')+'" title="Mark high" aria-label="Mark high">&#9650;</button>'
      +  '</span>')
      +  '</div>';
@@ -1165,7 +1189,16 @@ function drawChrome(){
     +' concerns. Mark something low or high to see the ripple.';
 }
 
-function render(){ relayout(); drawRail(); drawDetail(); drawChrome(); }
+/* The map is drawn before the detail panel, so on the first paint there is no
+   kicker line to measure yet. Re-apply the measured y once the panel has its
+   content: it moves three <text> nodes and touches nothing else. */
+function alignTitles(){
+ const y = headCentre().toFixed(1);
+ Array.prototype.forEach.call(document.querySelectorAll('.map .colttl'),
+   function(t){ t.setAttribute('y', y); });
+}
+
+function render(){ relayout(); drawRail(); drawDetail(); drawChrome(); alignTitles(); }
 
 /* ---------- events ---------- */
 document.addEventListener('click', function(e){

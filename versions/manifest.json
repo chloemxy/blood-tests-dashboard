@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-05T00:40:50Z",
+ "generated": "2026-08-05T00:45:35Z",
  "live": "index.html",
  "constraints": [
   [
@@ -28,6 +28,52 @@
   ]
  ],
  "feedback": [
+  {
+   "id": "F35",
+   "date": "2026-08-04",
+   "who": "Chloe",
+   "title": "An icon for normal",
+   "status": "addressed",
+   "versions": [
+    "v4.4"
+   ],
+   "quote": "use an icon for normal",
+   "did": [
+    [
+     "A drawn bar, not a dash character",
+     "addressed",
+     "Low and high are solid triangles; normal was an en-dash borrowed from the type. It is now a bar drawn at the same optical weight — 9×2px, 1px radius — so the three states read as one set. It inherits the button’s colour, so the selected state needs no separate rule."
+    ]
+   ]
+  },
+  {
+   "id": "F34",
+   "date": "2026-08-04",
+   "who": "Chloe",
+   "title": "Still not bottom aligned",
+   "status": "addressed",
+   "versions": [
+    "v4.4"
+   ],
+   "quote": "still not bottom aligned",
+   "did": [
+    [
+     "Measured, not calculated",
+     "addressed",
+     "The first attempt computed the kicker’s baseline from padding and line-height. That cannot be right in general: where a baseline falls inside a line box depends on the font’s own ascent and descent, which CSS does not expose. The kicker’s box is now measured against the stage at render time."
+    ],
+    [
+     "Centre to centre, not baseline to baseline",
+     "addressed",
+     "An SVG <code>y</code> is a baseline; a CSS box is not. Rather than convert between them and guess the metrics, the column titles are set <code>dominant-baseline:central</code> and aligned centre to centre. They are the same size and face as the kicker, so equal centres are equal baselines."
+    ],
+    [
+     "Re-applied after the panel is drawn",
+     "addressed",
+     "The map is drawn before the detail panel, so on the first paint there was no kicker to measure. The measured y is re-applied once the panel has content — it moves three text nodes and touches nothing else."
+    ]
+   ]
+  },
   {
    "id": "F33",
    "date": "2026-08-04",
@@ -1302,6 +1348,27 @@
   }
  ],
  "versions": [
+  {
+   "id": "v4.4",
+   "file": "v4.4-measured-baseline.html",
+   "title": "Ripple atlas — measured baseline, normal as an icon",
+   "date": "2026-08-04",
+   "source": "index-v3.html",
+   "status": "candidate",
+   "tag": "v4.4-measured-baseline",
+   "gitpath": "index-v3.html",
+   "answers": [
+    "F34",
+    "F35"
+   ],
+   "summary": "The column titles align to the detail panel’s kicker line by measurement rather than arithmetic, and normal joins low and high as a drawn icon.",
+   "changes": [
+    "<b>Alignment is measured</b>: the kicker’s box is read against the stage at render time and the titles are aligned centre to centre with <code>dominant-baseline:central</code>, so no font metric has to be guessed.",
+    "<b>Re-applied after the panel draws</b>, because the map is painted first and has nothing to measure on the first pass.",
+    "<b>Normal is an icon</b> — a 9×2px bar at the same optical weight as the low and high triangles, taking its colour from the button."
+   ],
+   "mb": 0.59
+  },
   {
    "id": "v4.3",
    "file": "v4.3-equal-thirds.html",
