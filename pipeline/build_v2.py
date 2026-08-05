@@ -1,6 +1,6 @@
 import re, sys, io, os
 
-SRC = "/sessions/optimistic-vigilant-turing/mnt/Blood test/blood-tests-dashboard/index.html"
+SRC = "/sessions/optimistic-vigilant-turing/mnt/Blood test/blood-tests-dashboard/catalogue.html"
 DST = "/sessions/optimistic-vigilant-turing/mnt/Blood test/blood-tests-dashboard/index-v2.html"
 
 s = io.open(SRC, encoding="utf8").read()

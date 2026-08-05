@@ -38,7 +38,7 @@ button{font-family:inherit;cursor:pointer}
 .top .sp{flex:1}
 .top .stat{font-family:var(--font-mono);font-size:10px;color:var(--dim);white-space:nowrap}
 .top .btn{border:1px solid var(--line);background:#fff;color:var(--slate);font-size:12px;font-weight:600;
- padding:4px 12px;border-radius:16px}
+ padding:4px 12px;border-radius:16px;text-decoration:none;line-height:20px;display:inline-block}
 .top .btn:hover{border-color:var(--accent);color:var(--accent)}
 .top .btn.on{border-color:var(--teal);background:var(--aqua);color:var(--teal)}
 @media(max-width:1000px){.top .stat{display:none}}
@@ -362,6 +362,8 @@ body:not(.legend) .rail, body:not(.legend) .det{bottom:0}
  <span class="tag">the ripple atlas</span>
  <span class="sp"></span>
  <span class="stat" id="hdrStat"></span>
+ <a class="btn" href="catalogue.html#feel">How are you feeling</a>
+ <a class="btn" href="catalogue.html#tests">All 6,192 tests</a>
  <button class="btn" id="btnFoot">Legend</button>
  <button class="btn" id="btnReset">Reset</button>
 </div>

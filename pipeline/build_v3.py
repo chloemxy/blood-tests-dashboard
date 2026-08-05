@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Builds index-v3.html — the ripple atlas.
+Builds index.html — the ripple atlas, the front door of the site.
 
-Reads the catalogue payload out of index.html and emits a compact standalone
+Reads the catalogue payload out of data/catalogue.json and emits a compact standalone
 build (no 6,192-row table), so the file stays small and fast.
 
 Flow:  annual panel marker -> concerns it can represent -> tests that would
@@ -16,12 +16,12 @@ actually fetched, with its URL. Nothing here is paraphrased or inferred.
 import io, json, os, re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SRC  = os.path.join(ROOT, "index.html")
-DST  = os.path.join(ROOT, "index-v3.html")
+SRC  = os.path.join(ROOT, "data", "catalogue.json")
+DST  = os.path.join(ROOT, "index.html")
 
-s = io.open(SRC, encoding="utf8").read()
-i = s.index('id="payload" type="application/json">') + len('id="payload" type="application/json">')
-D = json.loads(s[i:s.index("</script>", i)])
+# The catalogue is a data file, not a page. Nothing here reads a document
+# that a build might later write.
+D = json.loads(io.open(SRC, encoding="utf8").read())
 TESTS, GROUPS, CONCERNS, CGROUPS, PANELS = D["tests"], D["groups"], D["concerns"], D["cgroups"], D["panels"]
 
 def unquote(t):
@@ -429,7 +429,7 @@ out = TPL.replace("__PAYLOAD__", json.dumps(PAY, ensure_ascii=False, separators=
 io.open(DST, "w", encoding="utf8").write(out)
 
 m = PAY["meta"]
-print("index-v3.html  %.0f KB" % (len(out) / 1024.0))
+print("%s  %.0f KB" % (os.path.basename(DST), len(out) / 1024.0))
 print("  %d markers across %d panels (%d components not in the catalogue)"
       % (len(markers), len(PANEL_ORDER), sum(p["nMissing"] for p in PANEL_ORDER)))
 print("  %d concerns (%d reachable from the annual panel)" % (m["nConcerns"], m["panelConcerns"]))

@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-05T08:27:17Z",
+ "generated": "2026-08-05T08:47:17Z",
  "live": "index.html",
  "constraints": [
   [
@@ -28,6 +28,49 @@
   ]
  ],
  "feedback": [
+  {
+   "id": "F46",
+   "date": "2026-08-04",
+   "who": "Chloe",
+   "title": "Put the atlas on the official index",
+   "status": "addressed",
+   "versions": [
+    "v5.0"
+   ],
+   "quote": "how should I implement this design to our official index?",
+   "quotes": [
+    "how should I implement this design to our official index?",
+    "atlas becomes index, but we need access to the data table site, and the how you feeling route"
+   ],
+   "did": [
+    [
+     "The circular dependency, first",
+     "addressed",
+     "<code>build_v3.py</code> read its 6,192-row catalogue <i>out of</i> <code>index.html</code>. The moment the atlas became index.html, the atlas would have been its own data source. The payload is now <code>data/catalogue.json</code> (2.77&nbsp;MB, extracted once and parsed to prove it valid), and no build reads a document another build writes."
+    ],
+    [
+     "The swap",
+     "addressed",
+     "The catalogue app moved to <code>catalogue.html</code> with <code>git mv</code>, so its history follows it and its own hash router keeps working untouched. <code>build_v3.py</code> now writes <code>index.html</code>. The front door went from 2.9&nbsp;MB to 598&nbsp;KB."
+    ],
+    [
+     "Both routes stay reachable",
+     "addressed",
+     "Two links in the atlas header: <b>How are you feeling</b> to <code>catalogue.html#feel</code> and <b>All 6,192 tests</b> to <code>catalogue.html#tests</code>. Those routes already existed in the app’s router — nothing in the catalogue had to be rewritten to support them."
+    ],
+    [
+     "The regression suite is in the repo",
+     "addressed",
+     "Twelve jsdom checks that lived in a scratch directory are now <code>pipeline/tests/</code>, run by <code>node pipeline/tests/run.js</code>, exiting non-zero on failure. Each one is a mistake that shipped once, and the README says which. All twelve pass against the promoted build."
+    ],
+    [
+     "Desktop-first, knowingly",
+     "open",
+     "Below 1080px the detail panel and the legend are hidden and the map still assumes a wide three-column canvas. Shipping anyway was the call; a one-column phone layout is the next piece of work, not a polish item."
+    ]
+   ],
+   "open": "No phone layout. The atlas maps 68 markers of 6,192 — the catalogue page carries the rest and has to stay linked, not retired."
+  },
   {
    "id": "F45",
    "date": "2026-08-04",
@@ -1610,6 +1653,29 @@
  ],
  "versions": [
   {
+   "id": "v5.0",
+   "file": "v5.0-atlas-on-index.html",
+   "title": "The ripple atlas is the front door",
+   "date": "2026-08-04",
+   "source": "index.html",
+   "status": "live",
+   "tag": "v5.0-atlas-on-index",
+   "gitpath": "index.html",
+   "answers": [
+    "F46"
+   ],
+   "summary": "The atlas is index.html. The catalogue app keeps both of its routes at catalogue.html, the payload became a data file so nothing builds from its own output, and the twelve regression checks moved into the repo.",
+   "changes": [
+    "<b>data/catalogue.json</b> — the 6,192-row payload extracted once; <code>build_v3.py</code> and <code>build_v2.py</code> read it instead of a page they might overwrite.",
+    "<b>index.html is the atlas</b> (598&nbsp;KB, down from 2.9&nbsp;MB); the catalogue app moved to <code>catalogue.html</code> by <code>git mv</code>.",
+    "<b>Both catalogue routes linked from the header</b>: <i>How are you feeling</i> &rarr; <code>#feel</code>, <i>All 6,192 tests</i> &rarr; <code>#tests</code>.",
+    "<b>pipeline/tests/</b> — twelve geometry checks with one runner, non-zero exit on failure, and a README saying which bug each one catches.",
+    "v0.4 is marked superseded: it is the catalogue page now, not the front door."
+   ],
+   "note": "Desktop-first. Below 1080px the detail panel and legend are hidden and there is no phone layout yet.",
+   "mb": 0.59
+  },
+  {
    "id": "v4.11",
    "file": "v4.11-row-pitch.html",
    "title": "Ripple atlas — row pitch follows the row box",
@@ -2344,7 +2410,7 @@
    "title": "Free-text symptom search",
    "date": "2026-07-30",
    "source": "index.html (working tree)",
-   "status": "live",
+   "status": "superseded",
    "tag": "v0.4-symptom-search",
    "answers": [],
    "diff": "196 added, 18 removed",
