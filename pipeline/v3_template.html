@@ -66,7 +66,16 @@ button{font-family:inherit;cursor:pointer}
    of the pill it labels. Each label is centred over its own 24px segment. */
 .picker{flex:0 0 auto;padding:16px;border-bottom:1px solid var(--line)}
 .picker h3{font-family:var(--font-mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;
- color:var(--dim);margin:0 0 8px}
+ color:var(--dim);margin:0}
+/* Two shortcuts on the header line: thirteen chips is too many to clear one at
+   a time. They keep their space whatever the state — when the selection already
+   matches, the button dims rather than disappearing. */
+.pickhd{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:0 0 8px}
+.pacts{display:flex;gap:8px;flex:0 0 auto}
+.pact{background:none;border:none;padding:0;font-family:var(--font-mono);font-size:9px;letter-spacing:.06em;
+ text-transform:uppercase;color:var(--teal);white-space:nowrap}
+.pact:hover{color:var(--accent)}
+.pact[disabled]{color:#c8d2d3}
 .pchips{display:flex;flex-wrap:wrap;gap:8px}
 .pchip{border:1px solid var(--line);background:#fff;color:var(--muted);font-size:11px;padding:4px 8px;
  border-radius:12px;white-space:nowrap;display:inline-flex;align-items:baseline;gap:4px}
@@ -239,6 +248,8 @@ button{font-family:inherit;cursor:pointer}
 .map .e3{fill:none;stroke:var(--warm);stroke-width:1.4}
 
 .map .colhd{font-family:var(--font-mono);font-size:9px;fill:var(--dim);letter-spacing:.09em}
+.map .fold .lb{fill:var(--dim)}
+.map .foldn{font-family:var(--font-mono);font-size:8px;fill:#b4c0c2}
 .map .grpdup{font-family:var(--font-mono);font-size:8px;fill:#b4c0c2}
 .map .grphd{font-family:var(--font-mono);font-size:8.5px;fill:#a9b6b8;letter-spacing:.07em}
 /* the arrow lives in its own reserved gutter, so labels never move */
@@ -356,7 +367,13 @@ button{font-family:inherit;cursor:pointer}
    <p>Mark anything that came back low or high. The ripple spreads outward into what it could mean.</p>
   </div>
   <div class="picker">
-   <h3>Panels you have had</h3>
+   <div class="pickhd">
+    <h3>Panels you have had</h3>
+    <span class="pacts">
+     <button class="pact" id="pReset" data-pset="annual" title="Back to the routine checkup: CBC, CMP and lipids">annual only</button>
+     <button class="pact" id="pAll" data-pset="all" title="Select every panel in the library">select all</button>
+    </span>
+   </div>
    <div class="pchips" id="pChips"></div>
   </div>
   <div class="railhd"><span>marker</span><span class="r"><i>low</i><i>norm</i><i>high</i></span></div>
@@ -398,6 +415,7 @@ const PANELS_ALL = D.panels;
    the concerns it can raise, the ripple — is derived from this, so adding a
    panel is a data change, not a code change. */
 let SLUGS = [], PICKER_GROUPS = [];
+const ANNUAL_IDS = D.panels.filter(p => p.grp === 'ANNUAL').map(p => p.id);
 function activePanels(){ return PANELS_ALL.filter(p => st.panels[p.id]); }
 function refreshSlugs(){
  const seen = {}; SLUGS = [];
@@ -468,6 +486,44 @@ function buildLayout(){
  const xT = b.L + b.w * 0.775;   // follow-up dots
  const xCend = xT - 26;          // right edge of the concern column
 
+ // The concern column is measured first, because both columns must end up at
+ // the same type size and the marker column has to know what that size is
+ // before it decides how names wrap. Nothing here depends on where a row
+ // lands — only on how many rows there are — so it can run first.
+ const nUnreach = CIDS.filter(ci => !C[ci].from.some(sl => SLUGS.indexOf(sl) >= 0)).length;
+ // The divider is a section header: it wraps to fit the column, and the band
+ // is sized from the number of lines so the space above and below is equal.
+ const divTxt = nUnreach + ' CONCERNS NO PANEL MARKER CAN REACH';
+ const divPer = Math.max(12, Math.floor((xCend - xC - 12) / 6.2));   // 9px mono + tracking
+ const divLines = wrap(divTxt, divPer, 2);
+ // 24 above the first baseline; below the last baseline the band closes at 16,
+ // exactly the gap a column header leaves before its first row, with the rule
+ // sitting halfway through it.
+ const divPad = 24, divLead = 12, divGap = 8, divTail = 16;
+ const divH = divPad + (divLines.length - 1) * divLead + divTail;
+ const cAvail = b.h - divH;
+ const LEAD = 1.06, PAD = 2;
+ // A concern name is never cut. Step the type down until every name fits on
+ // the lines it needs. The 52px reserved on the right is the marker-count
+ // chip's space, held whether or not the chip is there.
+ const cSolve = cap => {
+  let best = null;
+  for(let fs = Math.min(12, cap); fs >= 8; fs--){
+   const per = Math.max(8, Math.floor((xCend - xC - 52) / (fs * 0.6)));
+   const lead = fs * LEAD;
+   const ln = {}; let need = 0;
+   CIDS.forEach(ci => {
+    ln[ci] = wrap(C[ci].label, per, 0);
+    need += ln[ci].length * lead + PAD;
+   });
+   const cand = { fs: fs, lead: lead, ln: ln, need: need, fits: need <= cAvail };
+   if(!best || cand.need < best.need) best = cand;
+   if(cand.fits) return cand;
+  }
+  return best;
+ };
+ const cs0 = cSolve(12);
+
  // ---- markers: three panel groups stacked down the full height. The group
  // sub-headers wrap to as many lines as the column needs, and the space they
  // take is measured from that rather than assumed, so they can never collide
@@ -477,27 +533,99 @@ function buildLayout(){
  const perHead = Math.max(8, Math.floor((mEdgeX - b.L) / 5.7));   // 8.5px mono + tracking
  const AP = activePanels();
  const gLines = AP.map(p => wrap(p.name.replace(/\s*\(.*\)/, '').toUpperCase(), perHead, 3));
+ // A marker belongs to the first selected panel that lists it.
+ const own = {};
+ AP.forEach(p => p.slugs.forEach(sl => { if(own[sl] == null) own[sl] = p.id; }));
+ const pOwn = AP.map(p => p.slugs.filter(sl => own[sl] === p.id));
  // A panel that is a subset of one already selected (BMP inside CMP) owns no
  // rows of its own. It still gets a header, with a line saying where its
  // markers went, rather than an empty gap.
- const gSeen = {}, gDup = AP.map(p => {
-  const nMine = p.slugs.filter(sl => !gSeen[sl]).length;
-  p.slugs.forEach(sl => gSeen[sl] = 1);
-  return nMine === p.slugs.length ? '' : (nMine ? (p.slugs.length - nMine) + ' also above' : 'all also above');
+ const gDup = AP.map((p, gi) => {
+  const d = p.slugs.length - pOwn[gi].length;
+  return d ? (pOwn[gi].length ? d + ' also above' : 'all also above') : '';
  });
- const headTotal = gLines.reduce((a, l, gi) => a + (l.length + (gDup[gi] ? 1 : 0)) * headLead + headPad, 0);
- const nGrp = Math.max(1, AP.length);
- const mAvail = b.h - headTotal - (nGrp - 1) * grpGap;
- const mRow = mAvail / SLUGS.length;
- // only, never by size or weight.
- const mFs = Math.max(8, Math.min(12, (mRow - 2) / 1.06));
- const mk = {}; let y = b.T, groups = [];
- // a marker shared by two selected panels is listed once, under the first
- const placed = {};
+ // All thirteen panels is 68 markers — more rows than this column can give a
+ // readable line to. Rather than shrink the type below reading size, a panel
+ // with nothing marked in it folds to a single row carrying its true count,
+ // and its edges bundle there. A panel you have marked never folds, and the
+ // rail always lists every marker in full.
+ // A folded row carries two lines — the panel and its count — so it is given
+ // 24px of its own rather than one marker row's worth.
+ const MIN_ROW = 12, FOLD_H = 24;
+ const fold = {};
+ const foldable = AP.map((p, gi) => gi)
+   .filter(gi => pOwn[gi].length > 1 && !AP[gi].slugs.some(sl => st.val[sl]))
+   .reverse();
+ // Type size and row heights are solved together. Each row is as tall as its
+ // name needs — two or three lines if that is what the full name takes — and
+ // folding a panel is what buys the room. A name is never cut to make it fit.
+ const mLabW0 = mEdgeX - b.L;
+ const solve = () => {
+  let heads = 0, nRows = 0, nFold = 0;
+  AP.forEach((p, gi) => {
+   if(fold[gi]){ if(pOwn[gi].length) nFold++; return; }
+   heads += (gLines[gi].length + (gDup[gi] ? 1 : 0)) * headLead + headPad;
+   nRows += pOwn[gi].length;
+  });
+  // Try the largest type first and step down. A smaller size wraps fewer
+  // names, so the column often fits at 10px where it did not at 12 — type size
+  // is spent before any panel is folded, because folding hides names and
+  // shrinking does not.
+  let best = null;
+  for(let fs = Math.min(12, cs0.fs); fs >= 8; fs--){
+   const per = Math.max(8, Math.floor(mLabW0 / (fs * 0.6)));
+   const lh = fs * 1.12;
+   // A folded row's own name wraps too, so its height is measured, not assumed.
+   const fLn = {}; let foldH = 0;
+   AP.forEach((p, gi) => {
+    if(!fold[gi] || !pOwn[gi].length) return;
+    fLn[gi] = wrap(p.short.toUpperCase(), per, 0);
+    foldH += Math.max(FOLD_H, fLn[gi].length * lh + 16);
+   });
+   const avail = b.h - heads - (Math.max(1, AP.length) - 1) * grpGap - foldH;
+   const ln = {}; let need = 0;
+   AP.forEach((p, gi) => {
+    if(fold[gi]) return;
+    pOwn[gi].forEach(sl => {
+     ln[sl] = wrap(M[sl].name.split('[')[0].trim(), per, 0);
+     need += Math.max(MIN_ROW, ln[sl].length * lh + 6);
+    });
+   });
+   const cand = { heads: heads, avail: avail, fs: fs, lh: lh, ln: ln, fLn: fLn,
+                  need: need, fits: need <= avail };
+   if(!best || cand.need < best.need) best = cand;
+   if(cand.fits) return cand;
+  }
+  return best;
+ };
+ let sv = solve();
+ for(let i = 0; i < foldable.length && !sv.fits; i++){ fold[foldable[i]] = 1; sv = solve(); }
+ const headTotal = sv.heads, mAvail = sv.avail, mFs = sv.fs, mLn = sv.ln, fLn = sv.fLn;
+ // Spare height is shared equally between rows — the same constant added to
+ // each — so the gap between one marker name and the next is identical all the
+ // way down whatever the line counts. If nothing fits even folded, the same
+ // constant comes off every row instead.
+ const mSlugs = Object.keys(mLn);
+ const mSlack = (mAvail - sv.need) / Math.max(1, mSlugs.length);
+ const mH = {};
+ mSlugs.forEach(sl => { mH[sl] = Math.max(MIN_ROW, mLn[sl].length * sv.lh + 6) + mSlack; });
+ const mRow = sv.avail / Math.max(1, Object.keys(mLn).length);
+ const mk = {}, shown = {}; let y = b.T, groups = [], folds = [];
  AP.forEach((p, gi) => {
-  groups.push({ lines: gLines[gi], y: y + 8, n: p.slugs.length, dup: gDup[gi] });
-  y += (gLines[gi].length + (gDup[gi] ? 1 : 0)) * headLead + headPad;
-  p.slugs.forEach(sl => { if(placed[sl]) return; placed[sl] = 1; mk[sl] = y + mRow / 2; y += mRow; });
+  if(fold[gi]){
+   if(pOwn[gi].length){
+    const fh = Math.max(FOLD_H, (fLn[gi] || ['']).length * sv.lh + 16);
+    const cy = y + fh / 2;
+    pOwn[gi].forEach(sl => mk[sl] = cy);
+    folds.push({ id: p.id, lines: fLn[gi] || [p.short.toUpperCase()], n: pOwn[gi].length,
+                 name: p.name.replace(/\s*\(.*\)/, ''), slugs: pOwn[gi], y: cy, h: fh });
+    y += fh;
+   }
+  } else {
+   groups.push({ lines: gLines[gi], y: y + 8, n: p.slugs.length, dup: gDup[gi] });
+   y += (gLines[gi].length + (gDup[gi] ? 1 : 0)) * headLead + headPad;
+   pOwn[gi].forEach(sl => { shown[sl] = 1; mk[sl] = y + mH[sl] / 2; y += mH[sl]; });
+  }
   y += grpGap;
  });
 
@@ -513,37 +641,20 @@ function buildLayout(){
  reach.sort((a, c) => a.bary - c.bary || a.ci - c.ci);
  unreach.sort((a, c) => C[a.ci].label.localeCompare(C[c.ci].label));
 
- // The divider is a section header: it wraps to fit the column, and the band
- // is sized from the number of lines so the space above and below is equal.
- const divTxt = unreach.length + ' CONCERNS NO PANEL MARKER CAN REACH';
- const divPer = Math.max(12, Math.floor((xCend - xC - 12) / 6.2));   // 9px mono + tracking
- const divLines = wrap(divTxt, divPer, 2);
- // 24 above the first baseline; below the last baseline the band closes at 16,
- // exactly the gap a column header leaves before its first row, with the rule
- // sitting halfway through it.
- const divPad = 24, divLead = 12, divGap = 8, divTail = 16;
- const divH = divPad + (divLines.length - 1) * divLead + divTail;
- // Concern rows are not uniform: a name that will not fit on one line gets two,
- // and the extra height is borrowed from the rest of the column. The wrapping
- // decision always reserves room for the marker-count chip, whether or not the
- // concern currently has one, so nothing reflows when you mark a marker.
- // Fit the type and the wrapping together. Narrowing the column makes more
- // names wrap, which needs more height, which may force the type down, which
- // changes the wrapping again — so settle it by iteration rather than by a
- // fixed multiplier. Stops as soon as everything fits, or at the 8px floor.
- // One type size, 12px, and one row height for every row in every column.
- // 12px only stops fitting on a window shorter than about 780px; below that it
- // steps down rather than letting rows collide, which is the only case where
- // the size is not exactly 12.
- const cAvail = b.h - divH;
- const LEAD = 1.06, PAD = 2;
- const cFs = Math.max(8, Math.min(12, (cAvail / CIDS.length - PAD) / LEAD));
- const cPer = Math.max(8, Math.floor((xCend - xC - 52) / (cFs * 0.56)));
- const cLines = {};
- CIDS.forEach(ci => { cLines[ci] = [clip(C[ci].label, cPer)]; });
- const cUnit = cAvail / CIDS.length;               // uniform, exact fill
+ // Both columns end up at one size: if the marker column had to step down, the
+ // concern column steps down with it, so the wrapping each was measured for is
+ // the wrapping that gets drawn.
+ const cs = cs0.fs === mFs ? cs0 : cSolve(mFs);
+ const cFs = cs.fs, cLines = cs.ln;
+ // Spare height is shared as the SAME number of pixels for every row, not in
+ // proportion to it. Proportional sharing gives a two-line name twice the
+ // breathing room of a one-line one and the column reads as unevenly spaced;
+ // an equal share means the gap between one name and the next is a constant
+ // down the whole column, which is what "even spacing" means here.
+ const cSlack = (cAvail - cs.need) / Math.max(1, CIDS.length);
  const cH = {};
- CIDS.forEach(ci => { cH[ci] = cUnit; });
+ CIDS.forEach(ci => { cH[ci] = cLines[ci].length * cs.lead + PAD + cSlack; });
+ const cUnit = cAvail / CIDS.length;
 
  const cn = {}; let cy = b.T, divY = 0;
  reach.forEach(o => { cn[o.ci] = cy + cH[o.ci] / 2; cy += cH[o.ci]; });
@@ -558,16 +669,27 @@ function buildLayout(){
  // Full names, never truncated — each wraps to as many lines as it needs, and
  // every entry carries the same 8px above and below whatever its line count,
  // so the padding around each is identical.
- const MAP_SHOW = 8, T_PAD = 8;
+ const T_PAD = 8;
  const ts = [];
  if(open !== null){
+  // b.R already sits 16px clear of the detail panel, so a label that ends at
+  // b.R keeps the full gutter. 0.6 em per character is the pessimistic width
+  // for this face — under-measuring is what let names touch the panel.
   const twAvail = b.R - xT - 13;
   const tLead = FS * 1.06;
-  const perT = Math.max(8, Math.floor(twAvail / (FS * 0.56)));
-  const items = (C[open].next || []).slice(0, MAP_SHOW).map(t => {
-   const ln = wrap(t.n, perT, 3);
-   return { t: t, lines: ln, h: ln.length * tLead + T_PAD * 2 };
-  });
+  const perT = Math.max(8, Math.floor(twAvail / (FS * 0.6)));
+  const mkItems = function(n){
+   return (C[open].next || []).slice(0, n).map(function(t){
+    const ln = wrap(t.n, perT, 0);
+    return { t: t, lines: ln, h: ln.length * tLead + T_PAD * 2 };
+   });
+  };
+  // Names wrap freely, so the block's height is not known in advance. Show
+  // fewer of them rather than squeezing any one of them.
+  let nShow = 8, items = mkItems(nShow);
+  while(nShow > 3 && items.reduce(function(a, it){ return a + it.h; }, 0) > b.h){
+   nShow--; items = mkItems(nShow);
+  }
   const blockH = items.reduce((a, it) => a + it.h, 0);
   const anchor = cn[open];
   let y = Math.max(b.T, Math.min(b.B - blockH, anchor - blockH / 2));
@@ -581,7 +703,7 @@ function buildLayout(){
  const divTop = divY - divH / 2;
  return { xM:xM, xC:xC, xT:xT, xCend:xCend, mk:mk, cn:cn, ts:ts, groups:groups, cOrder:cOrder,
           divLines:divLines, divTop:divTop, divPad:divPad, divLead:divLead, divGap:divGap,
-          divTail:divTail, cLines:cLines, cH:cH,
+          divTail:divTail, cLines:cLines, cH:cH, folds:folds, shown:shown, mH:mH, mLn:mLn,
           headLead:headLeadOut,
           mRow:mRow, cRow:cRow, mFs:FS, cFs:FS, FS:FS, divY:divY, open:open,
           nReach:reach.length, nUnreach:unreach.length };
@@ -594,20 +716,34 @@ function clip(t, n){ return t.length > n ? t.slice(0, n - 1) + '…' : t; }
 function kfoc(c, i){ return st.foc && st.focVia === 'preview' && st.foc.c === c && st.foc.i === i; }
 /* Break a label onto up to `maxLines` lines at word boundaries. Only the last
    line is ever ellipsised, and only if the whole name genuinely cannot fit. */
+/* A token with no spaces in it — "Gamma glutamyl transferase.macromolecular" —
+   used to run straight out of its column and under the panel beside it, because
+   there was no space to break at. It is now split at a natural boundary
+   (. + / - ,) if there is one within the line, and hard otherwise. maxLines of
+   0 means as many rows as the name takes: see design rule 6. */
 function wrap(t, perLine, maxLines){
- if(t.length <= perLine) return [t];
- const words = t.split(' '), lines = [];
- let cur = '';
- for(let i = 0; i < words.length; i++){
-  const next = cur ? cur + ' ' + words[i] : words[i];
-  if(next.length <= perLine){ cur = next; continue; }
-  if(cur) lines.push(cur);
-  cur = words[i];
-  if(lines.length === maxLines - 1) break;
+ perLine = Math.max(4, Math.floor(perLine) || 4);
+ const lines = []; let cur = '';
+ const push = function(){ if(cur) lines.push(cur); cur = ''; };
+ String(t).split(/\s+/).filter(Boolean).forEach(function(w){
+  while(w.length > perLine){
+   push();
+   let at = perLine;
+   for(let i = perLine; i > perLine * 0.5; i--) if('.+/-,'.indexOf(w.charAt(i-1)) >= 0){ at = i; break; }
+   lines.push(w.slice(0, at)); w = w.slice(at);
+  }
+  if(!w) return;
+  if(!cur) cur = w;
+  else if((cur + ' ' + w).length <= perLine) cur += ' ' + w;
+  else { push(); cur = w; }
+ });
+ push();
+ if(maxLines && lines.length > maxLines){
+  const keep = lines.slice(0, maxLines);
+  keep[maxLines - 1] = clip(keep[maxLines - 1] + ' ' + lines.slice(maxLines).join(' '), perLine);
+  return keep;
  }
- const rest = words.slice(lines.join(' ').split(' ').filter(Boolean).length).join(' ');
- lines.push(lines.length === maxLines - 1 ? clip(rest, perLine) : cur);
- return lines.slice(0, maxLines);
+ return lines.length ? lines : [''];
 }
 
 function draw(){
@@ -673,17 +809,30 @@ function draw(){
     + (g.y + g.lines.length*L.headLead).toFixed(1)+'" text-anchor="end">'+esc(g.dup)+'</text>';
  });
  const mLabW = mEdge - b.L;
+ // A folded panel: one dot, one row, the true count. Its markers keep their
+ // edges — they all leave from this row, which is what a bundle should look
+ // like — and the rail beside it still lists every one of them by name.
+ L.folds.forEach(f => {
+  const ln = f.lines;
+  const lh = L.mFs * 1.12, y0 = f.y - f.h / 2 + L.mFs * 0.9;
+  h += '<g class="row fold"><title>'+esc(f.name + ' — ' + f.n + ' markers, listed in full in the panel on the left')+'</title>'
+    +  ln.map((t2, li) => '<text class="lb" x="'+mEdge.toFixed(1)+'" y="'+(y0 + li*lh).toFixed(1)
+        +'" text-anchor="end" style="font-size:'+L.mFs.toFixed(1)+'px">'+esc(t2)+'</text>').join('')
+    +  '<text class="foldn" x="'+mEdge.toFixed(1)+'" y="'+(y0 + ln.length * lh).toFixed(1)
+    +  '" text-anchor="end">'+f.n+' markers</text>'
+    +  '<circle class="dot" cx="'+L.xM.toFixed(1)+'" cy="'+f.y.toFixed(1)+'" r="5"/></g>';
+ });
  SLUGS.forEach(sl => {
+  if(!L.shown[sl]) return;
   const y = L.mk[sl], v = st.val[sl];
   const cls = ['row','mkr', v<0?'lo':v>0?'hi':'', selM===sl?'sel':'', st.hot===sl?'hot':'',
                kfoc(0, SLUGS.indexOf(sl))?'foc':''].filter(Boolean).join(' ');
-  const nm = M[sl].name.split('[')[0].trim();
-  const perM = Math.max(8, Math.floor(mLabW / (L.mFs * 0.56)));
-  const canTwoM = L.mRow >= L.mFs * 2.3;
-  const ln = wrap(nm, perM, canTwoM ? 2 : 1);
+  // The lines were settled during layout, so what is drawn is exactly what the
+  // row was measured for.
+  const ln = L.mLn[sl], rh = L.mH[sl];
   const lh = L.mFs * 1.12, y0 = y + L.mFs * 0.34 - (ln.length - 1) * lh / 2;
   h += '<g class="'+cls+'" data-mk="'+sl+'"><title>'+esc(M[sl].name)+'</title>'
-    +  '<rect class="hitbox" x="'+b.L.toFixed(0)+'" y="'+(y-L.mRow/2).toFixed(1)+'" width="'+(L.xM-b.L+9).toFixed(0)+'" height="'+L.mRow.toFixed(1)+'" rx="4"/>'
+    +  '<rect class="hitbox" x="'+b.L.toFixed(0)+'" y="'+(y-rh/2).toFixed(1)+'" width="'+(L.xM-b.L+9).toFixed(0)+'" height="'+rh.toFixed(1)+'" rx="4"/>'
     +  ln.map((t2, li) => '<text class="lb'+(v<0?' lo':v>0?' hi':'')+'" x="'+mEdge.toFixed(1)
         +'" y="'+(y0 + li*lh).toFixed(1)+'" text-anchor="end" style="font-size:'+L.mFs.toFixed(1)+'px">'
         +esc(t2)+'</text>').join('')
@@ -800,6 +949,11 @@ function drawRail(){
    '<button class="pchip'+(g.ids.every(id=>st.panels[id])?' on':'')+'" data-pgroup="'+esc(g.key)+'" title="'+esc(g.tip)+'">'
    + esc(g.label) + '<i>' + Object.keys(g.slugs).length + '</i></button>').join('');
  PICKER_GROUPS = groups;
+ const nOn = activePanels().length;
+ const isAnnual = nOn === ANNUAL_IDS.length && ANNUAL_IDS.every(id => st.panels[id]);
+ $('pReset').disabled = isAnnual;
+ $('pAll').disabled = nOn === PANELS_ALL.length;
+ $('pAll').textContent = 'select all ' + PANELS_ALL.length;
 
  const act = activeConcerns();
  const reachSet = {}; SLUGS.forEach(sl => (M[sl].k || []).forEach(ci => reachSet[ci] = 1));
@@ -1006,6 +1160,11 @@ function render(){ relayout(); drawRail(); drawDetail(); drawChrome(); }
 
 /* ---------- events ---------- */
 document.addEventListener('click', function(e){
+ const ps = e.target.closest('[data-pset]');
+ if(ps){ st.panels = {};
+   (ps.dataset.pset === 'all' ? PANELS_ALL : PANELS_ALL.filter(p => ANNUAL_IDS.indexOf(p.id) >= 0))
+     .forEach(p => st.panels[p.id] = 1);
+   refreshSlugs(); st.sel = null; st.foc = null; save(); render(); return; }
  const pk = e.target.closest('[data-pgroup]');
  if(pk){ const g = PICKER_GROUPS.find(x => x.key === pk.dataset.pgroup);
    if(!g) return;

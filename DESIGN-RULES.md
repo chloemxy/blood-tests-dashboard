@@ -120,6 +120,35 @@ acceptable.
 meaningful axis, show the commonly-relevant members by default, and put the true
 count on every group header so nothing is hidden without being counted.
 
+**Text never runs under a panel.** Every column measures its available width
+from the nearest panel edge minus the constant 16px gutter, and wraps to that
+width — at every window size, in every column, for every label. A name with no
+space in it (`Gamma glutamyl transferase.macromolecular`) is broken at a natural
+boundary — `.` `+` `/` `-` `,` — or hard if there is none. Nothing is allowed to
+overflow its column and slide under the panel beside it. Verify by measurement,
+not by eye: the regression checks the right edge of the widest label against the
+gutter at six window sizes.
+
+**When it will not fit, spend type size first, then fold — never truncate.**
+Step the type down to the 8px floor before giving up any content. Only then
+group the least relevant rows into a single row that states its true count, and
+keep the full list somewhere on screen (in our case, the rail).
+
+## 5b. Even spacing within a column
+
+Rows in a column may differ in height — a two-line name is taller than a
+one-line one — but **the gap between one row's text and the next is a constant**
+down the whole column.
+
+The failure mode is sharing leftover height *in proportion* to each row: a
+two-line row then gets twice the breathing room of a one-line row and the column
+reads as ragged. Share it as the same number of pixels added to every row.
+
+Where two columns are set at one type size, both must be *measured* at that
+size. Measuring a column at 12px and drawing it at 11px silently reintroduces
+uneven gaps, because the wrapping that was budgeted for is not the wrapping that
+gets drawn.
+
 ## 7. Sourcing
 
 - No hallucination. Every claim carries a credible reference with a link.

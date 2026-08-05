@@ -43,6 +43,55 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F31",
+  "date": "2026-08-04",
+  "who": "Chloe",
+  "title": "Even spacing for each column",
+  "status": "addressed",
+  "versions": ["v4.2"],
+  "quote": "even spacing for each column",
+  "did": [
+   ("Spare height shared equally, not in proportion", "addressed",
+    "Rows differ in height because names now wrap, and the leftover height was being shared <i>in proportion</i> to each row \u2014 so a two-line row got twice the breathing room of a one-line one and the column read as ragged. The same number of pixels is now added to every row, which makes the gap between one name and the next a constant down the whole column. Measured: gap spread is 0.1px in all three columns at four window sizes."),
+   ("One measured size, not one drawn size", "addressed",
+    "A second cause: the marker column was measured at 12px and drawn at 11px, because the shared type size is the smaller of the two columns and was settled after the marker column had already budgeted its rows. The concern column is now solved first, the marker column is capped at that size, and the concern column re-solves if the marker column steps down further \u2014 so what is measured is what is drawn."),
+  ],
+ },
+ {
+  "id": "F30",
+  "date": "2026-08-04",
+  "who": "Chloe",
+  "title": "Text must respect the panel gutter, and wrap",
+  "status": "addressed",
+  "versions": ["v4.2"],
+  "quote": "again, respect the padding between text and right panel, put in multiple rows of text if needed, put in rule and apply to all text and relationship to panels",
+  "did": [
+   ("The real cause was an unbreakable name", "addressed",
+    "The column width already reserved the 16px gutter. What broke it was <code>wrap()</code>, which could only break at spaces \u2014 so <i>Gamma glutamyl transferase.macromolecular</i> was one token and ran straight under the detail panel. It is now broken at a natural boundary (<code>. + / - ,</code>) or hard if there is none."),
+   ("Names wrap to as many rows as they need", "addressed",
+    "The three-line cap with an ellipsis is gone from the follow-up column, and the marker and concern columns \u2014 which were capped at two lines and one clipped line respectively \u2014 now wrap freely. Row heights are measured from the wrapped result, so nothing collides."),
+   ("Type size is spent before content is", "addressed",
+    "When a column will not fit, the type steps down from 12px to the 8px floor first. Only then does a panel fold. Truncation is no longer a step in that sequence anywhere in the map."),
+   ("Written into the rules and checked", "addressed",
+    "New design rules: text never runs under a panel (\u00a76) and even spacing within a column (\u00a75b). The regression measures the widest label\u2019s right edge against the panel gutter at six window sizes and the leftmost label against the rail at five \u2014 all clear."),
+  ],
+ },
+ {
+  "id": "F29",
+  "date": "2026-08-04",
+  "who": "Chloe",
+  "title": "A reset and a select-all for the panel picker",
+  "status": "addressed",
+  "versions": ["v4.2"],
+  "quote": "it\u2019s kinda annoying to toggle on and off each one, can we have a reset button to annual? and a select all?",
+  "did": [
+   ("Two shortcuts on the picker header", "addressed",
+    "<b>annual only</b> resets to the routine checkup; <b>select all 13</b> turns on the whole library. They hold their place whatever the state \u2014 when the selection already matches, the button dims rather than disappearing, so the header never reflows."),
+   ("Select-all had to be survivable", "addressed",
+    "All 13 panels is 68 markers, which at 900px gave each row 5px \u2014 unreadable. A panel with nothing marked in it now folds to one row carrying its true count, with its edges bundled there and every one of its markers still listed in the rail. A panel you have marked never folds, and the annual panel on its own is never folded at any window size."),
+  ],
+ },
+ {
   "id": "F28",
   "date": "2026-08-04",
   "who": "Chloe",
@@ -726,6 +775,26 @@ FEEDBACK = [
 # VERSIONS — newest first
 # ===========================================================================
 VERSIONS = [
+ {
+  "id": "v4.2",
+  "file": "v4.2-even-columns.html",
+  "title": "Ripple atlas \u2014 picker shortcuts, whole names, even columns",
+  "date": "2026-08-04",
+  "source": "index-v3.html",
+  "status": "candidate",
+  "tag": "v4.2-even-columns",
+  "gitpath": "index-v3.html",
+  "answers": ["F29", "F30", "F31"],
+  "summary": "Two shortcuts on the panel picker, no truncation left anywhere in the map, and one constant gap between rows in every column.",
+  "changes": [
+   "<b>annual only</b> and <b>select all 13</b> on the picker header; they dim rather than disappear when the selection already matches.",
+   "<b>Folding</b> \u2014 a panel with nothing marked collapses to one row with its true count when 68 markers will not fit, edges bundled, full list still in the rail.",
+   "<b>No truncation in the map.</b> Names wrap to as many rows as they take; unbreakable names split at <code>. + / - ,</code>; type steps 12&#8594;8px before any content is given up.",
+   "<b>One constant gap</b> between rows in each column: spare height is shared equally, not in proportion. Measured spread 0.1px.",
+   "<b>Measured is drawn</b> \u2014 the concern column is solved first and the marker column capped to it, so both columns wrap at the size they are rendered at.",
+   "Regression: label right edges clear the detail-panel gutter at six window sizes; left edges clear the rail at five; no row overlaps with all 13 panels on.",
+  ],
+ },
  {
   "id": "v4.1",
   "file": "v4.1-thirteen-panels.html",
