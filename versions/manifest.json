@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-05T08:01:52Z",
+ "generated": "2026-08-05T08:02:25Z",
  "live": "index.html",
  "constraints": [
   [
@@ -39,6 +39,11 @@
    ],
    "quote": "these kind of titles can be 10 px, apply to all similar component texts",
    "did": [
+    [
+     "Picker title cut to one word",
+     "addressed",
+     "<i>Panels you have had</i> wrapped onto two lines beside its two shortcuts. It is <b>Panels</b> now — the rail already says whose bloodwork this is, and the chips say which ones are on."
+    ],
     [
      "The three map column titles, missed on the first pass",
      "addressed",
