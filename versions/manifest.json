@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-05T08:11:10Z",
+ "generated": "2026-08-05T08:11:45Z",
  "live": "index.html",
  "constraints": [
   [
@@ -28,6 +28,39 @@
   ]
  ],
  "feedback": [
+  {
+   "id": "F41",
+   "date": "2026-08-04",
+   "who": "Chloe",
+   "title": "Scroll the map instead of rolling markers up",
+   "status": "addressed",
+   "versions": [
+    "v4.8"
+   ],
+   "quote": "the main screen is scrollable to compensate more panel tests, right now the roll up markers don’t show and can’t be clicked open",
+   "did": [
+    [
+     "Folding is gone",
+     "addressed",
+     "It was the wrong answer to the 12px floor: a folded panel showed a count and nothing else, and there was no way to open it. Every marker in every selected panel now has its own row at every window size — 68 rows with all 13 panels on — and all 47 concerns are always listed. The “+N more” row and the “add any of them in the panel” band suffix are gone with it."
+    ],
+    [
+     "The map is a box that scrolls",
+     "addressed",
+     "The canvas is as tall as the taller of the window and what the columns need — 2,320px at 1280&times;720 with every panel on — and scrolls inside its own frame. The rail, the detail panel and the footer are its siblings, not its children, so they do not move."
+    ],
+    [
+     "The headings stay put",
+     "addressed",
+     "The three column titles moved out of the SVG into a fixed band above it, so scrolling never takes them away. They are HTML in the same box shape as a panel header — same size, same 16px from the top — which puts all four labels on one line by construction. The measured-baseline helper from v4.4 is deleted: there is nothing left to measure."
+    ],
+    [
+     "Keyboard follows",
+     "addressed",
+     "Arrow keys can now walk past the bottom of the window, so the canvas scrolls the focused row into view with 48px of air rather than leaving it off screen."
+    ]
+   ]
+  },
   {
    "id": "F40",
    "date": "2026-08-04",
@@ -1484,6 +1517,28 @@
   }
  ],
  "versions": [
+  {
+   "id": "v4.8",
+   "file": "v4.8-scrolling-canvas.html",
+   "title": "Ripple atlas — the canvas scrolls, nothing rolls up",
+   "date": "2026-08-04",
+   "source": "index-v3.html",
+   "status": "candidate",
+   "tag": "v4.8-scrolling-canvas",
+   "gitpath": "index-v3.html",
+   "answers": [
+    "F41"
+   ],
+   "summary": "Every marker and every concern gets its own row at every window size. When they do not fit, the map grows and scrolls inside its own frame rather than rolling panels up out of reach.",
+   "changes": [
+    "<b>Folding removed</b> — 68 marker rows with all 13 panels on, and all 47 concerns, always.",
+    "<b>Scrolling canvas</b>: the map is as tall as it needs to be (2,320px at 1280&times;720 with every panel on); the panels around it hold still.",
+    "<b>Column titles in a fixed band</b> above the canvas, in the same box shape as a panel header — four labels on one line by construction rather than by measurement.",
+    "<b>Keyboard scrolls with you</b>, keeping the focused row 48px clear of the edge.",
+    "Deleted: the fold machinery, the “+N more” row, the band suffix and the measured-baseline helper."
+   ],
+   "mb": 0.58
+  },
   {
    "id": "v4.7",
    "file": "v4.7-toggle-icons.html",

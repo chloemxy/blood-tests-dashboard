@@ -72,9 +72,9 @@ title, 20 for the app title.
 **Line height on the map is 16px** for content and 12px for the 10px labels, and
 the shortest a content row can be is 16px.
 
-A floor this high costs room, and that cost is paid in content, not in type: a
-column that cannot fit every row shows fewer rows and states how many it is not
-showing (see §6). Type size is never the variable that absorbs a small window.
+A floor this high costs room, and that cost is paid in height, not in type or in
+content: the canvas grows and scrolls (see §6). Type size is never the variable
+that absorbs a small window, and neither is the number of rows.
 
 ## 2. Nothing shifts under the cursor
 
