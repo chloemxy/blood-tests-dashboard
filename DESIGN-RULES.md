@@ -54,6 +54,20 @@ for m in re.finditer(r'([\w.#>\-\s,:\[\]()="]+)\{([^}]*)\}', css):
 
 ---
 
+## 1b. The type scale
+
+**12px is the floor.** Nothing on the page is set smaller, anywhere, for any
+reason — not a badge, not a chip, not a label on the map.
+
+**Sizes go up in steps of 2px**: 12, 14, 16, 18, 20. In use: 12 for everything,
+16 for a section head, 18 for a panel title, 20 for the app title.
+
+**Line height on the map is 16px**, and the shortest a row can be is 16px.
+
+A floor this high costs room, and that cost is paid in content, not in type: a
+column that cannot fit every row shows fewer rows and states how many it is not
+showing (see §6). Type size is never the variable that absorbs a small window.
+
 ## 2. Nothing shifts under the cursor
 
 Interacting with the page must not move anything already on screen.
@@ -161,6 +175,18 @@ rather than centred in it — centred text moves with its content.
 
 Titles are short. A heading competes with the names below it for the same
 column width, and the names need it more.
+
+**Panel headers are one object.** Every panel header is the same thing in the
+same box: a mono kicker, a serif title, one short line under it, 16px padding,
+96px minimum height. Two panels side by side are then automatically in register.
+
+## 5c. No decoration
+
+Nothing is applied for atmosphere. No drop shadows, no background blur, no
+translucent panels, no gradients. A panel is a white box with a 1px border.
+
+Every visual property should be answerable with what it tells the reader. If the
+answer is "it looks nicer", remove it.
 
 ## 7. Sourcing
 

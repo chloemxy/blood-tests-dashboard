@@ -43,6 +43,43 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F37",
+  "date": "2026-08-04",
+  "who": "Chloe",
+  "title": "Left panel header, same shape as the right",
+  "status": "addressed",
+  "versions": ["v4.5"],
+  "quote": "reformat the left panel title to match the right panel title section",
+  "did": [
+   ("One header object, used twice", "addressed",
+    "The rail header was a serif <code>h1</code> and a paragraph; the detail panel was a mono kicker, a serif title and a short line, in a 96px box. Both are now the second thing: <i>YOUR BLOODWORK</i> / <b>Start with your annual panel</b> / <i>Mark anything that came back low or high.</i> The two panels are in register because they are the same object, not because two sets of numbers were matched up."),
+   ("A useful side effect", "addressed",
+    "Both kicker lines now sit on the same baseline as the map\u2019s three column titles \u2014 one line across the whole screen."),
+  ],
+ },
+ {
+  "id": "F36",
+  "date": "2026-08-04",
+  "who": "Chloe",
+  "title": "12px floor, 2px steps, no decoration",
+  "status": "addressed",
+  "versions": ["v4.5"],
+  "quote": "the smallest font size on the page shouldn\u2019t be smaller than 12px, each size up is 2x pixels. remove unnecessary styling",
+  "did": [
+   ("Four sizes, nothing under 12", "addressed",
+    "The page had thirteen sizes between 8px and 19px. It now has four \u2014 12, 16, 18, 20 \u2014 and 12px is the floor everywhere, including every label on the map. The map\u2019s line height is 16px and its shortest row is 16px."),
+   ("The map no longer scales its type", "addressed",
+    "The two solvers that stepped the type from 12px down to 8px to make a column fit are gone, and with them the whole class of bug where a column was measured at one size and drawn at another. Type size is now a constant, not a variable."),
+   ("What absorbs a small window instead", "addressed",
+    "Content, and it says so. A marker panel with nothing marked folds to one row with its true count; the concern column places what fits and the divider band carries the rest \u2014 <i>29 concerns no panel marker can reach &middot; add any of them in the panel</i>, which is exactly where they are. At 1920&times;1080 all 47 concerns are listed; at 900px tall, the 18 the panel reaches are listed and the other 29 are counted."),
+   ("Truncation is now gone from the map entirely", "addressed",
+    "The last three line-caps \u2014 panel group headers, the divider band, and the rail\u2019s marker names \u2014 wrapped instead. No ellipsis is produced anywhere on the page."),
+   ("Decoration removed", "addressed",
+    "Drop shadows, background blur and translucent panel fills are gone; a panel is a white box with a 1px border. Inline font-size overrides in the SVG are gone too \u2014 size lives in one CSS rule."),
+  ],
+  "open": "The 12px floor costs rows. At 1280&times;720 with the annual panel selected, one of the three panels folds; at that size the old build showed all 26 markers at 8px.",
+ },
+ {
   "id": "F35",
   "date": "2026-08-04",
   "who": "Chloe",
@@ -835,6 +872,27 @@ FEEDBACK = [
 # VERSIONS — newest first
 # ===========================================================================
 VERSIONS = [
+ {
+  "id": "v4.5",
+  "file": "v4.5-type-floor.html",
+  "title": "Ripple atlas \u2014 12px floor, no decoration",
+  "date": "2026-08-04",
+  "source": "index-v3.html",
+  "status": "candidate",
+  "tag": "v4.5-type-floor",
+  "gitpath": "index-v3.html",
+  "answers": ["F36", "F37"],
+  "summary": "One type scale with a 12px floor, the map\u2019s type no longer scaling with the window, decoration stripped, and both panel headers built from the same object.",
+  "changes": [
+   "<b>Four sizes</b> \u2014 12 / 16 / 18 / 20 \u2014 down from thirteen between 8 and 19. 12px is the floor everywhere.",
+   "<b>The map\u2019s type is a constant.</b> The 12&#8594;8px solvers are gone; 16px line height, 16px minimum row.",
+   "<b>Content absorbs a small window, and says so</b>: panels fold with their true count, the concern column places what fits and the band carries the rest \u2014 <i>&middot; add any of them in the panel</i>.",
+   "<b>No truncation left anywhere on the page.</b> The last three line-caps now wrap.",
+   "<b>No decoration</b>: shadows, blur and translucency removed; panels are white boxes with a 1px border.",
+   "<b>One panel-header object</b>, used by the rail and the detail panel, which also puts both kickers on the map\u2019s title baseline.",
+  ],
+  "note": "The floor costs rows: at 1280\u00d7720 one annual panel folds where the old build showed all 26 markers at 8px.",
+ },
  {
   "id": "v4.4",
   "file": "v4.4-measured-baseline.html",
