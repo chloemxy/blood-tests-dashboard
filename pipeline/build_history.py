@@ -43,6 +43,23 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F38",
+  "date": "2026-08-04",
+  "who": "Chloe",
+  "title": "Component labels can be 10px",
+  "status": "addressed",
+  "versions": ["v4.6"],
+  "quote": "these kind of titles can be 10 px, apply to all similar component texts",
+  "did": [
+   ("A second tier, defined by what the text is", "addressed",
+    "10px is now reserved for mono, uppercase, tracked text that <i>names</i> what is below it rather than being part of it: the three map column titles, panel group headers, the divider band, section kickers, the picker header and its two shortcuts, the quoted / ai-written tags, family headers, the keyboard hint. 36 rules in all. Anything sentence-case, or that carries meaning on its own \u2014 marker names, concern names, chips, buttons, body copy \u2014 stays at 12px."),
+   ("Their own line height", "addressed",
+    "10px labels sit on a 12px lead rather than the 16px content lead, which is what makes them read as a signpost. That also bought back rows: at 1280&times;720 the marker column now shows 21 of 26 markers individually where it showed 19."),
+   ("Written into the rule", "addressed",
+    "\u00a71b now states the test rather than a list: a label may be quieter than what it points at; if it is sentence-case or is content in its own right, it is not one of these. Scale is 10 / 12 / 16 / 18 / 20."),
+  ],
+ },
+ {
   "id": "F37",
   "date": "2026-08-04",
   "who": "Chloe",
@@ -872,6 +889,24 @@ FEEDBACK = [
 # VERSIONS — newest first
 # ===========================================================================
 VERSIONS = [
+ {
+  "id": "v4.6",
+  "file": "v4.6-label-tier.html",
+  "title": "Ripple atlas \u2014 a label tier at 10px",
+  "date": "2026-08-04",
+  "source": "index-v3.html",
+  "status": "candidate",
+  "tag": "v4.6-label-tier",
+  "gitpath": "index-v3.html",
+  "answers": ["F38"],
+  "summary": "Mono uppercase component labels drop to 10px on a 12px lead \u2014 a signpost tier, distinct from the 12px floor that still governs everything read as content.",
+  "changes": [
+   "<b>36 rules to 10px</b>: column titles, group headers, the divider band, kickers, picker header and shortcuts, quoted / ai-written tags, family headers, keyboard hint.",
+   "<b>12px floor holds</b> for marker names, concern names, chips, buttons and body copy.",
+   "<b>12px lead for labels</b>, 16px for content \u2014 which returned five marker rows at 1280&times;720.",
+   "Scale is now 10 / 12 / 16 / 18 / 20.",
+  ],
+ },
  {
   "id": "v4.5",
   "file": "v4.5-type-floor.html",

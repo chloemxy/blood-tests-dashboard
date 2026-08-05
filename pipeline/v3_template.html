@@ -34,9 +34,9 @@ button{font-family:inherit;cursor:pointer}
  padding:0 16px;background:var(--panel);border-bottom:1px solid var(--line);z-index:6}
 .top .logo{font-family:var(--font-serif);font-size:18px;color:var(--slate);font-weight:700}
 .top .logo b{color:var(--teal)}
-.top .tag{font-family:var(--font-mono);font-size:12px;color:var(--muted);letter-spacing:.04em}
+.top .tag{font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:.04em}
 .top .sp{flex:1}
-.top .stat{font-family:var(--font-mono);font-size:12px;color:var(--dim);white-space:nowrap}
+.top .stat{font-family:var(--font-mono);font-size:10px;color:var(--dim);white-space:nowrap}
 .top .btn{border:1px solid var(--line);background:#fff;color:var(--slate);font-size:12px;font-weight:600;
  padding:4px 12px;border-radius:16px}
 .top .btn:hover{border-color:var(--accent);color:var(--accent)}
@@ -48,7 +48,7 @@ button{font-family:inherit;cursor:pointer}
 .pnl{position:absolute;background:#fff;border:1px solid var(--line);border-radius:14px;
  z-index:3;display:flex;flex-direction:column}
 .pnl > header{flex:0 0 auto;padding:8px 16px;border-bottom:1px solid var(--line);
- font-family:var(--font-mono);font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--dim);
+ font-family:var(--font-mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--dim);
  display:flex;align-items:center;gap:8px}
 .pnl > header b{font-family:var(--font-mono);color:var(--slate);font-weight:600}
 .pnl > header .sp{flex:1}
@@ -60,7 +60,7 @@ button{font-family:inherit;cursor:pointer}
    the two kicker lines on one baseline across the screen. */
 .railtop{flex:0 0 auto;padding:16px;border-bottom:1px solid var(--line);min-height:96px;
  display:flex;flex-direction:column;justify-content:flex-start;gap:4px}
-.railtop .k{font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
+.railtop .k{font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
 .railtop h1{font-family:var(--font-serif);font-size:18px;color:var(--slate);margin:0;line-height:1.3;font-weight:700}
 .railtop p{font-size:12px;color:var(--muted);margin:0;line-height:1.5}
 .railbody{flex:1 1 auto;min-height:0;padding:0 8px 8px}
@@ -69,35 +69,35 @@ button{font-family:inherit;cursor:pointer}
    gutter plus 8px of row padding — without that the header sat 8px to the right
    of the pill it labels. Each label is centred over its own 24px segment. */
 .picker{flex:0 0 auto;padding:16px;border-bottom:1px solid var(--line)}
-.picker h3{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+.picker h3{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
  color:var(--dim);margin:0}
 /* Two shortcuts on the header line: thirteen chips is too many to clear one at
    a time. They keep their space whatever the state — when the selection already
    matches, the button dims rather than disappearing. */
 .pickhd{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:0 0 8px}
 .pacts{display:flex;gap:8px;flex:0 0 auto}
-.pact{background:none;border:none;padding:0;font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;
+.pact{background:none;border:none;padding:0;font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;
  text-transform:uppercase;color:var(--teal);white-space:nowrap}
 .pact:hover{color:var(--accent)}
 .pact[disabled]{color:#c8d2d3}
 .pchips{display:flex;flex-wrap:wrap;gap:8px}
 .pchip{border:1px solid var(--line);background:#fff;color:var(--muted);font-size:12px;padding:4px 8px;
  border-radius:12px;white-space:nowrap;display:inline-flex;align-items:baseline;gap:4px}
-.pchip i{font-style:normal;font-family:var(--font-mono);font-size:12px;color:var(--dim)}
+.pchip i{font-style:normal;font-family:var(--font-mono);font-size:10px;color:var(--dim)}
 .pchip:hover{border-color:var(--teal);color:var(--teal)}
 .pchip.on{background:var(--aqua);border-color:var(--teal);color:var(--slate)}
 .pchip.on i{color:var(--teal)}
-.nocat{font-family:var(--font-mono);font-size:12px;color:#b4c0c2;text-align:center;cursor:help}
+.nocat{font-family:var(--font-mono);font-size:10px;color:#b4c0c2;text-align:center;cursor:help}
 .railhd{flex:0 0 auto;display:grid;grid-template-columns:1fr var(--tglW);gap:8px;align-items:center;
  padding:8px 24px 8px 16px;border-bottom:1px solid var(--line);background:rgba(247,249,249,.7)}
-.railhd span{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.railhd span{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
 .railhd .r{display:grid;grid-template-columns:repeat(3,1fr)}
-.railhd .r i{font-style:normal;font-family:var(--font-mono);font-size:12px;letter-spacing:0;
+.railhd .r i{font-style:normal;font-family:var(--font-mono);font-size:10px;letter-spacing:0;
  text-transform:uppercase;color:#a9b6b8;text-align:center;display:block}
-.grouphd{font-family:var(--font-mono);font-size:12px;letter-spacing:.07em;text-transform:uppercase;
+.grouphd{font-family:var(--font-mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;
  color:var(--dim);padding:16px 8px 8px;display:flex;align-items:baseline;gap:8px}
 .grouphd b{color:var(--slate);font-weight:600}
-.grouphd .dup{margin-left:auto;color:#b4c0c2;font-size:12px;text-transform:none;letter-spacing:0}
+.grouphd .dup{margin-left:auto;color:#b4c0c2;font-size:10px;text-transform:none;letter-spacing:0}
 /* Row highlights bleed to the panel edge: the row carries the horizontal
    padding and cancels its container's with a negative margin. Same pattern for
    every row-like component — marker rows, follow-up rows, family headers, the
@@ -131,7 +131,7 @@ button{font-family:inherit;cursor:pointer}
 
 .layer{flex:0 0 auto;border-top:1px solid var(--line);padding:16px;max-height:184px;
  display:flex;flex-direction:column}
-.layer h3{font-family:var(--font-mono);font-size:12px;letter-spacing:.07em;text-transform:uppercase;
+.layer h3{font-family:var(--font-mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;
  color:var(--dim);margin:0 0 4px}
 .layer p{font-size:12px;color:var(--muted);margin:0 0 8px;line-height:1.45}
 .chips{flex:1 1 auto;min-height:0;display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;padding-right:8px}
@@ -145,11 +145,11 @@ button{font-family:inherit;cursor:pointer}
 .det{top:0;right:0;bottom:var(--footH);width:var(--detW);border-radius:0;border-right:none;border-top:none}
 .dhead{flex:0 0 auto;padding:16px;border-bottom:1px solid var(--line);min-height:96px;
  display:flex;flex-direction:column;justify-content:flex-start;gap:4px}
-.dhead .k{font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
+.dhead .k{font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
 .dhead h2{font-family:var(--font-serif);font-size:18px;color:var(--slate);margin:0;line-height:1.3}
 .dhead .s{font-size:12px;color:var(--muted);line-height:1.5;padding-bottom:4px}
 .slot{flex:0 0 auto;border-bottom:1px solid var(--line);display:flex;flex-direction:column}
-.slot > .h{flex:0 0 auto;font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+.slot > .h{flex:0 0 auto;font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;
  color:var(--dim);padding:16px 16px 8px;display:flex;align-items:baseline;gap:8px}
 .slot > .h b{color:var(--accent);font-weight:600}
 .slot > .c{flex:1 1 auto;min-height:0;padding:0 16px 16px}
@@ -176,15 +176,15 @@ button{font-family:inherit;cursor:pointer}
 .wl{list-style:none;margin:0;padding:0}
 .wl li{font-size:12px;color:var(--muted);padding:4px 16px;margin:0 -16px;line-height:1.45}
 .wl li b{color:var(--slate)}
-.wl li i{font-style:normal;font-family:var(--font-mono);font-size:12px;padding:0 4px;border-radius:8px;margin-right:8px}
+.wl li i{font-style:normal;font-family:var(--font-mono);font-size:10px;padding:0 4px;border-radius:8px;margin-right:8px}
 .wl li i.lo{background:#e2f2f5;color:var(--low)}
 .wl li i.hi{background:#fdf1ea;color:var(--high)}
 
 .fc{border-left:2px solid var(--warm);padding:0 0 0 12px;margin:0 0 24px}
 .fc:last-child{margin-bottom:0}
 .fc q{font-family:var(--font-serif);font-size:12px;color:var(--slate);line-height:1.55;display:block;font-style:italic}
-.fc .cite{font-family:var(--font-mono);font-size:12px;color:var(--dim);margin-top:8px;display:block}
-.fc .rel{font-family:var(--font-mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;
+.fc .cite{font-family:var(--font-mono);font-size:10px;color:var(--dim);margin-top:8px;display:block}
+.fc .rel{font-family:var(--font-mono);font-size:10px;letter-spacing:.04em;text-transform:uppercase;
  color:var(--accent);display:block;margin-bottom:4px;line-height:1.4}
 
 .nl{list-style:none;margin:0;padding:0}
@@ -197,17 +197,17 @@ button{font-family:inherit;cursor:pointer}
 .famtog{display:grid;grid-template-columns:16px 1fr auto;gap:8px;align-items:baseline;width:auto;
  background:none;border:none;padding:4px 16px;margin:0 -16px;border-bottom:1px solid var(--line);text-align:left}
 .famtog:hover{background:var(--aqua)}
-.famtog .fx{font-family:var(--font-mono);font-size:12px;color:var(--teal);text-align:center}
-.famtog .fn{font-family:var(--font-mono);font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--slate)}
-.famtog .fc{font-family:var(--font-mono);font-size:12px;color:var(--dim)}
+.famtog .fx{font-family:var(--font-mono);font-size:10px;color:var(--teal);text-align:center}
+.famtog .fn{font-family:var(--font-mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--slate)}
+.famtog .fc{font-family:var(--font-mono);font-size:10px;color:var(--dim)}
 .famtog:hover .fn{color:var(--teal)}
 .more{display:block;width:100%;margin:8px 0 0;padding:4px 8px;border:1px solid var(--line);background:#fff;
- border-radius:8px;font-family:var(--font-mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;
+ border-radius:8px;font-family:var(--font-mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;
  color:var(--teal)}
 .more:hover{border-color:var(--teal);background:var(--aqua)}
 .morenote{font-size:12px;color:var(--dim);margin:8px 0 0;line-height:1.45}
 .nl .n{font-size:12px;color:var(--slate);line-height:1.35}
-.nl .n em{font-style:normal;font-family:var(--font-mono);font-size:12px;color:var(--dim);margin-left:8px}
+.nl .n em{font-style:normal;font-family:var(--font-mono);font-size:10px;color:var(--dim);margin-left:8px}
 /* how many LOINC codes collapse into this one marker */
 .tlink{background:none;border:none;padding:0;font-family:inherit;font-size:12px;color:var(--teal);
  text-align:left;text-decoration:none;line-height:1.35}
@@ -222,12 +222,12 @@ button{font-family:inherit;cursor:pointer}
 .tagchip:hover{border-color:var(--teal);color:var(--teal)}
 .tagchip.inp{border-color:#b9ddc9;background:#e9f5ee;color:var(--ok)}
 .slot > .h b .backlink{font-size:12px}
-.backlink{background:none;border:none;padding:0;font-family:var(--font-mono);font-size:12px;
+.backlink{background:none;border:none;padding:0;font-family:var(--font-mono);font-size:10px;
  letter-spacing:.06em;text-transform:uppercase;color:var(--teal);margin-bottom:8px}
 .backlink:hover{color:var(--accent)}
-.nl .n i.nv{font-style:normal;font-family:var(--font-mono);font-size:12px;color:#a9b6b8;margin-left:8px;
+.nl .n i.nv{font-style:normal;font-family:var(--font-mono);font-size:10px;color:#a9b6b8;margin-left:8px;
  border:1px solid var(--line);border-radius:8px;padding:0 4px;cursor:help}
-.tg{font-family:var(--font-mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;
+.tg{font-family:var(--font-mono);font-size:10px;letter-spacing:.04em;text-transform:uppercase;
  padding:4px 8px;border-radius:8px;white-space:nowrap}
 .tg.q{background:#e3f2ea;color:var(--ok)}
 .tg.g{background:#f0f3f3;color:var(--dim)}
@@ -253,15 +253,15 @@ button{font-family:inherit;cursor:pointer}
 .map .edge.hot{stroke-width:1.6;opacity:1}
 .map .e3{fill:none;stroke:var(--warm);stroke-width:1.4}
 
-.map .colhd{font-family:var(--font-mono);font-size:12px;fill:var(--dim);letter-spacing:.09em}
+.map .colhd{font-family:var(--font-mono);font-size:10px;fill:var(--dim);letter-spacing:.09em}
 /* Column titles are centred on their y rather than sitting on it, so they can
    be aligned to a measured CSS box without guessing where its baseline is. */
 .map .colttl{font-family:var(--font-mono);font-size:12px;fill:var(--dim);letter-spacing:.09em;
  dominant-baseline:central}
 .map .fold .lb{fill:var(--dim)}
-.map .foldn{font-family:var(--font-mono);font-size:12px;fill:#b4c0c2}
-.map .grpdup{font-family:var(--font-mono);font-size:12px;fill:#b4c0c2}
-.map .grphd{font-family:var(--font-mono);font-size:12px;fill:#a9b6b8;letter-spacing:.07em}
+.map .foldn{font-family:var(--font-mono);font-size:10px;fill:#b4c0c2}
+.map .grpdup{font-family:var(--font-mono);font-size:10px;fill:#b4c0c2}
+.map .grphd{font-family:var(--font-mono);font-size:10px;fill:#a9b6b8;letter-spacing:.07em}
 /* the arrow lives in its own reserved gutter, so labels never move */
 .map .arw{font-family:var(--font-sans);font-size:12px;fill:var(--dim)}
 .map .arw.lo{fill:var(--low)}
@@ -301,13 +301,13 @@ button{font-family:inherit;cursor:pointer}
 .map .lb.acc{fill:var(--accent)}
 .map .lb.lo{fill:var(--low)}
 .map .lb.hi{fill:var(--high)}
-.map .cnt{font-family:var(--font-mono);font-size:12px;fill:#a9b6b8}
+.map .cnt{font-family:var(--font-mono);font-size:10px;fill:#a9b6b8}
 .map .hint{font-family:var(--font-sans);font-size:12px;fill:#a9b6b8;font-style:italic}
 .map .slot{fill:none;stroke:#dfe6e7;stroke-width:1;stroke-dasharray:1.6 2}
 .map .cnt.on{fill:var(--teal)}
 
 /* ---------------- keyboard help ---------------- */
-.kbdhint{position:absolute;right:16px;bottom:16px;z-index:4;font-family:var(--font-mono);font-size:12px;
+.kbdhint{position:absolute;right:16px;bottom:16px;z-index:4;font-family:var(--font-mono);font-size:10px;
  letter-spacing:.06em;text-transform:uppercase;color:#b4c0c2;background:#fff;
  border:1px solid var(--line);border-radius:8px;padding:4px 8px;cursor:pointer}
 .kbdhint:hover{color:var(--teal);border-color:var(--teal)}
@@ -318,16 +318,16 @@ button{font-family:inherit;cursor:pointer}
  width:432px;max-width:calc(100% - 32px)}
 .kbd h3{font-family:var(--font-serif);font-size:20px;color:var(--slate);margin:0 0 16px}
 .kbd dl{display:grid;grid-template-columns:112px 1fr;gap:8px 16px;margin:0}
-.kbd dt{font-family:var(--font-mono);font-size:12px;color:var(--teal);text-align:right}
+.kbd dt{font-family:var(--font-mono);font-size:10px;color:var(--teal);text-align:right}
 .kbd dd{margin:0;font-size:12px;color:var(--muted);line-height:1.5}
-.kbd .sec{grid-column:1/3;font-family:var(--font-mono);font-size:12px;letter-spacing:.07em;
+.kbd .sec{grid-column:1/3;font-family:var(--font-mono);font-size:10px;letter-spacing:.07em;
  text-transform:uppercase;color:#b4c0c2;margin-top:8px}
 .kbd .close{margin-top:24px;width:100%;padding:8px;border:1px solid var(--line);background:#fff;
- border-radius:8px;font-family:var(--font-mono);font-size:12px;letter-spacing:.05em;
+ border-radius:8px;font-family:var(--font-mono);font-size:10px;letter-spacing:.05em;
  text-transform:uppercase;color:var(--teal)}
 .kbd .close:hover{background:var(--aqua);border-color:var(--teal)}
 .mapnote{position:absolute;left:50%;transform:translateX(-50%);bottom:8px;font-family:var(--font-mono);
- font-size:12px;color:#b4c0c2;letter-spacing:.06em;pointer-events:none;z-index:2;white-space:nowrap}
+ font-size:10px;color:#b4c0c2;letter-spacing:.06em;pointer-events:none;z-index:2;white-space:nowrap}
 
 @media(max-width:1080px){
  .det{display:none}
@@ -491,7 +491,11 @@ function buildLayout(){
  // The whole map is set at one size. 12px is the floor for the page and the
  // only size the map uses; 16px is its line height and the shortest a row can
  // be. Nothing here scales with the window.
- const FSZ = 12, LINE = 16, MIN_ROW = 16;
+ // 12px is the floor for anything read as content, and 16px is its line
+ // height. The mono uppercase component labels — column titles, group heads,
+ // the divider band — are 10px on a 12px lead: they are labels for what is
+ // below them, not part of it.
+ const FSZ = 12, LINE = 16, MIN_ROW = 16, HEADLINE = 12;
 
  // Three columns of equal width with an equal gap between them, so the two
  // runs of edges — markers to concerns, concerns to follow-ups — span exactly
@@ -513,11 +517,11 @@ function buildLayout(){
  // The divider is a section header: it wraps to fit the column, and the band
  // is sized from the number of lines so the space above and below is equal.
  const divTxt = nUnreach + ' CONCERNS NO PANEL MARKER CAN REACH';
- const divPer = Math.max(12, Math.floor((xCend - xC - 12) / 8.3));   // 12px mono + tracking
+ const divPer = Math.max(12, Math.floor((xCend - xC - 12) / 6.9));   // 10px mono + tracking
  // 24 above the first baseline; below the last baseline the band closes at 16,
  // exactly the gap a column header leaves before its first row, with the rule
  // sitting halfway through it.
- const divPad = 24, divLead = LINE, divGap = 8, divTail = 16;
+ const divPad = 24, divLead = HEADLINE, divGap = 8, divTail = 16;
  const mkDiv = txt => {
   const l = wrap(txt, divPer, 0);
   return { lines: l, h: divPad + (l.length - 1) * divLead + divTail };
@@ -538,8 +542,8 @@ function buildLayout(){
  // take is measured from that rather than assumed, so they can never collide
  // with the rows or run under the rail.
  const mEdgeX = xM - 24;                       // shared right edge for this column
- const headLead = LINE, headPad = 8, grpGap = 16;
- const perHead = Math.max(8, Math.floor((mEdgeX - b.L) / 8.3));   // 12px mono + tracking
+ const headLead = HEADLINE, headPad = 8, grpGap = 16;
+ const perHead = Math.max(8, Math.floor((mEdgeX - b.L) / 6.9));   // 10px mono + tracking
  const AP = activePanels();
  const gLines = AP.map(p => wrap(p.name.replace(/\s*\(.*\)/, '').toUpperCase(), perHead, 0));
  // A marker belongs to the first selected panel that lists it.

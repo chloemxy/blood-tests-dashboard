@@ -56,13 +56,21 @@ for m in re.finditer(r'([\w.#>\-\s,:\[\]()="]+)\{([^}]*)\}', css):
 
 ## 1b. The type scale
 
-**12px is the floor.** Nothing on the page is set smaller, anywhere, for any
-reason — not a badge, not a chip, not a label on the map.
+**12px is the floor for anything read as content** — names, values, sentences,
+chips, buttons. Nothing that carries meaning on its own is smaller.
 
-**Sizes go up in steps of 2px**: 12, 14, 16, 18, 20. In use: 12 for everything,
-16 for a section head, 18 for a panel title, 20 for the app title.
+**10px is reserved for component labels**: mono, uppercase, tracked text that
+names the thing below it rather than being part of it — column titles, group
+headers, section kickers, the quoted/ai-written tags, the divider band. They are
+signposts, and a signpost may be quieter than what it points at. If a label is
+sentence-case, or is content in its own right, it is not one of these.
 
-**Line height on the map is 16px**, and the shortest a row can be is 16px.
+**Sizes go up in steps of 2px**: 10, 12, 14, 16, 18, 20. In use: 10 for
+component labels, 12 for everything else, 16 for a section head, 18 for a panel
+title, 20 for the app title.
+
+**Line height on the map is 16px** for content and 12px for the 10px labels, and
+the shortest a content row can be is 16px.
 
 A floor this high costs room, and that cost is paid in content, not in type: a
 column that cannot fit every row shows fewer rows and states how many it is not
