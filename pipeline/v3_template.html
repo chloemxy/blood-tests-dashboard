@@ -40,6 +40,7 @@ button{font-family:inherit;cursor:pointer}
 .top .btn{border:1px solid var(--line);background:#fff;color:var(--slate);font-size:12px;font-weight:600;
  padding:4px 12px;border-radius:16px}
 .top .btn:hover{border-color:var(--accent);color:var(--accent)}
+.top .btn.on{border-color:var(--teal);background:var(--aqua);color:var(--teal)}
 @media(max-width:1000px){.top .stat{display:none}}
 
 .stage{position:absolute;top:56px;left:0;right:0;bottom:0;overflow:hidden}
@@ -244,6 +245,10 @@ button{font-family:inherit;cursor:pointer}
 .tg.src{background:#fdf1ea;color:var(--accent)}
 
 /* ---------------- footer ---------------- */
+/* The legend is reference, not working surface: off until asked for, and the
+   three panels take back its height when it is. */
+body:not(.legend) .foot{display:none}
+body:not(.legend) .rail, body:not(.legend) .det{bottom:0}
 .foot{left:0;right:0;bottom:0;height:var(--footH);flex-direction:row;
  align-items:center;gap:16px;padding:0 16px;border-radius:0;border-left:none;border-right:none;border-bottom:none}
 .leg{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);flex:0 0 auto}
@@ -268,7 +273,7 @@ button{font-family:inherit;cursor:pointer}
    the map does not take its headings away. They are HTML in the same box shape
    as a panel header, which is what puts them on the same line as the two panel
    kickers without anything having to be measured. */
-.colbar{position:absolute;top:0;height:40px;z-index:2;background:var(--bg);
+.colbar{position:absolute;top:0;height:40px;z-index:4;background:var(--paper);
  border-bottom:1px solid var(--line);pointer-events:none}
 .colbar span{position:absolute;top:16px;font-family:var(--font-mono);font-size:10px;
  letter-spacing:.09em;color:var(--dim);white-space:nowrap;line-height:1}
@@ -357,6 +362,7 @@ button{font-family:inherit;cursor:pointer}
  <span class="tag">the ripple atlas</span>
  <span class="sp"></span>
  <span class="stat" id="hdrStat"></span>
+ <button class="btn" id="btnFoot">Legend</button>
  <button class="btn" id="btnReset">Reset</button>
 </div>
 
@@ -450,16 +456,20 @@ function refreshSlugs(){
 const CIDS = Object.keys(C).map(Number);
 
 /* ---------- state ---------- */
-const st = { val:{}, added:{}, sel:null, hot:null, expand:false, foc:null, focVia:'select', fam:{}, panels:{} };
+const st = { val:{}, added:{}, sel:null, hot:null, expand:false, foc:null, focVia:'select',
+             fam:{}, panels:{}, legend:0 };
 PANELS_ALL.forEach(p => { if(p.default) st.panels[p.id] = 1; });   // val: slug -> -1|0|1
 PANELS_ALL.forEach(p => p.slugs.forEach(sl => { st.val[sl] = 0; }));
 try{ const raw = localStorage.getItem('v3.state');
      if(raw){ const o = JSON.parse(raw);
        Object.keys(o.val||{}).forEach(k=>{ if(k in st.val) st.val[k]=o.val[k]; });
        Object.keys(o.added||{}).forEach(k=>{ st.added[k]=1; });
-       if(o.panels && Object.keys(o.panels).length){ st.panels = {}; Object.keys(o.panels).forEach(k=>{ st.panels[k]=1; }); } } }catch(e){}
+       if(o.panels && Object.keys(o.panels).length){ st.panels = {}; Object.keys(o.panels).forEach(k=>{ st.panels[k]=1; }); }
+       st.legend = o.legend ? 1 : 0; } }catch(e){}
+document.body.classList.toggle('legend', !!st.legend);
 refreshSlugs();
-const save = () => { try{ localStorage.setItem('v3.state', JSON.stringify({val:st.val, added:st.added, panels:st.panels})); }catch(e){} };
+const save = () => { try{ localStorage.setItem('v3.state',
+  JSON.stringify({val:st.val, added:st.added, panels:st.panels, legend:st.legend})); }catch(e){} };
 
 const flagged = () => SLUGS.filter(s => st.val[s] !== 0);
 function activeConcerns(){
@@ -490,7 +500,7 @@ function box(){
  // text is a constant 16px on every edge, at every size.
  // Panels are docked to the window edges, so the map's margin is measured from
  // the panel edge, not the window: a constant 16px on every side.
- const hasDet = W > 1080, hasFoot = W > 1080;
+ const hasDet = W > 1080, hasFoot = st.legend && W > 1080;
  const L = railW + g;
  const R = W - (hasDet ? detW + g : g);
  const T = 56, B = H - (hasFoot ? footH + g : g) - 24;
@@ -1198,12 +1208,18 @@ $('map').addEventListener('mouseover', function(e){
  if(v !== st.hot){ st.hot = v; draw(); }
 });
 $('map').addEventListener('mouseleave', function(){ if(st.hot){ st.hot = null; draw(); } });
+$('btnFoot').addEventListener('click', function(){
+ st.legend = st.legend ? 0 : 1;
+ document.body.classList.toggle('legend', !!st.legend);
+ this.classList.toggle('on', !!st.legend);
+ save(); render();
+});
 $('btnReset').addEventListener('click', function(){
  SLUGS.forEach(s => st.val[s] = 0); st.added = {}; st.sel = null; save(); render();
 });
 window.addEventListener('resize', function(){
  clearTimeout(window.__rt);
- window.__rt = setTimeout(relayout, 100);
+ window.__rt = setTimeout(function(){ relayout(); drawColBar(); }, 100);
 });
 /* ---------- keyboard navigation ----------------------------------------
    Three columns, arrow keys move within and between them. Crossing columns

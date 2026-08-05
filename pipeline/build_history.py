@@ -43,6 +43,36 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F43",
+  "date": "2026-08-04",
+  "who": "Chloe",
+  "title": "Legend off by default",
+  "status": "addressed",
+  "versions": ["v4.9"],
+  "quote": "make the bottom panel default hidden",
+  "did": [
+   ("Off until asked for", "addressed",
+    "The legend is reference, not working surface. It starts hidden and a <b>Legend</b> button in the top bar brings it back; the choice is remembered with the rest of the state."),
+   ("The map takes the height back", "addressed",
+    "Hiding it is not just <code>display:none</code> \u2014 the rail and the detail panel drop to <code>bottom:0</code> and the map gains the full 72px, verified as a 72px change in the map\u2019s bottom edge."),
+  ],
+ },
+ {
+  "id": "F42",
+  "date": "2026-08-04",
+  "who": "Chloe",
+  "title": "Rows scrolling over the column titles",
+  "status": "addressed",
+  "versions": ["v4.9"],
+  "quote": "when scroll, content doesn\u2019t scroll over the header",
+  "did": [
+   ("An undefined colour", "addressed",
+    "The title band was painted <code>background:var(--bg)</code> and this palette has no <code>--bg</code>. An unknown variable makes the declaration invalid, so the band was transparent and the rows slid straight under its text while it sat on top of them. It is <code>var(--paper)</code> now, and above the panels\u2019 stacking level rather than just above the canvas."),
+   ("Worth the note", "rule",
+    "A misspelt custom property fails silently \u2014 no console error, no fallback. Any <code>var()</code> that carries a background is worth checking against the <code>:root</code> block by name."),
+  ],
+ },
+ {
   "id": "F41",
   "date": "2026-08-04",
   "who": "Chloe",
@@ -938,6 +968,23 @@ FEEDBACK = [
 # VERSIONS — newest first
 # ===========================================================================
 VERSIONS = [
+ {
+  "id": "v4.9",
+  "file": "v4.9-legend-off.html",
+  "title": "Ripple atlas \u2014 opaque header band, legend off by default",
+  "date": "2026-08-04",
+  "source": "index-v3.html",
+  "status": "candidate",
+  "tag": "v4.9-legend-off",
+  "gitpath": "index-v3.html",
+  "answers": ["F42", "F43"],
+  "summary": "The column-title band is actually opaque, and the legend panel starts hidden with the map taking its height.",
+  "changes": [
+   "<b>The band was transparent</b> because it was painted with a variable this palette does not define. Fixed, and lifted above the panels\u2019 stacking level.",
+   "<b>Legend hidden by default</b>, with a Legend button in the top bar; the rail and detail panel run to the bottom and the map gains 72px.",
+   "The choice is remembered with the rest of the state.",
+  ],
+ },
  {
   "id": "v4.8",
   "file": "v4.8-scrolling-canvas.html",
