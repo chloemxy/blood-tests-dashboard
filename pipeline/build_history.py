@@ -43,6 +43,21 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F54",
+  "date": "2026-08-05",
+  "who": "Chloe",
+  "title": "The header sentence",
+  "status": "addressed",
+  "versions": ["v5.4"],
+  "quote": "what is this suppose to be? make it shorter or remove it",
+  "did": [
+   ("My mistake, from the version before", "addressed",
+    "Removing the legend, I redirected its footer sentence into <code>#hdrStat</code> \u2014 which already had a line. The second assignment simply overwrote the first, so the compact counts were replaced by 230 characters of prose written for a 72px footer, sitting in a 56px bar."),
+   ("Counts, not prose", "addressed",
+    "<i>3 of 13 panels &middot; 26 markers &middot; 18 of 47 reachable</i>, and once something is marked, <i>&middot; 1 marked &rarr; 2</i>. 48 characters, 63 when marked, down from 230. Nothing is lost: the sentence\u2019s numbers are all still there, and the instruction it ended with already lives on the map, where the thing to do is."),
+  ],
+ },
+ {
   "id": "F53",
   "date": "2026-08-05",
   "who": "Chloe",
@@ -1147,12 +1162,28 @@ FEEDBACK = [
 # ===========================================================================
 VERSIONS = [
  {
+  "id": "v5.4",
+  "file": "v5.4-header-counts.html",
+  "title": "Counts back in the header",
+  "date": "2026-08-05",
+  "source": "index.html",
+  "status": "live",
+  "tag": "v5.4-header-counts",
+  "gitpath": "index.html",
+  "answers": ["F54"],
+  "summary": "The legend sentence that landed in the header when the legend was deleted is replaced by the compact counts line it had overwritten.",
+  "changes": [
+   "<b>48 characters instead of 230</b>: panels, markers, concerns reachable, and the marked count once there is one.",
+   "The duplicate assignment to <code>#hdrStat</code> is gone \u2014 that was the actual bug.",
+  ],
+ },
+ {
   "id": "v5.3",
   "file": "v5.3-four-tabs.html",
   "title": "Four tabs, no legend, no repeated titles",
   "date": "2026-08-05",
   "source": "index.html",
-  "status": "live",
+  "status": "superseded",
   "tag": "v5.3-four-tabs",
   "gitpath": "index.html",
   "answers": ["F50", "F51", "F52", "F53"],

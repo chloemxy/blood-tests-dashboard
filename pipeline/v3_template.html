@@ -1161,20 +1161,15 @@ function reachableNow(){
 function drawChrome(){
  const act = activeConcerns(), nFlag = flagged().length;
  const reachable = reachableNow();
- $('hdrStat').textContent = activePanels().length+' of '+PANELS_ALL.length+' panels · '
-  + SLUGS.length+' markers · '+reachable+' of '+META.nConcerns+' concerns reachable';
  const nOn = Object.keys(act).length;
+ // Counts, not prose. The header is 56px; a sentence does not belong in it.
+ // The prompt lives on the map, where the thing to do is.
+ $('hdrStat').textContent = activePanels().length+' of '+PANELS_ALL.length+' panels · '
+  + SLUGS.length+' markers · ' + reachable+' of '+META.nConcerns+' reachable'
+  + (nFlag ? ' · '+nFlag+' marked → '+nOn : '');
  $('mapNote').textContent = nFlag
   ? nOn + ' OF ' + META.nConcerns + ' CONCERNS RAISED BY WHAT YOU MARKED'
   : 'MARK A MARKER LOW OR HIGH TO LIGHT UP WHAT IT CAN POINT AT';
- const off = Object.keys(act).reduce((a,ci)=>a+C[ci].nOutside, 0);
- $('hdrStat').innerHTML = nFlag
-  ? 'You marked <b>'+nFlag+'</b> marker'+(nFlag===1?'':'s')+', raising <b>'+Object.keys(act).length
-    +'</b> concern'+(Object.keys(act).length===1?'':'s')+'. <b>'+nf(off)+'</b> tests related to them sit outside '
-    +'the panels you have selected and have never been ordered — that absence is information too.'
-  : activePanels().map(p=>p.short).join(' + ')+' measure <b>'+SLUGS.length+'</b> of '+nf(META.total)
-    +' things measurable in blood, and can raise <b>'+reachable+'</b> of '+META.nConcerns
-    +' concerns. Mark something low or high to see the ripple.';
 }
 
 /* The map is drawn before the detail panel, so on the first paint there is no
