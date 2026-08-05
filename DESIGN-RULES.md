@@ -172,6 +172,13 @@ Rows in a column may differ in height — a two-line name is taller than a
 one-line one — but **the gap between one row's text and the next is a constant**
 down the whole column.
 
+**Spare height goes between the boxes, never inside them.** A row's highlight is
+the lines it carries plus 8px above and below — the same box in every column, at
+every window size, whatever the window height. Growing the highlight to absorb
+leftover space makes the padding around a name a function of how much room the
+column happens to have, which is how three columns end up looking like three
+different components.
+
 The failure mode is sharing leftover height *in proportion* to each row: a
 two-line row then gets twice the breathing room of a one-line row and the column
 reads as ragged. Share it as the same number of pixels added to every row.

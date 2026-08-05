@@ -785,6 +785,11 @@ function draw(){
     + (g.y + g.lines.length*L.headLead).toFixed(1)+'" text-anchor="end">'+esc(g.dup)+'</text>';
  });
  const mLabW = mEdge - b.L;
+ // Every interactive row in every column is highlighted with the same box: the
+ // lines it carries plus 8px above and below. Spare column height is the gap
+ // between boxes, never padding inside one, so the padding around a name is
+ // identical in all three columns at every window size.
+ const ROWPAD = 8, hbox = n => n * L.LINE + ROWPAD * 2;
  SLUGS.forEach(sl => {
   const y = L.mk[sl], v = st.val[sl];
   const cls = ['row','mkr', v<0?'lo':v>0?'hi':'', selM===sl?'sel':'', st.hot===sl?'hot':'',
@@ -794,7 +799,7 @@ function draw(){
   const ln = L.mLn[sl], rh = L.mH[sl];
   const lh = L.LINE, y0 = y + 4 - (ln.length - 1) * lh / 2;
   h += '<g class="'+cls+'" data-mk="'+sl+'"><title>'+esc(M[sl].name)+'</title>'
-    +  '<rect class="hitbox" x="'+b.L.toFixed(0)+'" y="'+(y-rh/2).toFixed(1)+'" width="'+(L.xM-b.L+9).toFixed(0)+'" height="'+rh.toFixed(1)+'" rx="4"/>'
+    +  '<rect class="hitbox" x="'+b.L.toFixed(0)+'" y="'+(y-hbox(ln.length)/2).toFixed(1)+'" width="'+(L.xM-b.L+9).toFixed(0)+'" height="'+hbox(ln.length).toFixed(1)+'" rx="4"/>'
     +  ln.map((t2, li) => '<text class="lb'+(v<0?' lo':v>0?' hi':'')+'" x="'+mEdge.toFixed(1)
         +'" y="'+(y0 + li*lh).toFixed(1)+'" text-anchor="end">'
         +esc(t2)+'</text>').join('')
@@ -829,7 +834,7 @@ function draw(){
   const cln = L.cLines[ci], ch = L.cH[ci];
   const cy0 = y + 4 - (cln.length - 1) * cLead / 2;
   h += '<g class="'+cls+'" data-cn="'+ci+'"><title>'+esc(C[ci].label)+' — '+nf(C[ci].nDistinct)+' markers outside the panel</title>'
-    +  '<rect class="hitbox" x="'+(L.xC-9).toFixed(1)+'" y="'+(y-ch/2).toFixed(1)+'" width="'+(L.xCend-L.xC+9).toFixed(1)+'" height="'+ch.toFixed(1)+'" rx="4"/>'
+    +  '<rect class="hitbox" x="'+(L.xC-9).toFixed(1)+'" y="'+(y-hbox(cln.length)/2).toFixed(1)+'" width="'+(L.xCend-L.xC+9).toFixed(1)+'" height="'+hbox(cln.length).toFixed(1)+'" rx="4"/>'
     +  '<circle class="dot" cx="'+L.xC.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="5"/>'
     +  cln.map((t2, li) => '<text class="'+lab+'" x="'+(L.xC+12).toFixed(1)+'" y="'+(cy0 + li*cLead).toFixed(1)
         +'">'+esc(t2)+'</text>').join('');
@@ -852,7 +857,7 @@ function draw(){
   const lhT = tLine, yT = o.y + 4 - (lnT.length - 1) * lhT / 2;
   h += '<g class="row tst'+(kfoc(2, j)?' foc':'')
     +  ((st.sel&&st.sel.t==='t'&&st.sel.i===j)?' sel':'')+'" data-test="'+L.open+'" data-ti="'+j+'">'
-    +  '<rect class="hitbox" x="'+(L.xT-8).toFixed(1)+'" y="'+(o.y-o.h/2).toFixed(1)+'" width="'+(b.R-L.xT+8).toFixed(1)+'" height="'+o.h.toFixed(1)+'" rx="4"/>'
+    +  '<rect class="hitbox" x="'+(L.xT-8).toFixed(1)+'" y="'+(o.y-hbox(lnT.length)/2).toFixed(1)+'" width="'+(b.R-L.xT+8).toFixed(1)+'" height="'+hbox(lnT.length).toFixed(1)+'" rx="4"/>'
     +  '<title>'+esc(o.t.n)+(o.t.g?' — '+esc(o.t.g):'')
     +  (o.t.v?' — source-quoted':' — ai-written')+'</title>'
     +  '<circle class="dot" cx="'+L.xT.toFixed(1)+'" cy="'+o.y.toFixed(1)+'" r="5"/>'

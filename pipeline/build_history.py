@@ -43,6 +43,21 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F44",
+  "date": "2026-08-04",
+  "who": "Chloe",
+  "title": "One highlight box for every column item",
+  "status": "addressed",
+  "versions": ["v4.10"],
+  "quote": "apply this padding to all column items",
+  "did": [
+   ("Padding is a constant, not a leftover", "addressed",
+    "A row\u2019s highlight is now the lines it carries plus 8px above and below \u2014 the same box in the marker, concern and follow-up columns. Measured across three window sizes: every row in every column is 20px from box top to first baseline and 12px from last baseline to box bottom, one value everywhere."),
+   ("What was wrong", "addressed",
+    "The highlight was the row\u2019s <i>pitch</i>, which includes the spare height the column shares out to fill the window. So the padding around a name grew with the window and differed between columns \u2014 three columns reading as three components. Spare height is now the gap between boxes, never padding inside one."),
+  ],
+ },
+ {
   "id": "F43",
   "date": "2026-08-04",
   "who": "Chloe",
@@ -968,6 +983,23 @@ FEEDBACK = [
 # VERSIONS — newest first
 # ===========================================================================
 VERSIONS = [
+ {
+  "id": "v4.10",
+  "file": "v4.10-one-row-box.html",
+  "title": "Ripple atlas \u2014 one row box",
+  "date": "2026-08-04",
+  "source": "index-v3.html",
+  "status": "candidate",
+  "tag": "v4.10-one-row-box",
+  "gitpath": "index-v3.html",
+  "answers": ["F44"],
+  "summary": "Every interactive row in every column is highlighted with the same box: its lines plus 8px above and below. Spare column height became the gap between boxes rather than padding inside them.",
+  "changes": [
+   "<b>One box</b> \u2014 markers, concerns and follow-ups all measure 20px from box top to first baseline and 12px from last baseline to box bottom, at every window size.",
+   "<b>Spare height moved outside the highlight</b>, so padding no longer grows with the window.",
+   "Written into \u00a75b as a rule.",
+  ],
+ },
  {
   "id": "v4.9",
   "file": "v4.9-legend-off.html",
