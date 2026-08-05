@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-05T08:47:17Z",
+ "generated": "2026-08-05T18:19:30Z",
  "live": "index.html",
  "constraints": [
   [
@@ -28,6 +28,76 @@
   ]
  ],
  "feedback": [
+  {
+   "id": "F48",
+   "date": "2026-08-05",
+   "who": "Chloe",
+   "title": "One header on every screen, and a way between them",
+   "status": "addressed",
+   "versions": [
+    "v5.1"
+   ],
+   "quote": "right now the headers across different screens don’t match, and can’t go back and forth between them, keep close to the first img style, make all headers the same size, layout, style, and can go to each other back and forth",
+   "did": [
+    [
+     "There were four headers",
+     "addressed",
+     "The atlas bar, the route chooser, the “how you feel” bar with a lone ←&nbsp;Menu button, and the dashboard bar carrying four 19px serif numbers and a colour ribbon. All four are now the same component: 56px, one row, always <i>identity · where you are · the counts · the three ways out · page actions</i>. One CSS block, injected into both documents from one definition."
+    ],
+    [
+     "The dashboard header was the outlier",
+     "addressed",
+     "Its rollup is what made it a different size. Rather than delete the numbers, the four serif figures are restyled into the same 10px mono line the atlas uses — <i>6,192 tests mapped &middot; 216 source-quoted</i> — so no information is lost and the bar fits in 56px. The body-system colour ribbon is hidden: it is decoration, and §5c says no."
+    ],
+    [
+     "Three ways out, on every screen",
+     "addressed",
+     "<b>Atlas</b> / <b>How you feel</b> / <b>Test catalogue</b>, in that order, in all four headers, with the current one marked by colour. Inside the catalogue the two catalogue routes switch in place through the app’s own <code>__cxSetMode</code> and push history, so nothing re-downloads 2.9&nbsp;MB and the browser back button still works."
+    ],
+    [
+     "The old workaround is gone",
+     "addressed",
+     "A script had been injecting a duplicate ←&nbsp;Menu button into the dashboard header at runtime — the band-aid over exactly this problem. Removed, and the check asserts it stays gone."
+    ],
+    [
+     "Guarded, because it was risky",
+     "addressed",
+     "The catalogue header sits on top of JS that binds a dozen ids. The new <code>header-parity</code> check loads both documents, asserts three unified bars with three nav items each, confirms every bound id still exists (<code>viewTog</code>, <code>rollup</code>, <code>rollgrid</code>, <code>sysbar</code>, <code>hdrTag</code>, <code>resetBtn</code>, <code>discBtn</code>, <code>cxMenuBtn</code>, <code>app</code>, <code>cxRoute</code>, <code>cxApp</code>) and clicks the nav to prove the route switch fires. 13 checks pass."
+    ]
+   ]
+  },
+  {
+   "id": "F47",
+   "date": "2026-08-05",
+   "who": "Chloe",
+   "title": "Ease the introduction — show demos first",
+   "status": "partial",
+   "versions": [],
+   "quote": "It’s pretty overwhelmed right now, can we take some gamification methods to easy the introduction? show me demo and examples before implementing anything",
+   "did": [
+    [
+     "Six patterns, playable, nothing implemented",
+     "addressed",
+     "<code>demos/onboarding-demos.html</code> — each pattern is a working miniature, not a mockup: <b>01</b> one move at a time (the map starts empty and you build the density), <b>02</b> borrow someone else’s bloodwork (three one-click scenarios), <b>03</b> guess before the reveal, <b>04</b> a three-step checklist that deletes itself, <b>05</b> coverage rather than score, <b>06</b> one ripple at a time."
+    ],
+    [
+     "Real numbers, not placeholders",
+     "addressed",
+     "Every figure is read from the live build: 68 markers, 47 concerns, 6,192 tests, calcium reaching 9 concerns against a median of 1, and the iron scenario’s four concerns carrying 192 / 103 / 60 / 33 follow-up markers. Illustrative groupings are labelled as such."
+    ],
+    [
+     "And what I would not build",
+     "addressed",
+     "A table of the standard gamification toolkit and why each piece is wrong here: points and streaks reward engagement with a medical record; badges make ordering more tests an achievement; a health score is the exact reduction this product argues against; confetti breaks §3."
+    ],
+    [
+     "Recommendation",
+     "open",
+     "Combine 01 + 02 + 04 — an empty map, three borrowed scenarios where the concern column will be, and the three-step strip in the footer the legend just vacated. Add 03 once, on the first mark. Hold 05 until the framing is settled; the meter is one word away from nudging someone to over-test. Awaiting a decision before any of it is built."
+    ]
+   ],
+   "open": "Nothing is implemented. The demo is for choosing."
+  },
   {
    "id": "F46",
    "date": "2026-08-04",
@@ -1653,12 +1723,35 @@
  ],
  "versions": [
   {
+   "id": "v5.1",
+   "file": "v5.1-one-header.html",
+   "title": "One header, every screen",
+   "date": "2026-08-05",
+   "source": "index.html",
+   "status": "live",
+   "tag": "v5.1-one-header",
+   "gitpath": "index.html",
+   "answers": [
+    "F48"
+   ],
+   "summary": "The four different headers become one 56px component with the same three-way navigation on every screen, and the runtime Menu-button workaround is deleted.",
+   "changes": [
+    "<b>One component</b>, one CSS definition, injected into both documents: identity, where you are, the counts, the three ways out, page actions.",
+    "<b>Atlas / How you feel / Test catalogue</b> in every header, current marked by colour; the catalogue routes switch in place and push history.",
+    "<b>The dashboard rollup</b> keeps its numbers at 10px mono instead of 19px serif; the colour ribbon is hidden as decoration.",
+    "<b>Deleted</b>: the script that injected a duplicate ← Menu button into the dashboard header.",
+    "<b>header-parity</b> joins the gate — both documents, three unified bars, eleven bound ids asserted, the route switch clicked. 13 checks pass."
+   ],
+   "note": "Also in the tree, not wired to anything: demos/onboarding-demos.html — six playable onboarding patterns for F47.",
+   "mb": 0.59
+  },
+  {
    "id": "v5.0",
    "file": "v5.0-atlas-on-index.html",
    "title": "The ripple atlas is the front door",
    "date": "2026-08-04",
    "source": "index.html",
-   "status": "live",
+   "status": "superseded",
    "tag": "v5.0-atlas-on-index",
    "gitpath": "index.html",
    "answers": [

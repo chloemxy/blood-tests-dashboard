@@ -320,6 +320,43 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
 @media(max-width:1200px){ #app.pinned{padding-right:0;} }
 @media(max-width:1100px){ .rollgrid{grid-template-columns:repeat(2,1fr);} .covwrap{grid-template-columns:1fr;} }
 
+
+/* ===== site header: one component, every screen =========================
+   56px, one row, always in the same order: identity, where you are, the
+   counts, the three ways out, then whatever that page can do. Same rules in
+   index.html and catalogue.html — if this block changes, it changes in both. */
+.sitehd{display:flex!important;align-items:center;gap:16px;height:56px;padding:0 16px!important;
+ border-bottom:1px solid var(--line);background:var(--panel);z-index:6}
+.sitehd .logo{font-family:var(--font-serif);font-size:18px;color:var(--slate);font-weight:700;
+ white-space:nowrap;text-decoration:none;flex:0 0 auto}
+.sitehd .logo b{color:var(--teal)}
+.sitehd .tag{font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+ color:var(--dim);white-space:nowrap;flex:0 0 auto}
+.sitehd .sp{flex:1 1 auto;min-width:8px}
+.sitehd nav{display:flex;gap:8px;flex:0 0 auto}
+.sitehd .nv{border:1px solid var(--line);background:#fff;color:var(--slate);font-size:12px;font-weight:600;
+ padding:4px 12px;border-radius:16px;text-decoration:none;line-height:20px;white-space:nowrap;
+ font-family:var(--font-sans);cursor:pointer}
+.sitehd .nv:hover{border-color:var(--accent);color:var(--accent)}
+/* where you are is a state, so it is carried by colour — never by size */
+.sitehd .nv.on{border-color:var(--teal);background:var(--aqua);color:var(--teal)}
+.sitehd .act{display:flex;gap:8px;align-items:center;flex:0 0 auto}
+/* the counts read as one quiet line, not as a scoreboard */
+.sitehd .stat,.sitehd #rollup .stat{font-family:var(--font-mono);font-size:10px;color:var(--dim);
+ white-space:nowrap;display:flex;align-items:baseline;gap:4px;padding:0;border:none;cursor:help}
+.sitehd #rollup{flex:0 1 auto;min-width:0;margin:0}
+.sitehd #rollup .rollrow{display:flex;align-items:center;gap:16px}
+.sitehd #rollup .rollgrid{display:flex;align-items:baseline;gap:16px;flex-wrap:nowrap}
+.sitehd #rollup .stat .num{font-family:var(--font-mono);font-size:10px;line-height:1.4;
+ font-weight:600;color:var(--slate)}
+.sitehd #rollup .stat .num small{font-family:var(--font-mono);font-size:10px;font-weight:400}
+.sitehd #rollup .stat .lab,.sitehd #rollup .stat span:not(.num){font-family:var(--font-mono);font-size:10px;
+ color:var(--dim);text-transform:none;letter-spacing:.04em}
+.sitehd #sysbarwrap{display:none}          /* a colour ribbon is decoration; §5c */
+/* Narrow: the counts go, the navigation stays. Hidden, never clipped. */
+@media(max-width:1200px){.sitehd .stat,.sitehd #rollup{display:none}}
+@media(max-width:900px){.sitehd .tag{display:none}}
+
 /* ==== injected: condition explorer ==== */
 /* ===== Condition Explorer + route landing (scoped, cx-*) ===== */
 #cxRoute,#cxApp{position:fixed;inset:0;overflow-y:auto;background:var(--paper);z-index:40;display:none;}
@@ -568,7 +605,7 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
 <body>
 <!-- ===== Route landing ===== -->
 <div id="cxRoute">
- <div class="cxtop"><span class="logo">What is your blood telling you<b>?</b></span><span class="tag">choose your route</span></div>
+ <div class="cxtop sitehd"><span class="logo">What is your blood telling you<b>?</b></span><span class="tag">choose your route</span><span class="sp"></span><nav><a class="nv" href="index.html">Atlas</a><a class="nv" href="catalogue.html#feel" data-go="feel">How you feel</a><a class="nv" href="catalogue.html#tests" data-go="tests">Test catalogue</a></nav></div>
  <div class="cxwrap">
   <h1 class="cxhero">Where do you want to start?</h1>
   <svg class="cxecg" viewBox="0 0 600 40" aria-hidden="true"><path d="M0 20 H218 l8 -5 8 5 h14 l5 -13 7 26 5 -13 h16 l9 -7 11 7 H600"/></svg>
@@ -688,10 +725,12 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
 
 <!-- ===== Condition explorer ===== -->
 <div id="cxApp">
- <div class="cxtop">
-  <button class="cxmenu" id="cxMenuBtn">&larr; Menu</button>
+ <div class="cxtop sitehd">
   <span class="logo">What is your blood telling you<b>?</b></span>
   <span class="tag">how you feel</span>
+  <span class="sp"></span>
+  <nav><a class="nv" href="index.html">Atlas</a><a class="nv on" href="catalogue.html#feel" data-go="feel">How you feel</a><a class="nv" href="catalogue.html#tests" data-go="tests">Test catalogue</a></nav>
+  <span class="act"><button class="cxmenu" id="cxMenuBtn">Routes</button></span>
  </div>
  <div class="cxwrap">
   <div class="cxcrumb" id="cxCrumb"></div>
@@ -785,7 +824,7 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
 
 
 <div id="app">
- <header class="top">
+ <header class="top sitehd">
   <span class="logo">What is your blood telling you<b>?</b></span>
   <span class="tag" id="hdrTag"></span>
   <div class="viewtog" id="viewTog">
@@ -801,9 +840,9 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
     </div>
    </div>
   </div>
-  <button class="resetlink" id="resetBtn">Clear all answers</button>
-  <a class="fblink" href="mailto:blood@goinvo.com" title="Send feedback to blood@goinvo.com">feedback</a>
-  <button class="discbtn" id="discBtn" title="About this guide">i</button>
+  <span class="sp"></span>
+  <nav><a class="nv" href="index.html">Atlas</a><a class="nv" href="catalogue.html#feel" data-go="feel">How you feel</a><a class="nv on" href="catalogue.html#tests" data-go="tests">Test catalogue</a></nav>
+  <span class="act"><button class="resetlink" id="resetBtn">Clear all answers</button><a class="fblink" href="mailto:blood@goinvo.com" title="Send feedback to blood@goinvo.com">feedback</a><button class="discbtn" id="discBtn" title="About this guide">i</button></span>
  </header>
 
  <aside id="rail">
@@ -2047,16 +2086,7 @@ $('cxRouteTests').addEventListener('click',()=>{ if(window.__cxEnsureTests)windo
 $('cxMenuBtn').addEventListener('click',()=>setMode('landing'));
 
 /* inject a "Menu" button into the existing dashboard header so tests-mode can return */
-(function(){
- const hdr=document.querySelector('#app header.top');
- if(hdr && !document.getElementById('cxToMenu')){
-  const b=document.createElement('button');
-  b.id='cxToMenu'; b.className='cxmenu'; b.textContent='← Menu';
-  b.style.marginRight='4px';
-  b.addEventListener('click',()=>setMode('landing'));
-  hdr.insertBefore(b,hdr.firstChild);
- }
-})();
+/* replaced by the shared header navigation below */
 
 /* ---------- browser / mouse back-button support ----------
    Every top-level navigation (landing, feel screens, tests dashboard)
@@ -2114,6 +2144,22 @@ drawConcerns();
 })();
 })();
 
+</script>
+<script>
+/* ---------- shared header navigation ----------------------------------
+   The two catalogue routes switch in place — no reload of a 2.9 MB page —
+   and still push history, so the browser's own back button keeps working.
+   The Atlas link is left alone: that one is a real navigation. */
+document.addEventListener('click', function(e){
+ const a = e.target.closest('.sitehd [data-go]');
+ if(!a || !window.__cxSetMode) return;
+ e.preventDefault();
+ const to = a.dataset.go;
+ window.__cxSetMode(to);
+ try{ history.pushState({cx:{m:to,s:'home',c:null}}, '', '#' + to); }catch(err){}
+ Array.prototype.forEach.call(document.querySelectorAll('.sitehd [data-go]'),
+   function(x){ x.classList.toggle('on', x.dataset.go === to); });
+}, true);
 </script>
 </body>
 </html>

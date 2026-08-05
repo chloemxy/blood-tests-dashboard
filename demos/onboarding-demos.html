@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Easing into the atlas — six onboarding patterns</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+ --font-serif:Georgia,"Times New Roman",serif;
+ --font-sans:"Open Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+ --font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Consolas,monospace;
+ --teal:#007385;--slate:#24434D;--accent:#B84A0E;--warm:#F09A57;
+ --aqua:#EAF7F8;--paper:#F7F9F9;--ink:#1D1B1A;--muted:#5A6B70;
+ --line:#D7E1E2;--panel:#fff;--dim:#8B9799;--ok:#2E7D5B;
+ --low:#0E8496;--high:#B84A0E;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-sans);font-size:12px;line-height:1.5}
+button{font-family:inherit;cursor:pointer}
+
+.wrap{max-width:1000px;margin:0 auto;padding:40px 24px 80px}
+.k{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+h1{font-family:var(--font-serif);font-size:20px;color:var(--slate);margin:8px 0 8px;font-weight:700}
+h2{font-family:var(--font-serif);font-size:18px;color:var(--slate);margin:0;font-weight:700}
+h3{font-family:var(--font-serif);font-size:16px;color:var(--slate);margin:0 0 8px;font-weight:700}
+p{margin:0 0 8px;color:var(--muted);max-width:74ch}
+p.lead{font-size:12px;color:var(--slate)}
+b{color:var(--slate)}
+.rule{height:1px;background:var(--line);margin:32px 0}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px;margin:0 0 24px}
+.cardhd{display:flex;align-items:baseline;gap:8px;margin-bottom:8px}
+.cardhd .n{font-family:var(--font-mono);font-size:10px;color:var(--teal);letter-spacing:.08em}
+.why{border-left:2px solid var(--line);padding:0 0 0 16px;margin:16px 0 0}
+.why dt{font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-top:8px}
+.why dd{margin:0;color:var(--muted)}
+.stage{border:1px solid var(--line);border-radius:8px;background:var(--paper);margin:16px 0 0;overflow:hidden}
+.bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 16px;border-bottom:1px solid var(--line);background:#fff}
+.bar .sp{flex:1}
+.btn{border:1px solid var(--line);background:#fff;color:var(--slate);font-size:12px;font-weight:600;
+ padding:4px 12px;border-radius:16px}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.on{border-color:var(--teal);background:var(--aqua);color:var(--teal)}
+.mini{display:block;width:100%}
+.cap{font-family:var(--font-mono);font-size:10px;letter-spacing:.04em;color:var(--dim);
+ padding:8px 16px;border-top:1px solid var(--line);background:#fff;min-height:32px}
+.cap b{color:var(--slate);font-weight:600}
+
+/* toggle, same three states as the atlas */
+.tri{display:inline-grid;grid-template-columns:repeat(3,24px);border:1px solid var(--line);border-radius:12px;
+ overflow:hidden;background:#fff;height:24px;vertical-align:middle}
+.tri button{border:none;background:none;font-size:10px;color:#b4c0c2;padding:0;
+ border-right:1px solid var(--line);line-height:24px;text-align:center}
+.tri button:last-child{border-right:none}
+.tri button.mid{display:flex;align-items:center;justify-content:center;font-size:0}
+.tri button.mid::before{content:'';display:block;width:8px;height:8px;border-radius:50%;border:2px solid currentColor}
+.tri button:hover{background:var(--aqua)}
+.tri button.on[data-v="-1"]{background:var(--low);color:#fff}
+.tri button.on[data-v="0"]{background:var(--line);color:var(--slate)}
+.tri button.on[data-v="1"]{background:var(--high);color:#fff}
+
+/* miniature map */
+.mini .lb{font-family:var(--font-sans);font-size:12px;fill:var(--slate)}
+.mini .lb.mut{fill:#93a2a4}
+.mini .lb.lo{fill:var(--low)}
+.mini .lb.hi{fill:var(--high)}
+.mini .sub{font-family:var(--font-mono);font-size:10px;fill:var(--dim)}
+.mini .hd{font-family:var(--font-mono);font-size:10px;fill:var(--dim);letter-spacing:.09em}
+.mini .dot{fill:#fff;stroke:#c6d4d6;stroke-width:1.5}
+.mini .row.lo .dot{fill:#dff0f3;stroke:var(--low);stroke-width:2.5}
+.mini .row.hi .dot{fill:#fbe6da;stroke:var(--high);stroke-width:2.5}
+.mini .row.on .dot{fill:var(--aqua);stroke:var(--teal);stroke-width:2.5}
+.mini .edge{fill:none;stroke:#e3eaeb;stroke-width:1}
+.mini .edge.lo{stroke:var(--low);stroke-width:1.6}
+.mini .edge.hi{stroke:var(--high);stroke-width:1.6}
+.mini .hint{font-family:var(--font-sans);font-size:12px;fill:var(--dim)}
+.mini .row{cursor:pointer}
+.mini .hit{fill:transparent}
+.mini .row:hover .hit{fill:rgba(0,115,133,.055)}
+
+/* scenario cards */
+.scn{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:16px}
+.scn button{text-align:left;border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 16px}
+.scn button:hover{border-color:var(--teal)}
+.scn button.on{border-color:var(--teal);background:var(--aqua)}
+.scn .t{font-weight:600;color:var(--slate);display:block}
+.scn .d{font-family:var(--font-mono);font-size:10px;color:var(--dim);display:block;margin-top:4px}
+
+/* guess */
+.guess{padding:16px}
+.guess .opts{display:flex;gap:8px;margin:8px 0 0}
+.guess .opts button{border:1px solid var(--line);background:#fff;border-radius:16px;padding:4px 16px;
+ font-family:var(--font-mono);font-size:12px;color:var(--slate)}
+.guess .opts button:hover{border-color:var(--teal)}
+.guess .opts button.pick{border-color:var(--accent);color:var(--accent);font-weight:600}
+.guess .opts button.ans{border-color:var(--teal);background:var(--aqua);color:var(--teal);font-weight:600}
+.reveal{margin:16px 0 0;padding:16px;border:1px solid var(--line);border-radius:8px;background:#fff;display:none}
+.reveal.on{display:block}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.chip{border:1px solid var(--line);border-radius:12px;padding:4px 8px;font-size:12px;color:var(--slate);background:#fff}
+.chip i{font-style:normal;font-family:var(--font-mono);font-size:10px;color:var(--dim);margin-left:4px}
+
+/* checklist */
+.steps{list-style:none;margin:0;padding:16px}
+.steps li{display:grid;grid-template-columns:24px 1fr auto;gap:8px;align-items:start;
+ padding:8px 8px;border-bottom:1px solid var(--line);cursor:pointer}
+.steps li:last-child{border-bottom:none}
+.steps li:hover{background:var(--aqua)}
+.steps .box{width:16px;height:16px;border:2px solid #c6d4d6;border-radius:50%;margin-top:2px}
+.steps li.done .box{border-color:var(--ok);background:var(--ok)}
+.steps li.done .t{color:var(--dim);text-decoration:line-through}
+.steps .t{color:var(--slate);font-weight:600}
+.steps .d{color:var(--muted);display:block;font-weight:400;margin-top:2px}
+.steps .num{font-family:var(--font-mono);font-size:10px;color:var(--dim)}
+.done-note{padding:16px;border-top:1px solid var(--line);color:var(--ok);display:none}
+.done-note.on{display:block}
+
+/* coverage */
+.cov{padding:16px}
+.meter{height:24px;border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden;display:flex}
+.meter i{display:block;height:100%;background:var(--aqua);border-right:1px solid var(--teal)}
+.meter i.add{background:#fdf1ea;border-right-color:var(--accent)}
+.covrow{display:flex;align-items:baseline;gap:8px;margin-bottom:8px}
+.covrow b{font-family:var(--font-mono);font-size:16px;color:var(--slate);font-weight:600}
+.warn{border-left:2px solid var(--accent);padding-left:16px;margin-top:16px;color:var(--muted)}
+
+/* focus compare */
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.cmp > div{padding:16px}
+.cmp > div + div{border-left:1px solid var(--line)}
+.cmp .k{margin-bottom:8px;display:block}
+
+table.no{width:100%;border-collapse:collapse;margin-top:8px}
+table.no th,table.no td{text-align:left;vertical-align:top;padding:8px 16px 8px 0;border-bottom:1px solid var(--line);font-size:12px}
+table.no th{font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);font-weight:400}
+table.no td:first-child{font-weight:600;color:var(--slate);white-space:nowrap}
+table.no td{color:var(--muted)}
+.src{font-family:var(--font-mono);font-size:10px;color:var(--dim);margin-top:32px;border-top:1px solid var(--line);padding-top:16px}
+.src a{color:var(--teal)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<span class="k">demo · not wired into the site</span>
+<h1>Easing into the atlas</h1>
+<p class="lead">Six ways to make the first thirty seconds survivable, each one playable below. Nothing here is
+implemented — this is for choosing. Every number shown is read from the live build
+(<b>68 markers, 47 concerns, 6,192 follow-up tests</b>); anything invented is labelled.</p>
+
+<p>The problem, stated plainly: the atlas opens with 26 marker rows, 47 concern rows and every edge between
+them drawn at once. That is the honest picture, and it is also nobody's first question. The patterns below
+all work the same way — <b>start from one thing the reader already has, and let the map earn its density.</b></p>
+
+<div class="rule"></div>
+
+<!-- ============================================ 1 -->
+<div class="card">
+ <div class="cardhd"><span class="n">01</span><h2>One move at a time</h2></div>
+ <p>The map starts almost empty. It holds your panel and a single instruction. Marking one result draws its
+ own ripple and nothing else, so the density is something you built rather than something you walked into.</p>
+ <div class="stage">
+  <div class="bar">
+   <span class="k">try it</span>
+   <span class="sp"></span>
+   <button class="btn" id="d1reset">Start over</button>
+  </div>
+  <svg class="mini" id="d1" viewBox="0 0 940 320" role="img" aria-label="Interactive miniature: mark a result to reveal what it can point at"></svg>
+  <div class="cap" id="d1cap"></div>
+ </div>
+ <dl class="why">
+  <dt>why it works here</dt>
+  <dd>The emptiness <i>is</i> the tutorial — no overlay, no coach marks, nothing to dismiss. And it is true to
+  the thesis: a blank middle column is an honest statement that nothing has been flagged yet.</dd>
+  <dt>what it costs</dt>
+  <dd>Someone with no results to hand sees an empty screen and leaves. Needs pattern 02 beside it.</dd>
+ </dl>
+</div>
+
+<!-- ============================================ 2 -->
+<div class="card">
+ <div class="cardhd"><span class="n">02</span><h2>Borrow someone else's bloodwork</h2></div>
+ <p>Three one-click scenarios. You do not need your own labs to understand what the map does, and the reader
+ who <i>does</i> have labs gets a worked example to compare against.</p>
+ <div class="stage">
+  <div class="scn" id="d2scn"></div>
+  <svg class="mini" id="d2" viewBox="0 0 940 320" role="img" aria-label="Interactive miniature: preset scenarios"></svg>
+  <div class="cap" id="d2cap"></div>
+ </div>
+ <dl class="why">
+  <dt>why it works here</dt>
+  <dd>Fastest path from arrival to comprehension, and the numbers it shows are real: the iron scenario lights
+  four concerns whose follow-up lists run to 192, 103, 60 and 33 markers.</dd>
+  <dt>what it costs</dt>
+  <dd>A scenario must never read as a diagnosis. It needs a permanent label — <i>example, not advice</i> — and
+  a one-click exit to your own data.</dd>
+ </dl>
+</div>
+
+<!-- ============================================ 3 -->
+<div class="card">
+ <div class="cardhd"><span class="n">03</span><h2>Guess before the reveal</h2></div>
+ <p>The one genuinely game-like mechanic that earns its place. It teaches the single fact the whole product
+ rests on — that one number opens onto many questions — by letting you be wrong about it first.</p>
+ <div class="stage">
+  <div class="guess">
+   <h3>Calcium came back high.</h3>
+   <p>How many of the 47 concerns can that one result point at, on its own?</p>
+   <div class="opts" id="d3opts"></div>
+   <div class="reveal" id="d3rev"></div>
+  </div>
+ </div>
+ <dl class="why">
+  <dt>why it works here</dt>
+  <dd>Curiosity gap, closed with real data in one interaction. Calcium is the strongest case in the catalogue
+  at 9 concerns; the median marker reaches 1 — which is itself the more interesting lesson.</dd>
+  <dt>what it costs</dt>
+  <dd>One question is a hook; five is a quiz nobody asked for. Show it once, never again.</dd>
+ </dl>
+</div>
+
+<!-- ============================================ 4 -->
+<div class="card">
+ <div class="cardhd"><span class="n">04</span><h2>Three steps, then it goes away</h2></div>
+ <p>Not a tour — a checklist that watches what you actually do and deletes itself when you have done it. The
+ three steps are the three things the atlas can do.</p>
+ <div class="stage">
+  <ul class="steps" id="d4"></ul>
+  <div class="done-note" id="d4done">Done — this panel would now disappear and not come back.</div>
+ </div>
+ <dl class="why">
+  <dt>why it works here</dt>
+  <dd>Cheapest of the six to build and the easiest to remove. Ticks respond to real actions, so it never
+  blocks anything.</dd>
+  <dt>what it costs</dt>
+  <dd>It occupies the rail, which is where the markers live. Probably belongs in the footer strip that the
+  legend now vacates.</dd>
+ </dl>
+</div>
+
+<!-- ============================================ 5 -->
+<div class="card">
+ <div class="cardhd"><span class="n">05</span><h2>Coverage, not score</h2></div>
+ <p>One honest number about the shape of your bloodwork: how much of the map it can even reach. The annual
+ panel reaches 18 of 47 concerns. All thirteen panels reach 28. Nineteen are out of reach of blood entirely.</p>
+ <div class="stage">
+  <div class="cov">
+   <div class="covrow"><b id="d5num">18</b><span class="k">of 47 concerns your selected panels can reach</span></div>
+   <div class="meter" id="d5meter"></div>
+   <div class="bar" style="border:none;background:none;padding:16px 0 0">
+    <button class="btn on" data-cov="annual">Annual panel</button>
+    <button class="btn" data-cov="all">All 13 panels</button>
+   </div>
+   <div class="warn"><b>The trap.</b> A meter invites you to fill it, and "collect more panels" is a
+   medical recommendation this tool has no business making. It works only if the number describes
+   <i>the map's coverage</i> and never the reader — and if the 19 unreachable concerns are presented as a fact
+   about blood tests, not a gap in you.</div>
+  </div>
+ </div>
+</div>
+
+<!-- ============================================ 6 -->
+<div class="card">
+ <div class="cardhd"><span class="n">06</span><h2>One ripple at a time</h2></div>
+ <p>Same map, two first frames. Left is what ships today. Right dims everything except one marker's ripple
+ until you ask for more.</p>
+ <div class="stage">
+  <div class="cmp">
+   <div><span class="k">today · everything at once</span>
+    <svg class="mini" id="d6a" viewBox="0 0 440 300"></svg></div>
+   <div><span class="k">focus · one ripple, rest at 15%</span>
+    <svg class="mini" id="d6b" viewBox="0 0 440 300"></svg></div>
+  </div>
+  <div class="cap">Same rows, same positions, same edges — only opacity differs. No layout change, so nothing
+  moves when focus turns off.</div>
+ </div>
+ <dl class="why">
+  <dt>why it works here</dt>
+  <dd>Costs one CSS class and no layout work, and it obeys the existing rule that state is carried by colour
+  and opacity rather than geometry.</dd>
+  <dt>what it costs</dt>
+  <dd>Dimming hides the thing the atlas is for — the surrounding context. Good as a first frame, wrong as a
+  default forever.</dd>
+ </dl>
+</div>
+
+<div class="rule"></div>
+
+<h2>What I would not build</h2>
+<p>Gamification has a standard toolkit, and most of it is actively wrong for a page about someone's blood.</p>
+<table class="no">
+ <tr><th>mechanic</th><th>why not</th></tr>
+ <tr><td>Points, XP, levels</td><td>Rewards engagement with a medical record. The goal is that you come once, understand something, and leave.</td></tr>
+ <tr><td>Streaks, daily check-ins</td><td>Bloodwork changes on a scale of months. A streak would manufacture anxiety and reward re-reading old results.</td></tr>
+ <tr><td>Badges for tests taken</td><td>Turns ordering more tests into an achievement. Overtesting has real costs — false positives, incidental findings, money.</td></tr>
+ <tr><td>Leaderboards, comparison to others</td><td>Reference ranges are already population comparison, and they are age- and sex-dependent. A rank would be meaningless and frightening.</td></tr>
+ <tr><td>A health score</td><td>Collapsing 68 markers into one number is exactly the reduction this product exists to argue against.</td></tr>
+ <tr><td>Confetti, celebration animation</td><td>Breaks the no-ambient-motion rule, and there is nothing here to celebrate.</td></tr>
+ <tr><td>Unlocking content by progress</td><td>Gating real clinical information behind a game loop. Never.</td></tr>
+</table>
+
+<h2 style="margin-top:32px">If it were my call</h2>
+<p><b>Combine 01, 02 and 04.</b> The map opens nearly empty with the three-step strip in the footer and the
+three borrowed scenarios sitting where the concern column will be. Marking one result — your own or a
+scenario's — starts the reveal. That is an empty state doing three jobs at once and adds no new screen.</p>
+<p><b>Add 03 once</b>, on the first result anyone marks, then never again. <b>Hold 05</b> until the framing is
+settled; the meter is one word away from being a nudge to over-test. <b>Skip 06</b> for now — 01 achieves the
+same calm without hiding anything.</p>
+
+<div class="src">
+ Numbers read from <code>index.html</code> and <code>data/catalogue.json</code> in this repo on 4 August 2026:
+ 68 markers across 13 panels, 47 concerns, 6,192 catalogued tests, 18 of 47 concerns reachable from the annual
+ panel, 28 from all thirteen. Marker-to-concern links and follow-up counts are the build's own, unmodified.
+ The concern labels, panel definitions and their sources are unchanged from the atlas — see
+ <a href="../history.html">history.html</a> for the sourcing ledger. Scenario names are illustrative groupings
+ of real markers, not diagnostic criteria.
+</div>
+
+</div>
+
+<script>
+/* Real slice of the live build: markers, their concern links, and concern
+   labels with true follow-up counts. Extracted from index.html, unmodified. */
+const D = {"m":{"hemoglobin":{"n":"Hemoglobin","k":[0,1],"g":"Hematology"},"hematocrit":{"n":"Hematocrit","k":[1],"g":"Hematology"},"redbloodcellindices":{"n":"Red Blood Cell indices","k":[0,1],"g":"Hematology"},"plateletcount":{"n":"Platelet count","k":[3],"g":"Hematology"},"whitebloodcellcount":{"n":"White Blood Cell count","k":[25],"g":"Hematology"},"bloodglucose":{"n":"Blood glucose","k":[7],"g":"Chemistry / Metabolic"},"calcium":{"n":"Calcium","k":[8,9,13,14,24,32,37,38,39],"g":"Chemistry / Metabolic"},"potassium":{"n":"Potassium","k":[9],"g":"Chemistry / Metabolic"},"sodium":{"n":"Sodium","k":[9],"g":"Chemistry / Metabolic"},"creatinine":{"n":"Creatinine","k":[13],"g":"Chemistry / Metabolic"},"alanineaminotransfe":{"n":"Alanine aminotransferase","k":[12],"g":"Chemistry / Metabolic"},"totalcholesterol":{"n":"Total cholesterol","k":[4],"g":"Lipids"},"ldlcholesterol":{"n":"LDL cholesterol","k":[4],"g":"Lipids"},"hdlcholesterol":{"n":"HDL cholesterol","k":[4],"g":"Lipids"},"triglycerides":{"n":"Triglycerides","k":[4],"g":"Lipids"},"ferritin":{"n":"Ferritin","k":[0,1,39,45],"g":"Iron studies"},"vitaminb12":{"n":"Vitamin B12","k":[0,30,37,38,39],"g":"Vitamins / Nutrition"},"folatesfolicacid":{"n":"Folates (folic acid)","k":[0,30,37,38,39],"g":"Vitamins / Nutrition"}},
+"c":{"0":{"l":"Fatigue & low energy","n":60},"1":{"l":"Anemia & iron","n":192},"3":{"l":"Bleeding & clotting","n":170},"4":{"l":"Heart & cholesterol","n":127},"7":{"l":"Blood sugar & diabetes","n":30},"8":{"l":"Thyroid","n":30},"9":{"l":"Weight changes","n":312},"12":{"l":"Liver","n":103},"13":{"l":"Kidney","n":25},"14":{"l":"Kidney stones","n":18},"24":{"l":"Allergies & asthma","n":22},"25":{"l":"Infection (general)","n":50},"30":{"l":"Vitamins & nutrition","n":126},"32":{"l":"Bone health & osteoporosis","n":50},"37":{"l":"Mood & mental health","n":40},"38":{"l":"Memory & brain fog","n":30},"39":{"l":"Hair, skin & nails","n":103},"45":{"l":"Athletic performance & muscle","n":33}}};
+
+const $ = id => document.getElementById(id);
+const esc = t => String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const nf = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+/* ---------- shared miniature ------------------------------------------- */
+/* One renderer for demos 01 and 02. Rows are 32px, names in full, no motion. */
+function miniature(svg, rows, vals, opts){
+ opts = opts || {};
+ const W = 940, xM = 300, xC = 500, ROW = 32, TOP = 48;
+ const lit = {};
+ rows.forEach(sl => { if(vals[sl]) (D.m[sl].k || []).forEach(ci => { lit[ci] = lit[ci] || []; lit[ci].push(sl); }); });
+ const order = Object.keys(lit).sort((a, b) => (D.c[b].n || 0) - (D.c[a].n || 0));
+ const my = {}, cy = {};
+ rows.forEach((sl, i) => my[sl] = TOP + i * ROW + ROW / 2);
+ order.forEach((ci, i) => cy[ci] = TOP + i * ROW + ROW / 2);
+
+ let h = '<text class="hd" x="16" y="24">YOUR PANEL &middot; ' + rows.length + '</text>'
+       + '<text class="hd" x="' + (xC + 12) + '" y="24">WHAT IT CAN POINT AT &middot; ' + order.length + '</text>';
+
+ // edges first, so rows sit above them
+ order.forEach(ci => lit[ci].forEach(sl => {
+  const v = vals[sl], y1 = my[sl], y2 = cy[ci];
+  h += '<path class="edge ' + (v < 0 ? 'lo' : 'hi') + '" d="M' + xM + ' ' + y1
+     + 'C' + ((xM + xC) / 2) + ' ' + y1 + ',' + ((xM + xC) / 2) + ' ' + y2 + ',' + xC + ' ' + y2 + '"/>';
+ }));
+
+ rows.forEach(sl => {
+  const v = vals[sl] || 0, y = my[sl];
+  h += '<g class="row ' + (v < 0 ? 'lo' : v > 0 ? 'hi' : '') + '" data-mk="' + sl + '">'
+     + '<rect class="hit" x="0" y="' + (y - 16) + '" width="' + (xM + 10) + '" height="32" rx="4"/>'
+     + '<text class="lb ' + (v < 0 ? 'lo' : v > 0 ? 'hi' : '') + '" x="' + (xM - 24) + '" y="' + (y + 4)
+     + '" text-anchor="end">' + esc(D.m[sl].n) + '</text>'
+     + (v ? '<text class="sub" x="' + (xM - 16) + '" y="' + (y + 4) + '" text-anchor="middle">'
+          + (v < 0 ? '▼' : '▲') + '</text>' : '')
+     + '<circle class="dot" cx="' + xM + '" cy="' + y + '" r="5"/></g>';
+ });
+
+ if(!order.length){
+  h += '<text class="hint" x="' + (xC + 12) + '" y="' + (TOP + 20) + '">'
+     + esc(opts.empty || 'Nothing marked yet — mark one result on the left.') + '</text>';
+ }
+ order.forEach(ci => {
+  const y = cy[ci];
+  h += '<g class="row on"><circle class="dot" cx="' + xC + '" cy="' + y + '" r="5"/>'
+     + '<text class="lb" x="' + (xC + 12) + '" y="' + (y + 4) + '">' + esc(D.c[ci].l) + '</text>'
+     + '<text class="sub" x="' + (xC + 20 + D.c[ci].l.length * 7) + '" y="' + (y + 4) + '">'
+     + nf(D.c[ci].n) + ' follow-up markers</text></g>';
+ });
+ svg.innerHTML = h;
+ return { lit: lit, order: order };
+}
+
+/* ---------- 01 one move at a time -------------------------------------- */
+const D1_ROWS = ['hemoglobin','hematocrit','redbloodcellindices','plateletcount','whitebloodcellcount','ferritin'];
+let d1 = {};
+function drawD1(){
+ const r = miniature($('d1'), D1_ROWS, d1, { empty: 'Click a name on the left to mark it low.' });
+ const n = Object.keys(d1).length;
+ $('d1cap').innerHTML = !n
+  ? 'The map holds one instruction and nothing else. <b>0 marks &middot; 0 concerns</b>'
+  : '<b>' + n + (n === 1 ? ' mark' : ' marks') + ' &middot; ' + r.order.length + ' concern'
+    + (r.order.length === 1 ? '' : 's') + '</b> &mdash; each one carries its own follow-up list. Keep going, or start over.';
+}
+$('d1').addEventListener('click', function(e){
+ const g = e.target.closest('[data-mk]'); if(!g) return;
+ const sl = g.dataset.mk;
+ d1[sl] = d1[sl] === -1 ? 1 : d1[sl] === 1 ? 0 : -1;
+ if(!d1[sl]) delete d1[sl];
+ drawD1();
+});
+$('d1reset').addEventListener('click', function(){ d1 = {}; drawD1(); });
+drawD1();
+
+/* ---------- 02 borrow someone else's bloodwork ------------------------- */
+/* Marker groupings are illustrative; the links and counts they light up are real. */
+const SCN = [
+ { id:'iron',  t:'Low iron picture', d:'4 results marked low',
+   v:{ hemoglobin:-1, hematocrit:-1, redbloodcellindices:-1, ferritin:-1 } },
+ { id:'metab', t:'Metabolic picture', d:'3 results marked high',
+   v:{ bloodglucose:1, triglycerides:1, alanineaminotransfe:1 } },
+ { id:'nutri', t:'Nutritional picture', d:'2 low, 1 high',
+   v:{ vitaminb12:-1, folatesfolicacid:-1, calcium:1 } },
+];
+const D2_ROWS = ['hemoglobin','hematocrit','redbloodcellindices','ferritin','bloodglucose',
+                 'triglycerides','alanineaminotransfe','vitaminb12','folatesfolicacid','calcium'];
+let d2 = null;
+function drawD2(){
+ $('d2scn').innerHTML = SCN.map(s =>
+  '<button data-scn="' + s.id + '"' + (d2 === s.id ? ' class="on"' : '') + '>'
+  + '<span class="t">' + esc(s.t) + '</span><span class="d">' + esc(s.d) + '</span></button>').join('');
+ const s = SCN.filter(x => x.id === d2)[0];
+ const r = miniature($('d2'), D2_ROWS, s ? s.v : {}, { empty: 'Pick one of the three above.' });
+ if(!s){ $('d2cap').innerHTML = 'Nothing loaded. <b>Pick a scenario</b> to see the map fill in one click.'; return; }
+ const tot = r.order.reduce((a, ci) => a + (D.c[ci].n || 0), 0);
+ $('d2cap').innerHTML = '<b>' + Object.keys(s.v).length + ' marks &middot; ' + r.order.length
+  + ' concerns &middot; ' + nf(tot) + ' follow-up markers</b> behind them. '
+  + 'Example only — not a diagnosis, and not advice.';
+}
+$('d2scn').addEventListener('click', function(e){
+ const b = e.target.closest('[data-scn]'); if(!b) return;
+ d2 = d2 === b.dataset.scn ? null : b.dataset.scn;
+ drawD2();
+});
+drawD2();
+
+/* ---------- 03 guess before the reveal --------------------------------- */
+const D3_ANS = D.m.calcium.k.length;                 // 9, read from the data
+const D3_OPTS = [1, 3, D3_ANS, 20];
+let d3done = false;
+function drawD3(pick){
+ $('d3opts').innerHTML = D3_OPTS.map(v =>
+  '<button data-g="' + v + '"' + (d3done ? (v === D3_ANS ? ' class="ans"' : (v === pick ? ' class="pick"' : '')) : '')
+  + '>' + v + '</button>').join('');
+ if(!d3done) return;
+ const list = D.m.calcium.k.map(ci =>
+  '<span class="chip">' + esc(D.c[ci].l) + '<i>' + nf(D.c[ci].n) + '</i></span>').join('');
+ $('d3rev').className = 'reveal on';
+ $('d3rev').innerHTML =
+   '<h3>' + D3_ANS + ' — ' + (pick === D3_ANS ? 'exactly right.' : 'more than most people guess.') + '</h3>'
+ + '<p>Calcium alone reaches nine of the 47 concerns, from kidney stones to memory and mood. It is the widest'
+ + ' reach of any single marker in the catalogue — and the more useful surprise is the other end: the'
+ + ' <b>median marker reaches exactly one</b>. Most results are narrow; a few open onto everything.</p>'
+ + '<div class="chips">' + list + '</div>'
+ + '<p style="margin-top:8px">Each chip carries the number of follow-up markers tagged to that concern.</p>';
+}
+$('d3opts').addEventListener('click', function(e){
+ const b = e.target.closest('[data-g]'); if(!b || d3done) return;
+ d3done = true; drawD3(+b.dataset.g);
+});
+drawD3(null);
+
+/* ---------- 04 three steps -------------------------------------------- */
+const D4 = [
+ { t:'Pick the panels you have had', d:'Thirteen to choose from; the annual three are on by default.' },
+ { t:'Mark one result low or high', d:'The ripple only starts when something is flagged.' },
+ { t:'Open a concern to see what would follow it up', d:'That is the whole loop — result, meaning, next test.' },
+];
+let d4 = [false, false, false];
+function drawD4(){
+ $('d4').innerHTML = D4.map((s, i) =>
+  '<li data-i="' + i + '"' + (d4[i] ? ' class="done"' : '') + '><span class="box"></span>'
+  + '<span class="t">' + esc(s.t) + '<span class="d">' + esc(s.d) + '</span></span>'
+  + '<span class="num">' + (i + 1) + ' of 3</span></li>').join('');
+ $('d4done').className = 'done-note' + (d4.every(Boolean) ? ' on' : '');
+}
+$('d4').addEventListener('click', function(e){
+ const li = e.target.closest('[data-i]'); if(!li) return;
+ d4[+li.dataset.i] = !d4[+li.dataset.i]; drawD4();
+});
+drawD4();
+
+/* ---------- 05 coverage ----------------------------------------------- */
+const COV = { annual: 18, all: 28 }, COV_TOTAL = 47;
+function drawD5(mode){
+ const n = COV[mode];
+ $('d5num').textContent = n;
+ $('d5meter').innerHTML = '<i style="width:' + (100 * COV.annual / COV_TOTAL).toFixed(1) + '%"></i>'
+  + (mode === 'all' ? '<i class="add" style="width:' + (100 * (n - COV.annual) / COV_TOTAL).toFixed(1) + '%"></i>' : '');
+ Array.prototype.forEach.call(document.querySelectorAll('[data-cov]'),
+   b => b.classList.toggle('on', b.dataset.cov === mode));
+}
+document.addEventListener('click', function(e){
+ const b = e.target.closest('[data-cov]'); if(!b) return;
+ drawD5(b.dataset.cov);
+});
+drawD5('annual');
+
+/* ---------- 06 focus compare ------------------------------------------ */
+/* Same geometry twice; the right one only changes opacity. */
+function drawD6(svg, focus){
+ const rows = ['hemoglobin','hematocrit','plateletcount','bloodglucose','calcium','creatinine',
+               'totalcholesterol','triglycerides','ferritin','vitaminb12'];
+ const cids = Object.keys(D.c);
+ const xM = 150, xC = 260, ROW = 24, TOP = 30;
+ const hot = 'calcium';
+ let h = '';
+ rows.forEach((sl, i) => {
+  const y1 = TOP + i * ROW + 12;
+  (D.m[sl].k || []).forEach(ci => {
+   const j = cids.indexOf(String(ci)); if(j < 0) return;
+   const y2 = TOP + j * ROW + 12;
+   const dim = focus && sl !== hot;
+   h += '<path class="edge' + (sl === hot ? ' hi' : '') + '" opacity="' + (dim ? '.15' : '1') + '" d="M'
+      + xM + ' ' + y1 + 'C' + ((xM + xC) / 2) + ' ' + y1 + ',' + ((xM + xC) / 2) + ' ' + y2 + ',' + xC + ' ' + y2 + '"/>';
+  });
+ });
+ rows.forEach((sl, i) => {
+  const y = TOP + i * ROW + 12, dim = focus && sl !== hot;
+  h += '<g opacity="' + (dim ? '.15' : '1') + '"><text class="lb' + (sl === hot && focus ? ' hi' : '')
+     + '" x="' + (xM - 16) + '" y="' + (y + 4) + '" text-anchor="end" style="font-size:12px">'
+     + esc(D.m[sl].n) + '</text><circle class="dot" cx="' + xM + '" cy="' + y + '" r="4"/></g>';
+ });
+ cids.forEach((ci, j) => {
+  const y = TOP + j * ROW + 12;
+  const on = (D.m[hot].k || []).indexOf(+ci) >= 0;
+  const dim = focus && !on;
+  h += '<g opacity="' + (dim ? '.15' : '1') + '"><circle class="dot" cx="' + xC + '" cy="' + y + '" r="4"/>'
+     + '<text class="lb" x="' + (xC + 12) + '" y="' + (y + 4) + '" style="font-size:12px">'
+     + esc(D.c[ci].l) + '</text></g>';
+ });
+ svg.innerHTML = h;
+}
+drawD6($('d6a'), false);
+drawD6($('d6b'), true);
+</script>
+</body>
+</html>
