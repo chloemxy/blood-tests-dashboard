@@ -51,6 +51,8 @@ FEEDBACK = [
   "versions": ["v4.6"],
   "quote": "these kind of titles can be 10 px, apply to all similar component texts",
   "did": [
+   ("The three map column titles, missed on the first pass", "addressed",
+    "<code>.map .colttl</code> and <code>.kbdhint</code> both sit under a comment block, and the sweep that rewrote the rules read the comment as part of the selector \u2014 so the two most visible labels on the page were the two it skipped. Both are 10px now, and the check is no longer \u201cdoes this selector match a list\u201d but \u201cis any mono rule still at 12px\u201d, which answers zero."),
    ("A second tier, defined by what the text is", "addressed",
     "10px is now reserved for mono, uppercase, tracked text that <i>names</i> what is below it rather than being part of it: the three map column titles, panel group headers, the divider band, section kickers, the picker header and its two shortcuts, the quoted / ai-written tags, family headers, the keyboard hint. 36 rules in all. Anything sentence-case, or that carries meaning on its own \u2014 marker names, concern names, chips, buttons, body copy \u2014 stays at 12px."),
    ("Their own line height", "addressed",

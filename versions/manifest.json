@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-05T07:59:02Z",
+ "generated": "2026-08-05T08:01:52Z",
  "live": "index.html",
  "constraints": [
   [
@@ -39,6 +39,11 @@
    ],
    "quote": "these kind of titles can be 10 px, apply to all similar component texts",
    "did": [
+    [
+     "The three map column titles, missed on the first pass",
+     "addressed",
+     "<code>.map .colttl</code> and <code>.kbdhint</code> both sit under a comment block, and the sweep that rewrote the rules read the comment as part of the selector — so the two most visible labels on the page were the two it skipped. Both are 10px now, and the check is no longer “does this selector match a list” but “is any mono rule still at 12px”, which answers zero."
+    ],
     [
      "A second tier, defined by what the text is",
      "addressed",
