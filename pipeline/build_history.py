@@ -43,6 +43,32 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F40",
+  "date": "2026-08-04",
+  "who": "Chloe",
+  "title": "Tell the two picker shortcuts apart",
+  "status": "addressed",
+  "versions": ["v4.7"],
+  "quote": "more distinct from each other",
+  "did": [
+   ("Each one is its own control", "addressed",
+    "<i>annual only</i> and <i>select all 13</i> were two runs of 10px small caps side by side and read as one string. Each now carries its own outline and 4/8px padding, so the 8px between them is a gap between two objects rather than a word space. Disabled dims the outline as well as the text."),
+  ],
+ },
+ {
+  "id": "F39",
+  "date": "2026-08-04",
+  "who": "Chloe",
+  "title": "A fitting icon for normal",
+  "status": "addressed",
+  "versions": ["v4.7"],
+  "quote": "replace - with a fitting icon",
+  "did": [
+   ("The marker\u2019s own dot", "addressed",
+    "The dash became a bar, and the bar was still just a mark. Normal is now the open circle the map already uses for an unflagged marker \u2014 marking it low or high is what adds the triangle. The three buttons now say <i>below the range / in it / above it</i> in the map\u2019s own vocabulary rather than in three unrelated glyphs."),
+  ],
+ },
+ {
   "id": "F38",
   "date": "2026-08-04",
   "who": "Chloe",
@@ -893,6 +919,22 @@ FEEDBACK = [
 # VERSIONS — newest first
 # ===========================================================================
 VERSIONS = [
+ {
+  "id": "v4.7",
+  "file": "v4.7-toggle-icons.html",
+  "title": "Ripple atlas \u2014 the toggle speaks the map\u2019s language",
+  "date": "2026-08-04",
+  "source": "index-v3.html",
+  "status": "candidate",
+  "tag": "v4.7-toggle-icons",
+  "gitpath": "index-v3.html",
+  "answers": ["F39", "F40"],
+  "summary": "Normal becomes the map\u2019s own unflagged-marker dot, and the two picker shortcuts become two visibly separate controls.",
+  "changes": [
+   "<b>Normal is an open circle</b> \u2014 the same shape the map draws for a marker with nothing flagged; low and high add the triangle, as they do on the map.",
+   "<b>The picker shortcuts are outlined</b>, so two controls no longer read as one run of small caps.",
+  ],
+ },
  {
   "id": "v4.6",
   "file": "v4.6-label-tier.html",

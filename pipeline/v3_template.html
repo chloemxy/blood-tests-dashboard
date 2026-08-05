@@ -76,10 +76,14 @@ button{font-family:inherit;cursor:pointer}
    matches, the button dims rather than disappearing. */
 .pickhd{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:0 0 8px}
 .pacts{display:flex;gap:8px;flex:0 0 auto}
-.pact{background:none;border:none;padding:0;font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;
- text-transform:uppercase;color:var(--teal);white-space:nowrap}
-.pact:hover{color:var(--accent)}
-.pact[disabled]{color:#c8d2d3}
+/* Two shortcuts, not one run of small caps. Each gets its own outline so it
+   reads as a control, and the 8px between them is a gap between two objects
+   rather than a word space. */
+.pact{background:#fff;border:1px solid var(--line);border-radius:12px;padding:4px 8px;
+ font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;
+ text-transform:uppercase;color:var(--teal);white-space:nowrap;line-height:1}
+.pact:hover{border-color:var(--accent);color:var(--accent)}
+.pact[disabled]{color:#c8d2d3;border-color:#eef2f2;background:#fbfcfc}
 .pchips{display:flex;flex-wrap:wrap;gap:8px}
 .pchip{border:1px solid var(--line);background:#fff;color:var(--muted);font-size:12px;padding:4px 8px;
  border-radius:12px;white-space:nowrap;display:inline-flex;align-items:baseline;gap:4px}
@@ -117,12 +121,14 @@ button{font-family:inherit;cursor:pointer}
  overflow:hidden;background:#fff;height:24px}
 .tri button{border:none;background:none;font-family:var(--font-sans);font-size:12px;color:#b4c0c2;
  padding:0;border-right:1px solid var(--line);line-height:24px;text-align:center}
-/* Normal is an icon, not a dash character: a bar drawn at the same optical
-   weight as the two triangles, so the three states read as one set. It takes
-   its colour from the button, so the selected state needs no extra rule. */
+/* Normal is the marker's own dot: on the map an unflagged marker is an open
+   circle, and marking it low or high adds the triangle. Reusing that circle
+   here makes the three buttons say "below the range / in it / above it" in the
+   map's own vocabulary. It takes its colour from the button, so the selected
+   state needs no extra rule. */
 .tri button.mid{font-size:0;display:flex;align-items:center;justify-content:center}
-.tri button.mid::before{content:'';display:block;width:9px;height:2px;border-radius:1px;
- background:currentColor}
+.tri button.mid::before{content:'';display:block;width:8px;height:8px;border-radius:50%;
+ border:2px solid currentColor}
 .tri button:last-child{border-right:none}
 .tri button:hover{background:var(--aqua)}
 .tri button.on[data-v="-1"]{background:var(--low);color:#fff}
