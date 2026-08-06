@@ -75,6 +75,23 @@ load('index.html',(w,d,errs)=>{
   console.log('   feedback pills: atlas', fbAtlas, '+ catalogue', fb, '| "i" buttons:', d2.querySelectorAll('.discbtn').length);
   if(fbAtlas !== 1) fail.push('atlas: '+fbAtlas+' feedback pills, expected 1');
   if(fb !== 3) fail.push('catalogue: '+fb+' feedback pills, expected one per screen');
+  // the same two actions, in the same order, on every screen
+  const acts = b => [...b.querySelectorAll('.act > *')].map(x => x.textContent.trim()).join(' > ');
+  const WANT = 'Clear all answers > feedback';
+  const aAtlas = acts(d.querySelector('.sitehd'));
+  console.log('   atlas actions:', JSON.stringify(aAtlas));
+  if(aAtlas !== WANT) fail.push('atlas actions are "'+aAtlas+'", expected "'+WANT+'"');
+  bars.forEach((b,i)=>{
+   const got = acts(b);
+   console.log('   bar '+(i+1)+' actions:', JSON.stringify(got));
+   if(got !== WANT) fail.push('catalogue bar '+(i+1)+' actions are "'+got+'", expected "'+WANT+'"');
+  });
+  // clearing is defined once: the other pills must reach the real one
+  const feelClear = bars[1].querySelector('.clearall');
+  d2.getElementById('qbox').value = 'tired';
+  feelClear.dispatchEvent(new w2.MouseEvent('click',{bubbles:true,cancelable:true}));
+  console.log('   clear from another screen emptied the query:', d2.getElementById('qbox').value === '');
+  if(d2.getElementById('qbox').value !== '') fail.push('a delegated Clear all answers did nothing');
   if(d2.querySelector('.discbtn')) fail.push('catalogue: the "i" button is still there');
   // its modal must still be reachable, from the counts line
   const h = d2.getElementById('hdrTag');

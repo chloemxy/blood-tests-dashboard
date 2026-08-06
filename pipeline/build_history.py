@@ -43,6 +43,21 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F57",
+  "date": "2026-08-05",
+  "who": "Chloe",
+  "title": "The same two actions on every page",
+  "status": "addressed",
+  "versions": ["v5.6"],
+  "quote": "use these two for all pages, replace what\u2019s already there.",
+  "did": [
+   ("Clear all answers, then feedback", "addressed",
+    "On all four screens, in that order. The atlas called the same action <i>Reset</i> and the landing and how-you-feel screens had no clear at all. <i>Clear all answers</i> carries the accent outline because it is the destructive one; feedback is an ordinary pill."),
+   ("Clearing is still defined once", "addressed",
+    "The catalogue\u2019s clear empties the shared answer state \u2014 concerns, the free-text query, age, sex, stage, medications \u2014 which is exactly what the landing and feel screens write into. The new pills click that button rather than reimplementing it, so there is one definition of what clearing means. The check proves it by typing into the query box, clicking clear from a different screen, and confirming the box is empty."),
+  ],
+ },
+ {
   "id": "F56",
   "date": "2026-08-05",
   "who": "Chloe",
@@ -1194,12 +1209,29 @@ FEEDBACK = [
 # ===========================================================================
 VERSIONS = [
  {
+  "id": "v5.6",
+  "file": "v5.6-two-actions.html",
+  "title": "Two actions, four screens",
+  "date": "2026-08-05",
+  "source": "index.html",
+  "status": "live",
+  "tag": "v5.6-two-actions",
+  "gitpath": "index.html",
+  "answers": ["F57"],
+  "summary": "Clear all answers and feedback, in that order, on every screen \u2014 with clearing still implemented in exactly one place.",
+  "changes": [
+   "<b>Clear all answers</b> (accent, destructive) then <b>feedback</b> on all four headers; the atlas\u2019s <i>Reset</i> is renamed to match.",
+   "<b>One clear</b>: the new pills delegate to the catalogue\u2019s existing button instead of repeating its logic.",
+   "<code>header-parity</code> asserts the action list is identical on every screen and exercises the delegated clear.",
+  ],
+ },
+ {
   "id": "v5.5",
   "file": "v5.5-feedback-everywhere.html",
   "title": "Feedback everywhere, two buttons fewer",
   "date": "2026-08-05",
   "source": "index.html",
-  "status": "live",
+  "status": "superseded",
   "tag": "v5.5-feedback-everywhere",
   "gitpath": "index.html",
   "answers": ["F55", "F56"],

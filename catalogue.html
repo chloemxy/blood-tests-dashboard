@@ -355,6 +355,11 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
 .sitehd .act .resetlink:hover,.sitehd .act .fblink:hover,.sitehd .act .discbtn:hover,
 .sitehd .act .cxmenu:hover{border-color:var(--accent);color:var(--accent)}
 .sitehd .act .discbtn{padding:4px 0;width:28px;text-align:center;font-family:var(--font-mono)}
+/* Clear is destructive, so it carries the accent; feedback is ordinary. Both
+   are the same pill in the same order on every screen. */
+.sitehd .act .clearall{border-color:var(--accent);color:var(--accent)}
+.sitehd .act .clearall:hover{background:#fdf1ea}
+
 
 /* the counts read as one quiet line, not as a scoreboard */
 .sitehd .stat,.sitehd #rollup .stat{font-family:var(--font-mono);font-size:10px;color:var(--dim);
@@ -621,7 +626,7 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
 <body>
 <!-- ===== Route landing ===== -->
 <div id="cxRoute">
- <div class="cxtop sitehd"><span class="id"><span class="logo">What is your blood telling you<b>?</b></span></span><nav><a class="nv" href="index.html">Atlas</a><a class="nv" href="catalogue.html#feel" data-go="feel">How you feel</a><a class="nv" href="catalogue.html#tests" data-go="tests">Guided tests</a><a class="nv" href="catalogue.html#table" data-go="table">All tests</a></nav><span class="act"><a class="fblink" href="mailto:blood@goinvo.com" title="Send feedback to blood@goinvo.com">feedback</a></span></div>
+ <div class="cxtop sitehd"><span class="id"><span class="logo">What is your blood telling you<b>?</b></span></span><nav><a class="nv" href="index.html">Atlas</a><a class="nv" href="catalogue.html#feel" data-go="feel">How you feel</a><a class="nv" href="catalogue.html#tests" data-go="tests">Guided tests</a><a class="nv" href="catalogue.html#table" data-go="table">All tests</a></nav><span class="act"><button type="button" class="resetlink clearall">Clear all answers</button><a class="fblink" href="mailto:blood@goinvo.com" title="Send feedback to blood@goinvo.com">feedback</a></span></div>
  <div class="cxwrap">
   <h1 class="cxhero">Where do you want to start?</h1>
   <svg class="cxecg" viewBox="0 0 600 40" aria-hidden="true"><path d="M0 20 H218 l8 -5 8 5 h14 l5 -13 7 26 5 -13 h16 l9 -7 11 7 H600"/></svg>
@@ -744,7 +749,7 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
  <div class="cxtop sitehd">
   <span class="id"><span class="logo">What is your blood telling you<b>?</b></span></span>
   <nav><a class="nv" href="index.html">Atlas</a><a class="nv on" href="catalogue.html#feel" data-go="feel">How you feel</a><a class="nv" href="catalogue.html#tests" data-go="tests">Guided tests</a><a class="nv" href="catalogue.html#table" data-go="table">All tests</a></nav>
-  <span class="act"><a class="fblink" href="mailto:blood@goinvo.com" title="Send feedback to blood@goinvo.com">feedback</a></span>
+  <span class="act"><button type="button" class="resetlink clearall">Clear all answers</button><a class="fblink" href="mailto:blood@goinvo.com" title="Send feedback to blood@goinvo.com">feedback</a></span>
  </div>
  <div class="cxwrap">
   <div class="cxcrumb" id="cxCrumb"></div>
@@ -857,7 +862,7 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
   </div>
   </span>
   <nav><a class="nv" href="index.html">Atlas</a><a class="nv" href="catalogue.html#feel" data-go="feel">How you feel</a><a class="nv on" href="catalogue.html#tests" data-go="tests">Guided tests</a><a class="nv" href="catalogue.html#table" data-go="table">All tests</a></nav>
-  <span class="act"><button class="resetlink" id="resetBtn">Clear all answers</button><a class="fblink" href="mailto:blood@goinvo.com" title="Send feedback to blood@goinvo.com">feedback</a></span>
+  <span class="act"><button class="resetlink clearall" id="resetBtn" type="button">Clear all answers</button><a class="fblink" href="mailto:blood@goinvo.com" title="Send feedback to blood@goinvo.com">feedback</a></span>
  </header>
 
  <aside id="rail">
@@ -2192,6 +2197,16 @@ document.addEventListener('click', function(e){
 }, true);
 /* #table is ours, not the app's router's, so honour it on a cold load. */
 if((location.hash || '').replace(/^#/, '') === 'table') cxGo('table', false);
+</script>
+<script>
+/* Clear all answers exists once, in the dashboard. The pills on the other
+   screens click it, so there is one definition of what clearing means. */
+document.addEventListener('click', function(e){
+ const b = e.target.closest('.clearall');
+ if(!b || b.id === 'resetBtn') return;
+ const real = document.getElementById('resetBtn');
+ if(real) real.click();
+}, true);
 </script>
 </body>
 </html>
