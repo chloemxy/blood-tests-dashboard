@@ -43,6 +43,23 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F60",
+  "date": "2026-08-05",
+  "who": "Chloe",
+  "title": "No prose in the personal-concern section",
+  "status": "addressed",
+  "versions": ["v6.1"],
+  "quote": "remove these descriptions, and reduce the height of the section to reflect that",
+  "did": [
+   ("Both paragraphs gone", "addressed",
+    "The section is a header and its chips. The reach count was already on the header\u2019s counts line, so removing it loses nothing."),
+   ("Sized for the chips", "addressed",
+    "<code>24vh</code> between a 176px floor and a 320px ceiling \u2014 about five rows of chips \u2014 down from 33vh / 264 / 432, which had been sized to hold two paragraphs as well."),
+   ("The off-specimen note has nowhere else to live", "open",
+    "It is on the section header\u2019s tooltip now: <i>urinalysis (11 measures, urine, not blood) and urea breath test (1 measure, breath, not blood), which this atlas cannot map</i>. A tooltip is weaker than text \u2014 it is not discoverable and not on a phone \u2014 so if that fact matters it needs a home somewhere else, perhaps beside the panel picker."),
+  ],
+ },
+ {
   "id": "F59",
   "date": "2026-08-05",
   "who": "Chloe",
@@ -1247,12 +1264,29 @@ FEEDBACK = [
 # ===========================================================================
 VERSIONS = [
  {
+  "id": "v6.1",
+  "file": "v6.1-quiet-layer.html",
+  "title": "The personal-concern section, quieter",
+  "date": "2026-08-05",
+  "source": "index.html",
+  "status": "live",
+  "tag": "v6.1-quiet-layer",
+  "gitpath": "index.html",
+  "answers": ["F60"],
+  "summary": "Two paragraphs removed from the personal-concern section and the section resized to the chips it holds.",
+  "changes": [
+   "<b>Header plus chips</b>, no prose. The reach count already lives on the header counts line.",
+   "<b>24vh, 176\u2013320px</b>, down from 33vh / 264\u2013432px.",
+   "The off-specimen note survives only as a tooltip \u2014 logged as open, because a tooltip is not a real home for it.",
+  ],
+ },
+ {
   "id": "v6.0",
   "file": "v6.0-real-annual-panel.html",
   "title": "Your actual annual panel",
   "date": "2026-08-05",
   "source": "index.html",
-  "status": "live",
+  "status": "superseded",
   "tag": "v6.0-real-annual-panel",
   "gitpath": "index.html",
   "answers": ["F58", "F59"],
