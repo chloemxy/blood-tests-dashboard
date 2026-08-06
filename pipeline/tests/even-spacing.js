@@ -23,8 +23,10 @@ let i=0,fail=[];
   };
   [['marker','.map .row.mkr','text.lb'],['concern','.map .row.cnc','text.lb'],['follow-up','.map .row.tst','text']].forEach(([nm,a,b2])=>{
    let gg=gaps(a,b2); if(!gg.length) return;
-   // drop the group boundaries: 2 panel headers in the marker column, 1 divider
-   const drop = nm==='marker' ? 2 : nm==='concern' ? 1 : 0;
+   // Drop the group boundaries rather than the interior gaps: one per panel
+   // header after the first in the marker column, one for the concern divider.
+   const nHeads = new Set([...d.querySelectorAll('.map text.grphd')].map(x=>+x.getAttribute('y'))).size;
+   const drop = nm==='marker' ? Math.max(0, nHeads-1) : nm==='concern' ? 1 : 0;
    const boundaries = gg.slice().sort((x,y)=>y-x).slice(0,drop);
    boundaries.forEach(v=>{ gg.splice(gg.indexOf(v),1); });
    const mn=Math.min(...gg),mx=Math.max(...gg),sp=mx-mn;

@@ -198,11 +198,17 @@ button{font-family:inherit;cursor:pointer}
 .tri button.on[data-v="0"]{background:var(--line);color:var(--slate)}
 .tri button.on[data-v="1"]{background:var(--high);color:#fff}
 
-.layer{flex:0 0 auto;border-top:1px solid var(--line);padding:16px;max-height:184px;
- display:flex;flex-direction:column}
+/* The chips are the whole point of this section — the concerns your bloodwork
+   cannot reach — so it gets a third of the rail rather than 184px. */
+.layer{flex:0 0 auto;border-top:1px solid var(--line);padding:16px;
+ height:33vh;min-height:264px;max-height:432px;display:flex;flex-direction:column}
 .layer h3{font-family:var(--font-mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;
  color:var(--dim);margin:0 0 4px}
 .layer p{font-size:12px;color:var(--muted);margin:0 0 8px;line-height:1.45}
+/* Two sections of the report are not blood at all. Saying so is the same rule
+   as naming a component the catalogue does not carry. */
+.offspec{font-size:12px;color:var(--muted);margin:0 0 8px;line-height:1.45;
+ border-left:2px solid var(--line);padding-left:8px}
 .chips{flex:1 1 auto;min-height:0;display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;padding-right:8px}
 .chip{border:1px solid var(--line);background:#fff;color:var(--slate);font-size:12px;padding:4px 8px;
  border-radius:12px;white-space:nowrap}
@@ -457,6 +463,7 @@ button{font-family:inherit;cursor:pointer}
   <div class="layer">
    <h3>Add a personal concern</h3>
    <p id="layerSub"></p>
+   <p class="offspec" id="offSpec"></p>
    <div class="chips scroll" id="chips"></div>
   </div>
  </section>
@@ -984,6 +991,11 @@ function drawRail(){
 
  const act = activeConcerns();
  const reachSet = {}; SLUGS.forEach(sl => (M[sl].k || []).forEach(ci => reachSet[ci] = 1));
+ if(D.offSpecimen && D.offSpecimen.length)
+  $('offSpec').innerHTML = 'Your report also has '
+   + D.offSpecimen.map(function(o){ return '<b>'+o.name.toLowerCase()+'</b> ('+o.n+' measure'
+       + (o.n===1?'':'s')+', '+o.why+')'; }).join(' and ')
+   + '. This atlas maps blood, so neither appears above.';
  $('layerSub').innerHTML = 'The panels you have selected reach <b>'+Object.keys(reachSet).length+'</b> of '
   +META.nConcerns+' concerns. The rest need bloodwork you have not had.';
  $('chips').innerHTML = CIDS.filter(ci => !reachSet[ci]).map(ci =>

@@ -63,6 +63,8 @@ def analyte(name):
 # such, because a panel we cannot fully model is itself worth knowing about.
 # ---------------------------------------------------------------------------
 MPLUS = "MedlinePlus (NIH)"
+# Not a published panel definition — one person's report, transcribed.
+MINE  = "Your own annual panel report"
 CLEVE = "Cleveland Clinic"
 
 LABCORP = "Labcorp test directory"
@@ -70,14 +72,75 @@ QUEST   = "Quest Diagnostics"
 ARUP    = "ARUP Laboratories"
 
 PANEL_DEFS = [
- {"id":"CBC", "name":"Complete Blood Count", "short":"CBC", "src":MPLUS, "default":1, "grp":"ANNUAL",
+ # ---- the report, section by section, exactly as printed -------------------
+ {"id":"MYHEM", "name":"Hematology", "short":"Hematology", "src":MINE, "default":1, "grp":"ANNUAL",
+  "url":"",
+  "quote":"Transcribed from your own annual panel report, section \u201cHematology\u201d.",
+  "comp":[("WBC","Leukocytes"),("RBC","Erythrocytes"),
+          ("Hemoglobin","Hemoglobin"),("Hematocrit","Hematocrit"),
+          ("MCV, MCH, MCHC","Red Blood Cell indices"),
+          ("RDW",None),
+          ("Platelet Count","Platelet count")]},
+
+ {"id":"MYDIFF", "name":"Differential", "short":"Differential", "src":MINE, "default":1, "grp":"ANNUAL",
+  "url":"",
+  "quote":"Transcribed from your own annual panel report, section \u201cDifferential\u201d.",
+  "comp":[("Neutrophils","Neutrophils"),("Lymphocytes","Lymphocytes"),
+          ("Monocytes","Monocytes"),("Eosinophils","Eosinophils"),
+          ("Basophils","Basophils"),
+          ("Immature Granulocytes",None),
+          ("Nucleated RBC","Nucleated erythrocytes")]},
+
+ {"id":"MYANEM", "name":"Biochemical investigation of anemias", "short":"Anemia workup",
+  "src":MINE, "default":1, "grp":"ANNUAL", "url":"",
+  "quote":"Transcribed from your own annual panel report, section \u201cBiochemical Investigation of Anemias\u201d.",
+  "comp":[("Vitamin B12","Vitamin B12"),("Ferritin","Ferritin")]},
+
+ {"id":"MYCHEM", "name":"General chemistry", "short":"Chemistry", "src":MINE, "default":1, "grp":"ANNUAL",
+  "url":"",
+  "quote":"Transcribed from your own annual panel report, section \u201cGeneral Chemistry\u201d.",
+  "comp":[("Glucose (Random)","Blood glucose"),("Hemoglobin A1c","Hemoglobin A1c"),
+          ("Sodium","Sodium"),("Potassium","Potassium"),("Chloride","Chloride"),
+          ("Creatinine","Creatinine"),
+          ("Glomerular Filtration Rate (eGFR)","Glomerular filtration rate"),
+          ("Urate","Urate"),("Albumin","Albumin"),
+          ("Bilirubin Total","Bilirubin"),
+          ("Alkaline Phosphatase","Alkaline phosphatase"),
+          ("Alanine Aminotransferase","Alanine aminotransferase")]},
+
+ {"id":"MYMUSC", "name":"Muscle enzymes", "short":"Muscle", "src":MINE, "default":1, "grp":"ANNUAL",
+  "url":"",
+  "quote":"Transcribed from your own annual panel report, section \u201cMuscle Enzymes\u201d.",
+  "comp":[("Creatine Kinase","Creatine kinase")]},
+
+ {"id":"MYLIP", "name":"Lipids", "short":"Lipids", "src":MINE, "default":1, "grp":"ANNUAL",
+  "url":"",
+  "quote":"Transcribed from your own annual panel report, section \u201cLipids\u201d.",
+  "comp":[("Triglyceride","Triglycerides"),("Cholesterol","Total cholesterol"),
+          ("HDL Cholesterol","HDL cholesterol"),
+          ("Non HDL Cholesterol","Cholesterol non HDL"),
+          ("LDL Cholesterol","LDL cholesterol"),
+          ("Cholesterol/HDL Ratio","Cholesterol.total/Cholesterol")]},
+
+ {"id":"MYTHY", "name":"Thyroid function", "short":"Thyroid", "src":MINE, "default":1, "grp":"ANNUAL",
+  "url":"",
+  "quote":"Transcribed from your own annual panel report, section \u201cThyroid Function\u201d.",
+  "comp":[("Thyroid Stimulating Hormone","Thyrotropin"),("Free T4","Thyroxine (Free T4)")]},
+
+ {"id":"MYBONE", "name":"Bone markers", "short":"Bone", "src":MINE, "default":1, "grp":"ANNUAL",
+  "url":"",
+  "quote":"Transcribed from your own annual panel report, section \u201cBone Markers\u201d.",
+  "comp":[("25-Hydroxy Vitamin D","Vitamin D (25-hydroxyvitamin D)")]},
+
+ # ---- the published definition of a routine checkup, kept for comparison ---
+ {"id":"CBC", "name":"Complete Blood Count", "short":"CBC", "src":MPLUS, "default":0,
   "url":"https://medlineplus.gov/lab-tests/complete-blood-count-cbc/",
   "quote":"A complete blood count is often part of a routine checkup.",
   "comp":[("Red Blood Cell count","Red Blood Cell count"),("White Blood Cell count","White Blood Cell count"),
           ("Platelet count","Platelet count"),("Hemoglobin","Hemoglobin"),("Hematocrit","Hematocrit"),
           ("Red Blood Cell indices","Red Blood Cell indices"),("Complete Blood Count","Complete Blood Count")]},
 
- {"id":"CMP", "name":"Comprehensive Metabolic Panel", "short":"CMP", "src":MPLUS, "default":1, "grp":"ANNUAL",
+ {"id":"CMP", "name":"Comprehensive Metabolic Panel", "short":"CMP", "src":MPLUS, "default":0,
   "url":"https://medlineplus.gov/lab-tests/comprehensive-metabolic-panel-cmp/",
   "quote":"A comprehensive metabolic panel (CMP) is a group of routine blood tests that measures 14 different substances in a sample of your blood.",
   "comp":[("Blood glucose","Blood glucose"),("Calcium","Calcium"),("Sodium","Sodium"),("Potassium","Potassium"),
@@ -86,7 +149,7 @@ PANEL_DEFS = [
           ("Aspartate aminotransferase","Aspartate aminotransferase"),("Bilirubin","Bilirubin"),
           ("Blood Urea Nitrogen","Blood Urea Nitrogen"),("Creatinine","Creatinine")]},
 
- {"id":"LIPID", "name":"Cholesterol / lipid panel", "short":"Lipids", "src":MPLUS, "default":1, "grp":"ANNUAL",
+ {"id":"LIPID", "name":"Cholesterol / lipid panel", "short":"Lipids", "src":MPLUS, "default":0,
   "url":"https://medlineplus.gov/lab-tests/cholesterol-levels/",
   "quote":"Younger adults should have the test every 5 years. Men ages 45 to 65 and women ages 55 to 65 should have it every 1 to 2 years.",
   "comp":[("Total cholesterol","Total cholesterol"),("LDL cholesterol","LDL cholesterol"),
@@ -411,6 +474,13 @@ for r in REL:
 # ---------------------------------------------------------------------------
 PAY = {
  "panels": PANEL_ORDER,
+ # Your report also contains measures this atlas structurally cannot map:
+ # a urinalysis (urine, not blood) and a urea breath test (breath, not blood).
+ # Stated rather than silently dropped.
+ "offSpecimen": [
+   {"name": "Urinalysis", "n": 11, "why": "urine, not blood"},
+   {"name": "Urea Breath Test", "n": 1, "why": "breath, not blood"},
+ ],
  "markers": markers,
  "concerns": concerns,
  "cgroups": CGROUPS,
@@ -432,7 +502,18 @@ m = PAY["meta"]
 print("%s  %.0f KB" % (os.path.basename(DST), len(out) / 1024.0))
 print("  %d markers across %d panels (%d components not in the catalogue)"
       % (len(markers), len(PANEL_ORDER), sum(p["nMissing"] for p in PANEL_ORDER)))
-print("  %d concerns (%d reachable from the annual panel)" % (m["nConcerns"], m["panelConcerns"]))
+ann_slugs = []
+for _p in PANEL_ORDER:
+    if _p.get("grp") == "ANNUAL":
+        ann_slugs += [sl for sl in _p["slugs"] if sl not in ann_slugs]
+ann_reach = set()
+for _sl in ann_slugs:
+    ann_reach |= set(markers[_sl].get("k") or [])
+print("  %d concerns (%d reachable from every panel in the library, %d from your annual panel)"
+      % (m["nConcerns"], m["panelConcerns"], len(ann_reach)))
+print("  your annual panel: %d sections, %d markers, %d components not in the catalogue"
+      % (sum(1 for _p in PANEL_ORDER if _p.get("grp") == "ANNUAL"), len(ann_slugs),
+         sum(_p["nMissing"] for _p in PANEL_ORDER if _p.get("grp") == "ANNUAL")))
 print("  %d sourced relationship notes" % len(REL))
 print("  %s follow-up tests sit outside the panel for those concerns" % format(m["offPanelForPanelConcerns"], ","))
 print("  %d distinct follow-up markers carried (cap 40 per concern)" % sum(len(c["next"]) for c in concerns.values()))

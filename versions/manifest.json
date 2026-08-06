@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-06T15:25:37Z",
+ "generated": "2026-08-06T16:24:10Z",
  "live": "index.html",
  "constraints": [
   [
@@ -28,6 +28,72 @@
   ]
  ],
  "feedback": [
+  {
+   "id": "F59",
+   "date": "2026-08-05",
+   "who": "Chloe",
+   "title": "The annual panel is my actual report",
+   "status": "addressed",
+   "versions": [
+    "v6.0"
+   ],
+   "quote": "these are what included from my annual blood panel, update to reflect",
+   "did": [
+    [
+     "Eight sections, transcribed as printed",
+     "addressed",
+     "<b>Hematology</b>, <b>Differential</b>, <b>Biochemical investigation of anemias</b>, <b>General chemistry</b>, <b>Muscle enzymes</b>, <b>Lipids</b>, <b>Thyroid function</b>, <b>Bone markers</b> — 38 rows, of which 36 map to catalogue rows and 22 of those are source-quoted. The real panel is a different shape from the textbook one: a nine-line differential, an A1c, urate, eGFR, creatine kinase, a cholesterol ratio, TSH and free T4, vitamin D."
+    ],
+    [
+     "It reaches more of the map",
+     "addressed",
+     "22 of 47 concerns, against 18 for the MedlinePlus CBC + CMP + lipids. The thyroid and vitamin D lines are most of that difference."
+    ],
+    [
+     "Two components the catalogue does not carry",
+     "addressed",
+     "<b>RDW</b> and <b>immature granulocytes</b>. Shown as <i>not carried</i> rather than dropped. The catalogue has <i>hemoglobin</i> distribution width, which is a different measurement, so mapping RDW to it would have been wrong."
+    ],
+    [
+     "Two sections blood cannot carry at all",
+     "addressed",
+     "Your <b>urinalysis</b> (11 measures) is urine and the <b>urea breath test</b> is breath. Both are stated under the personal-concern section rather than dropped or faked. The catalogue does have <i>H. pylori</i> rows, but they are serum antibody tests — a different test from the breath test — so mapping to one would have been a wrong answer that looked right."
+    ],
+    [
+     "The published panels stay",
+     "addressed",
+     "CBC, CMP and the cholesterol panel are still in the library as separate chips, off by default. They are the citable definition of a routine checkup and worth comparing against; they are just no longer pretending to be your panel. The library is 21 panels now."
+    ],
+    [
+     "A stale number, found on the way",
+     "addressed",
+     "The build printed “N reachable from the annual panel” while computing it across every panel in the library — it read 31 where the annual panel reaches 22. Both numbers are printed now, each with the right label."
+    ],
+    [
+     "Two checks were asserting the data",
+     "addressed",
+     "<code>default-view</code> and <code>scrolling-canvas</code> hard-coded 26 and 68 markers, so a legitimate data change failed them. They read the expected counts from the payload now and assert the invariant — every marker drawn, none rolled up. <code>even-spacing</code> assumed three panel headers when dropping group boundaries; it counts the headers it finds. That one was a real bug in the check, not the layout."
+    ]
+   ]
+  },
+  {
+   "id": "F58",
+   "date": "2026-08-05",
+   "who": "Chloe",
+   "title": "More room for the personal-concern section",
+   "status": "addressed",
+   "versions": [
+    "v6.0"
+   ],
+   "quote": "make this section higher",
+   "did": [
+    [
+     "A third of the rail, not 184px",
+     "addressed",
+     "<code>height:33vh</code> between a 264px floor and a 432px ceiling. The chips in it are the concerns your bloodwork cannot reach — the argument the product is making — and they were the most cramped thing on the screen."
+    ]
+   ]
+  },
   {
    "id": "F57",
    "date": "2026-08-05",
@@ -1950,12 +2016,37 @@
  ],
  "versions": [
   {
+   "id": "v6.0",
+   "file": "v6.0-real-annual-panel.html",
+   "title": "Your actual annual panel",
+   "date": "2026-08-05",
+   "source": "index.html",
+   "status": "live",
+   "tag": "v6.0-real-annual-panel",
+   "gitpath": "index.html",
+   "answers": [
+    "F58",
+    "F59"
+   ],
+   "summary": "The annual panel stops being MedlinePlus’s idealisation and becomes the report as printed — eight sections, 38 rows, 22 of 47 concerns reachable — with everything it cannot map named.",
+   "changes": [
+    "<b>Eight sections transcribed from the report</b>: hematology, differential, anemia workup, general chemistry, muscle enzymes, lipids, thyroid, bone. 36 of 38 rows map, 22 source-quoted.",
+    "<b>22 of 47 concerns reachable</b>, up from 18.",
+    "<b>Named, not dropped</b>: RDW and immature granulocytes are not in the catalogue; the urinalysis and the urea breath test are not blood.",
+    "<b>CBC, CMP and lipids remain</b> as separate chips, off by default — 21 panels in the library.",
+    "<b>The personal-concern section</b> is a third of the rail instead of 184px.",
+    "Build labels corrected, and three checks rewritten to read the data rather than hard-code it."
+   ],
+   "note": "The panel’s source is a personal lab report, not a published directory — flagged as such on every section.",
+   "mb": 0.6
+  },
+  {
    "id": "v5.6",
    "file": "v5.6-two-actions.html",
    "title": "Two actions, four screens",
    "date": "2026-08-05",
    "source": "index.html",
-   "status": "live",
+   "status": "superseded",
    "tag": "v5.6-two-actions",
    "gitpath": "index.html",
    "answers": [
