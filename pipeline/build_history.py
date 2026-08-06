@@ -43,6 +43,38 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F56",
+  "date": "2026-08-05",
+  "who": "Chloe",
+  "title": "Drop the \u201ci\u201d, feedback on every page",
+  "status": "addressed",
+  "versions": ["v5.5"],
+  "quote": "remove, have feedback button on every page",
+  "did": [
+   ("Feedback is on all four screens", "addressed",
+    "The atlas, the route chooser, how-you-feel and the dashboard each carry the same feedback pill to <code>blood@goinvo.com</code>. The check counts them: one on the atlas, three in the catalogue."),
+   ("The \u201ci\u201d had something behind it", "addressed",
+    "It was the only way to open the provenance modal \u2014 <i>6,192 tests &middot; 216 quoted verbatim from MedlinePlus (NIH), NCBI and the National Cancer Institute &middot; every test linked to LOINC</i>, with the panel source links. Deleting the button alone would have left the site\u2019s own sourcing disclosure unreachable, which \u00a77 does not allow."),
+   ("So it moved to the line it describes", "addressed",
+    "Clicking the counts \u2014 <i>6,192 tests mapped &middot; 216 source-quoted</i> \u2014 opens the same modal. That line was already <code>cursor:help</code>, so it was halfway there. Per-test provenance never depended on the button: every row carries its own source-quoted / ai-written badge. The check asserts the modal is still reachable."),
+  ],
+ },
+ {
+  "id": "F55",
+  "date": "2026-08-05",
+  "who": "Chloe",
+  "title": "Remove the Routes button",
+  "status": "addressed",
+  "versions": ["v5.5"],
+  "quote": "remove",
+  "did": [
+   ("Gone, with its listener", "addressed",
+    "The four tabs are the navigation, so a fifth control back to the route chooser was redundant. The button and the <code>cxMenuBtn</code> listener are both removed \u2014 leaving the listener would have thrown on a null element the moment the page loaded."),
+   ("Worth knowing", "open",
+    "The route-chooser screen is now reachable only by loading <code>catalogue.html</code> with no hash. It is not orphaned \u2014 it carries the same four tabs, so you can leave it \u2014 but nothing points back to it."),
+  ],
+ },
+ {
   "id": "F54",
   "date": "2026-08-05",
   "who": "Chloe",
@@ -1162,12 +1194,30 @@ FEEDBACK = [
 # ===========================================================================
 VERSIONS = [
  {
+  "id": "v5.5",
+  "file": "v5.5-feedback-everywhere.html",
+  "title": "Feedback everywhere, two buttons fewer",
+  "date": "2026-08-05",
+  "source": "index.html",
+  "status": "live",
+  "tag": "v5.5-feedback-everywhere",
+  "gitpath": "index.html",
+  "answers": ["F55", "F56"],
+  "summary": "Routes and the \u201ci\u201d are removed, feedback appears on all four screens, and the provenance modal moves onto the counts line so nothing is lost with the button.",
+  "changes": [
+   "<b>Feedback pill on every screen</b> \u2014 one on the atlas, three in the catalogue.",
+   "<b>Routes removed</b>, along with the listener that would have thrown once its element was gone.",
+   "<b>The \u201ci\u201d removed</b>, and its provenance modal rebound to the counts line it explains.",
+   "<code>header-parity</code> counts the feedback pills, asserts both buttons are gone, and asserts the modal is still reachable.",
+  ],
+ },
+ {
   "id": "v5.4",
   "file": "v5.4-header-counts.html",
   "title": "Counts back in the header",
   "date": "2026-08-05",
   "source": "index.html",
-  "status": "live",
+  "status": "superseded",
   "tag": "v5.4-header-counts",
   "gitpath": "index.html",
   "answers": ["F54"],

@@ -621,7 +621,7 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
 <body>
 <!-- ===== Route landing ===== -->
 <div id="cxRoute">
- <div class="cxtop sitehd"><span class="id"><span class="logo">What is your blood telling you<b>?</b></span></span><nav><a class="nv" href="index.html">Atlas</a><a class="nv" href="catalogue.html#feel" data-go="feel">How you feel</a><a class="nv" href="catalogue.html#tests" data-go="tests">Guided tests</a><a class="nv" href="catalogue.html#table" data-go="table">All tests</a></nav><span class="act"></span></div>
+ <div class="cxtop sitehd"><span class="id"><span class="logo">What is your blood telling you<b>?</b></span></span><nav><a class="nv" href="index.html">Atlas</a><a class="nv" href="catalogue.html#feel" data-go="feel">How you feel</a><a class="nv" href="catalogue.html#tests" data-go="tests">Guided tests</a><a class="nv" href="catalogue.html#table" data-go="table">All tests</a></nav><span class="act"><a class="fblink" href="mailto:blood@goinvo.com" title="Send feedback to blood@goinvo.com">feedback</a></span></div>
  <div class="cxwrap">
   <h1 class="cxhero">Where do you want to start?</h1>
   <svg class="cxecg" viewBox="0 0 600 40" aria-hidden="true"><path d="M0 20 H218 l8 -5 8 5 h14 l5 -13 7 26 5 -13 h16 l9 -7 11 7 H600"/></svg>
@@ -744,7 +744,7 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
  <div class="cxtop sitehd">
   <span class="id"><span class="logo">What is your blood telling you<b>?</b></span></span>
   <nav><a class="nv" href="index.html">Atlas</a><a class="nv on" href="catalogue.html#feel" data-go="feel">How you feel</a><a class="nv" href="catalogue.html#tests" data-go="tests">Guided tests</a><a class="nv" href="catalogue.html#table" data-go="table">All tests</a></nav>
-  <span class="act"><button class="cxmenu" id="cxMenuBtn">Routes</button></span>
+  <span class="act"><a class="fblink" href="mailto:blood@goinvo.com" title="Send feedback to blood@goinvo.com">feedback</a></span>
  </div>
  <div class="cxwrap">
   <div class="cxcrumb" id="cxCrumb"></div>
@@ -857,7 +857,7 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
   </div>
   </span>
   <nav><a class="nv" href="index.html">Atlas</a><a class="nv" href="catalogue.html#feel" data-go="feel">How you feel</a><a class="nv on" href="catalogue.html#tests" data-go="tests">Guided tests</a><a class="nv" href="catalogue.html#table" data-go="table">All tests</a></nav>
-  <span class="act"><button class="resetlink" id="resetBtn">Clear all answers</button><a class="fblink" href="mailto:blood@goinvo.com" title="Send feedback to blood@goinvo.com">feedback</a><button class="discbtn" id="discBtn" title="About this guide">i</button></span>
+  <span class="act"><button class="resetlink" id="resetBtn">Clear all answers</button><a class="fblink" href="mailto:blood@goinvo.com" title="Send feedback to blood@goinvo.com">feedback</a></span>
  </header>
 
  <aside id="rail">
@@ -1758,7 +1758,11 @@ document.getElementById('modalProv').innerHTML=
  '<a href="https://medlineplus.gov/lab-tests/complete-blood-count-cbc/" target="_blank" rel="noopener">CBC</a>, '+
  '<a href="https://medlineplus.gov/lab-tests/comprehensive-metabolic-panel-cmp/" target="_blank" rel="noopener">CMP</a>, '+
  '<a href="https://medlineplus.gov/lab-tests/cholesterol-levels/" target="_blank" rel="noopener">cholesterol</a>.';
-document.getElementById('discBtn').onclick=function(){ modal.classList.add('on'); };
+/* The provenance modal now opens from the counts line it explains, so the
+   sourcing disclosure survives the loss of its button. */
+ (function(){ const h=document.getElementById('hdrTag');
+  if(h){ h.style.cursor='pointer'; h.title='Where these numbers come from';
+   h.onclick=function(){ modal.classList.add('on'); }; } })();
 document.getElementById('modalClose').onclick=function(){ modal.classList.remove('on'); };
 modal.onclick=function(e){ if(e.target===modal) modal.classList.remove('on'); };
 
@@ -2098,7 +2102,7 @@ $('cxRouteTests').addEventListener('click',()=>{ if(window.__cxEnsureTests)windo
  if(tn) tn.textContent=(typeof nfmt==='function'?nfmt(TESTS.length):TESTS.length);
  if(sn) sn.textContent=GROUPS.length;
 })();
-$('cxMenuBtn').addEventListener('click',()=>setMode('landing'));
+/* the Routes button is gone: the four tabs are the navigation */
 
 /* inject a "Menu" button into the existing dashboard header so tests-mode can return */
 /* replaced by the shared header navigation below */

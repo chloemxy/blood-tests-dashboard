@@ -66,11 +66,22 @@ load('index.html',(w,d,errs)=>{
   const tags = d2.querySelectorAll('.sitehd .tag').length + d.querySelectorAll('.sitehd .tag').length;
   console.log('   repeated screen titles left:', tags);
   if(tags) fail.push(tags + ' .tag screen titles left in the headers');
-  ['viewTog','rollup','rollgrid','sysbar','hdrTag','resetBtn','discBtn','cxMenuBtn','app','cxRoute','cxApp']
+  ['viewTog','rollup','rollgrid','sysbar','hdrTag','resetBtn','app','cxRoute','cxApp']
    .forEach(id=>{ if(!d2.getElementById(id)) fail.push('catalogue: #'+id+' was removed'); });
   console.log('   all bound ids present:', !fail.some(f=>f.includes('was removed')));
-  console.log('   duplicate Menu button gone:', !d2.getElementById('cxToMenu'));
-  if(d2.getElementById('cxToMenu')) fail.push('catalogue: duplicate Menu button still injected');
+  // feedback on every screen, and the "i" gone from all of them
+  const fb = [...d2.querySelectorAll('.sitehd .act .fblink')].length;
+  const fbAtlas = d.querySelectorAll('.sitehd .act .fblink').length;
+  console.log('   feedback pills: atlas', fbAtlas, '+ catalogue', fb, '| "i" buttons:', d2.querySelectorAll('.discbtn').length);
+  if(fbAtlas !== 1) fail.push('atlas: '+fbAtlas+' feedback pills, expected 1');
+  if(fb !== 3) fail.push('catalogue: '+fb+' feedback pills, expected one per screen');
+  if(d2.querySelector('.discbtn')) fail.push('catalogue: the "i" button is still there');
+  // its modal must still be reachable, from the counts line
+  const h = d2.getElementById('hdrTag');
+  console.log('   provenance opens from the counts line:', typeof h.onclick === 'function');
+  if(typeof h.onclick !== 'function') fail.push('the provenance modal is unreachable');
+  console.log('   menu buttons left:', ['cxToMenu','cxMenuBtn'].filter(i=>d2.getElementById(i)).join(',') || 'none');
+  ['cxToMenu','cxMenuBtn'].forEach(i=>{ if(d2.getElementById(i)) fail.push('catalogue: #'+i+' is still there'); });
   console.log('   __cxSetMode exposed:', typeof w2.__cxSetMode);
   // in-place route switch
   d2.querySelector('.sitehd [data-go="tests"]').dispatchEvent(new w2.MouseEvent('click',{bubbles:true,cancelable:true}));
