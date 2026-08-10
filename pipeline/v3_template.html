@@ -394,6 +394,35 @@ button{font-family:inherit;cursor:pointer}
 .kbd .close:hover{background:var(--aqua);border-color:var(--teal)}
 .mapnote{position:absolute;left:50%;transform:translateX(-50%);bottom:8px;font-family:var(--font-mono);
  font-size:10px;color:#b4c0c2;letter-spacing:.06em;pointer-events:none;z-index:2;white-space:nowrap}
+body.guiding .mapnote{display:none}
+
+/* ---------------- the guide ----------------
+   Three steps, ticked by what you actually do, gone for good once done. It
+   spans the map area between the two panels and never covers a row: the canvas
+   carries a matching bottom padding while it is there. */
+.guide{position:absolute;left:var(--railW);right:var(--detW);bottom:0;height:48px;z-index:5;
+ background:var(--panel);border-top:1px solid var(--line);
+ display:flex;align-items:center;gap:16px;padding:0 16px}
+body:not(.guiding) .guide{display:none}
+body.guiding .canvas{padding-bottom:48px}
+@media(max-width:1080px){.guide{right:0}}
+.gsteps{list-style:none;display:flex;align-items:center;gap:16px;margin:0;padding:0}
+.gsteps li{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--slate);white-space:nowrap}
+.gsteps li i{font-style:normal;font-family:var(--font-mono);font-size:10px;width:16px;height:16px;
+ border:2px solid #c6d4d6;border-radius:50%;display:flex;align-items:center;justify-content:center;
+ color:var(--dim);flex:0 0 auto}
+/* the step you are on is the only one at full strength */
+.gsteps li.now i{border-color:var(--teal);color:var(--teal)}
+.gsteps li.now{font-weight:600}
+.gsteps li.todo{color:var(--dim)}
+.gsteps li.done{color:var(--dim)}
+.gsteps li.done i{border-color:var(--ok);background:var(--ok);color:#fff}
+.gsp{flex:1 1 auto}
+.gex{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);white-space:nowrap}
+.gex button,.gskip{border:1px solid var(--line);background:#fff;color:var(--slate);font-family:var(--font-sans);
+ font-size:12px;font-weight:600;padding:4px 12px;border-radius:16px;white-space:nowrap}
+.gex button:hover,.gskip:hover{border-color:var(--accent);color:var(--accent)}
+.gskip{color:var(--dim);font-weight:400}
 
 @media(max-width:1080px){
  .det{display:none}
@@ -416,6 +445,12 @@ button{font-family:inherit;cursor:pointer}
  <div class="colbar" id="colBar"></div>
  <div class="canvas" id="canvas"><svg class="map" id="map" role="img" aria-label="Ripple map: annual panel markers, the concerns they can represent, and the tests that would follow up"></svg></div>
  <p class="mapnote" id="mapNote"></p>
+ <div class="guide" id="guide">
+  <ol class="gsteps" id="gSteps"></ol>
+  <span class="gsp"></span>
+  <span class="gex" id="gEx"></span>
+  <button class="gskip" id="gSkip" title="Hide this for good">Skip</button>
+ </div>
  <button class="kbdhint" id="kbdHint">? shortcuts</button>
  <div class="kbdwrap" id="kbdWrap"><div class="kbd">
   <h3>Keyboard</h3>
@@ -493,7 +528,9 @@ const CIDS = Object.keys(C).map(Number);
 
 /* ---------- state ---------- */
 const st = { val:{}, added:{}, sel:null, hot:null, expand:false, foc:null, focVia:'select',
-             fam:{}, panels:{} };
+             fam:{}, panels:{},
+             // what the guide has seen you do; 'off' once it is finished with
+             guide:{ mark:0, open:0, follow:0, off:0 } };
 PANELS_ALL.forEach(p => { if(p.default) st.panels[p.id] = 1; });   // val: slug -> -1|0|1
 PANELS_ALL.forEach(p => p.slugs.forEach(sl => { st.val[sl] = 0; }));
 try{ const raw = localStorage.getItem('v3.state');
@@ -501,10 +538,10 @@ try{ const raw = localStorage.getItem('v3.state');
        Object.keys(o.val||{}).forEach(k=>{ if(k in st.val) st.val[k]=o.val[k]; });
        Object.keys(o.added||{}).forEach(k=>{ st.added[k]=1; });
        if(o.panels && Object.keys(o.panels).length){ st.panels = {}; Object.keys(o.panels).forEach(k=>{ st.panels[k]=1; }); }
-       } }catch(e){}
+       if(o.guide) Object.keys(st.guide).forEach(k=>{ st.guide[k] = o.guide[k] ? 1 : 0; }); } }catch(e){}
 refreshSlugs();
 const save = () => { try{ localStorage.setItem('v3.state',
-  JSON.stringify({val:st.val, added:st.added, panels:st.panels})); }catch(e){} };
+  JSON.stringify({val:st.val, added:st.added, panels:st.panels, guide:st.guide})); }catch(e){} };
 
 const flagged = () => SLUGS.filter(s => st.val[s] !== 0);
 function activeConcerns(){
@@ -1204,7 +1241,40 @@ function scrollToFocus(){
  else if(y + pad > c.scrollTop + c.clientHeight) c.scrollTop = y + pad - c.clientHeight;
 }
 
-function render(){ relayout(); drawColBar(); drawRail(); drawDetail(); drawChrome(); scrollToFocus(); }
+/* Three examples, so the map is legible to someone with no report to hand.
+   Real markers from the panel, marked in a shape that reads as a picture —
+   they are examples of how the ripple works, not diagnoses, and they are
+   labelled as such on the strip. */
+const GUIDE_EX = [
+ { id:'iron',  label:'Low iron',   v:{ hemoglobin:-1, hematocrit:-1, ferritin:-1 } },
+ { id:'metab', label:'Metabolic',  v:{ glucoserandom:1, hemoglobina1c:1, triglyceride:1 } },
+ { id:'thy',   label:'Thyroid',    v:{ thyroidstimulatingh:1, freet4:-1 } },
+];
+const GUIDE_STEPS = [
+ { k:'mark',   t:'Mark a result low or high' },
+ { k:'open',   t:'Open a concern it points at' },
+ { k:'follow', t:'Open a test that would follow it up' },
+];
+
+function drawGuide(){
+ const g = st.guide;
+ if(flagged().length) g.mark = 1;
+ const done = g.mark && g.open && g.follow;
+ // Finished means finished: it does not come back on the next visit.
+ if(done && !g.off){ g.off = 1; save(); }
+ document.body.classList.toggle('guiding', !g.off);
+ if(g.off) return;
+ let first = true;
+ $('gSteps').innerHTML = GUIDE_STEPS.map(function(s){
+  const isDone = !!g[s.k];
+  const cls = isDone ? 'done' : (first ? (first = false, 'now') : 'todo');
+  return '<li class="'+cls+'"><i>'+(isDone ? '&#10003;' : GUIDE_STEPS.indexOf(s)+1)+'</i>'+esc(s.t)+'</li>';
+ }).join('');
+ $('gEx').innerHTML = g.mark ? '' : 'No results to hand? Try an example: '
+   + GUIDE_EX.map(e => '<button data-ex="'+e.id+'">'+esc(e.label)+'</button>').join('');
+}
+
+function render(){ drawGuide(); relayout(); drawColBar(); drawRail(); drawDetail(); drawChrome(); scrollToFocus(); }
 
 /* ---------- events ---------- */
 document.addEventListener('click', function(e){
@@ -1235,7 +1305,8 @@ document.addEventListener('click', function(e){
  // Clicking moves the keyboard focus to what you clicked, so the arrow keys
  // carry on from there rather than restarting at the top of the first column.
  const tt = e.target.closest('[data-test]');
- if(tt){ st.sel = {t:'t', v:tt.dataset.test, i:+tt.dataset.ti}; st.focVia = 'select';
+ if(tt){ st.guide.follow = 1;
+   st.sel = {t:'t', v:tt.dataset.test, i:+tt.dataset.ti}; st.focVia = 'select';
    if(LAYOUT && LAYOUT.ts && +tt.dataset.ti < LAYOUT.ts.length) st.foc = {c:2, i:+tt.dataset.ti};
    st.expand = false; render(); return; }
  const mk = e.target.closest('[data-mk]');
@@ -1243,8 +1314,14 @@ document.addEventListener('click', function(e){
    st.sel = (st.sel && st.sel.t==='m' && st.sel.v===s) ? null : {t:'m', v:s};
    st.foc = {c:0, i:Math.max(0, SLUGS.indexOf(s))}; st.focVia = 'select';
    st.expand = false; st.fam = {}; render(); return; }
+ const gx = e.target.closest('[data-ex]');
+ if(gx){ const preset = GUIDE_EX.filter(x => x.id === gx.dataset.ex)[0];
+   if(preset){ SLUGS.forEach(sl => st.val[sl] = 0);
+     Object.keys(preset.v).forEach(sl => { if(sl in st.val) st.val[sl] = preset.v[sl]; });
+     st.guide.mark = 1; st.sel = null; st.foc = null; save(); render(); }
+   return; }
  const cn = e.target.closest('[data-cn]');
- if(cn){ const ci = cn.dataset.cn;
+ if(cn){ st.guide.open = 1; const ci = cn.dataset.cn;
    st.sel = (st.sel && st.sel.t==='c' && String(st.sel.v)===String(ci)) ? null : {t:'c', v:ci};
    if(LAYOUT){ const at = LAYOUT.cOrder.indexOf(+ci); if(at >= 0) st.foc = {c:1, i:at}; }
    st.focVia = 'select';
@@ -1256,6 +1333,9 @@ $('map').addEventListener('mouseover', function(e){
  if(v !== st.hot){ st.hot = v; draw(); }
 });
 $('map').addEventListener('mouseleave', function(){ if(st.hot){ st.hot = null; draw(); } });
+$('gSkip').addEventListener('click', function(){
+ st.guide.off = 1; save(); render();
+});
 $('btnReset').addEventListener('click', function(){
  SLUGS.forEach(s => st.val[s] = 0); st.added = {}; st.sel = null; save(); render();
 });
@@ -1284,7 +1364,7 @@ function selectFocused(){
  const f = st.foc;
  if(!f){ focRefresh(); return; }
  if(f.c === 0)      st.sel = {t:'m', v:SLUGS[f.i]};
- else if(f.c === 1) st.sel = {t:'c', v:String(LAYOUT.cOrder[f.i])};
+ else if(f.c === 1){ st.guide.open = 1; st.sel = {t:'c', v:String(LAYOUT.cOrder[f.i])}; }
  else if(LAYOUT.open !== null) st.sel = {t:'t', v:String(LAYOUT.open), i:f.i};
  st.expand = false; st.fam = {};
  render();

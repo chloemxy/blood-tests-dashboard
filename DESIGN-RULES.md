@@ -95,6 +95,11 @@ with it.
 The other deliberate exception: a section explicitly labelled as expandable,
 where the user asked for the growth.
 
+And one more: the first-run guide strip. It appears once, occupies 48px at the
+bottom of the map — with the canvas reserving that height so no row hides under
+it — and when its three steps are done it is gone for good, remembered across
+visits. Onboarding is allowed to change the layout exactly once.
+
 ## 3. No ambient motion
 
 Nothing drifts, floats, breathes or animates on its own. Transitions are for
@@ -204,6 +209,35 @@ column width, and the names need it more.
 **Panel headers are one object.** Every panel header is the same thing in the
 same box: a mono kicker, a serif title, one short line under it, 16px padding,
 96px minimum height. Two panels side by side are then automatically in register.
+
+## 5b2. Guidance, not gamification
+
+A page about someone's blood may tell them **where to start and what to do
+next**. It may not turn that into a game.
+
+Allowed: a step list that ticks off what the reader actually did and deletes
+itself when finished; worked examples they can load in one click, labelled as
+examples; stating what their data cannot reach.
+
+Not allowed, and the reasons matter:
+
+- **Points, XP, levels** — rewards engagement with a medical record. Success is
+  that someone comes once, understands something, and leaves.
+- **Streaks, daily check-ins** — bloodwork changes over months. A streak would
+  manufacture anxiety and reward re-reading old results.
+- **Badges for tests taken** — makes ordering more tests an achievement.
+  Overtesting has real costs: false positives, incidental findings, money.
+- **Leaderboards or comparison to others** — reference ranges already are
+  population comparison, and they are age- and sex-dependent.
+- **A single health score** — collapsing 68 markers into one number is the exact
+  reduction this product exists to argue against.
+- **Celebration animation** — breaks §3, and there is nothing here to celebrate.
+- **Unlocking content by progress** — never gate clinical information behind a
+  game loop.
+
+If a mechanic would still make sense with the word "health" removed from the
+product, it is probably fine. If it only makes sense because someone is anxious
+about their body, it is not.
 
 ## 5c. No decoration
 
