@@ -43,6 +43,25 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F62",
+  "date": "2026-08-05",
+  "who": "Chloe",
+  "title": "One move at a time",
+  "status": "addressed",
+  "versions": ["v6.3"],
+  "quote": "implement 1 and 4",
+  "did": [
+   ("The middle column starts empty", "addressed",
+    "On a first visit the map is your panel and nothing else, with one line where the rows will be: <i>mark a result on the left and what it can point at appears here</i>. Mark something and only the concerns it raises appear \u2014 four for the low-iron example \u2014 and the column grows as you mark more. The header counts what you are seeing: <i>can point at &middot; 4 of 47</i>."),
+   ("A frame, not a mode", "addressed",
+    "It ends by itself the moment the guide\u2019s three steps are done, and <b>Show all 47</b> sits in the strip throughout. The 19 unreachable concerns and their divider band are the product\u2019s whole argument \u2014 they come back with everything else, they are just not the first thing a new reader is asked to absorb."),
+   ("Step 4 was already in", "addressed",
+    "The three-step strip shipped in v6.2; this pass is pattern 01 joining it. Together they are the demo\u2019s recommended combination, complete."),
+   ("The checks had to be split", "addressed",
+    "Twelve geometry checks measure the full map, so they seed <code>localStorage</code> to skip the first frame \u2014 that is the demanding case and the one worth measuring. <code>guide</code> is the check that exercises the first frame, and it now asserts the empty column, its prompt, that marking reveals only what was raised, that Show all exists, and that finishing restores all 47."),
+  ],
+ },
+ {
   "id": "F61",
   "date": "2026-08-05",
   "who": "Chloe",
@@ -1285,12 +1304,31 @@ FEEDBACK = [
 # ===========================================================================
 VERSIONS = [
  {
+  "id": "v6.3",
+  "file": "v6.3-first-frame.html",
+  "title": "One move at a time",
+  "date": "2026-08-05",
+  "source": "index.html",
+  "status": "live",
+  "tag": "v6.3-first-frame",
+  "gitpath": "index.html",
+  "answers": ["F62"],
+  "summary": "The middle column starts empty and fills with what your marks raise \u2014 a first frame that ends when the three steps are done, with Show all available throughout.",
+  "changes": [
+   "<b>Empty middle column</b> on a first visit, with a line saying what it is waiting for.",
+   "<b>It fills as you mark</b>: only the concerns your marks raise, counted in the column title as <i>N of 47</i>.",
+   "<b>Show all 47</b> in the guide strip, and the frame ends on its own once the three steps are done.",
+   "<b>The divider band is not drawn</b> while the column is still filling \u2014 it has nothing to divide yet.",
+   "The twelve geometry checks seed state to skip the frame; <code>guide</code> covers it. 14 pass.",
+  ],
+ },
+ {
   "id": "v6.2",
   "file": "v6.2-guide.html",
   "title": "A three-step guide",
   "date": "2026-08-05",
   "source": "index.html",
-  "status": "live",
+  "status": "superseded",
   "tag": "v6.2-guide",
   "gitpath": "index.html",
   "answers": ["F61"],

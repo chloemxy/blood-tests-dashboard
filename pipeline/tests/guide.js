@@ -20,9 +20,17 @@ setTimeout(() => {
  if (d.querySelectorAll('#gSteps li').length !== 3) fail.push('expected three steps');
  if (!/now/.test(state())) fail.push('no step is marked as the one to do next');
 
- const ex = [...d.querySelectorAll('#gEx button')];
+ const ex = [...d.querySelectorAll('#gEx [data-ex]')];
  console.log('examples offered:', ex.map(b => b.textContent).join(', '));
  if (ex.length !== 3) fail.push(ex.length + ' examples, expected 3');
+
+ // pattern 01: the middle column starts empty and says what it is waiting for
+ console.log('concerns at boot:', d.querySelectorAll('.map .row.cnc').length,
+             '| prompt:', /Mark a result on the left/.test(d.getElementById('map').textContent));
+ if (d.querySelectorAll('.map .row.cnc').length) fail.push('the middle column is not empty on a first visit');
+ if (!/Mark a result on the left/.test(d.getElementById('map').textContent))
+  fail.push('the empty column does not say what it is waiting for');
+ if (!d.querySelector('#gEx [data-reveal]')) fail.push('no way out of the first frame');
 
  // step 1 via an example
  click(ex[0]);
@@ -30,7 +38,11 @@ setTimeout(() => {
  console.log('after the low-iron example: marked rows', marked, '|', state());
  if (!marked) fail.push('the example marked nothing — the slugs may not exist');
  if (!/^done/.test(state())) fail.push('step 1 did not tick after marking');
- if (d.querySelectorAll('#gEx button').length) fail.push('examples still offered after marking');
+ if (d.querySelectorAll('#gEx [data-ex]').length) fail.push('examples still offered after marking');
+ const cShown = d.querySelectorAll('.map .row.cnc').length, D = w.eval('D');
+ console.log('concerns after one example:', cShown, 'of', D.meta.nConcerns);
+ if (!cShown) fail.push('marking revealed no concerns');
+ if (cShown >= D.meta.nConcerns) fail.push('marking revealed the whole column, not just what it raised');
 
  // step 2
  click(d.querySelector('.map [data-cn]'));
@@ -48,6 +60,11 @@ setTimeout(() => {
   console.log('remembered as finished:', !!(saved.guide && saved.guide.off));
   if (!(saved.guide && saved.guide.off)) fail.push('finishing was not remembered, so it will come back');
  }
+
+ // and Show all is a real way out
+ const seen = d.querySelectorAll('.map .row.cnc').length;
+ console.log('after all three steps, the whole column is back:', seen, '/', w.eval('D').meta.nConcerns);
+ if (seen !== w.eval('D').meta.nConcerns) fail.push('finishing the steps did not restore the whole map');
 
  // nothing hides under it: the canvas reserves the strip's height while it shows
  const css = [...d.querySelectorAll('style')].map(x => x.textContent).join('');

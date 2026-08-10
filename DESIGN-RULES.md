@@ -217,7 +217,9 @@ next**. It may not turn that into a game.
 
 Allowed: a step list that ticks off what the reader actually did and deletes
 itself when finished; worked examples they can load in one click, labelled as
-examples; stating what their data cannot reach.
+examples; stating what their data cannot reach; **a first frame that shows less
+than the full picture, provided it is a frame and not a mode** — it must end on
+its own, and the way to the whole thing must be visible while it lasts.
 
 Not allowed, and the reasons matter:
 

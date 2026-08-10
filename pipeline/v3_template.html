@@ -526,11 +526,23 @@ function refreshSlugs(){
 }
 const CIDS = Object.keys(C).map(Number);
 
+/* Pattern 01, one move at a time: on a first visit the middle column holds only
+   the concerns your marks have raised. It stops being a first frame as soon as
+   the guide is finished or the whole map is asked for. */
+function firstFrame(){ return !st.reveal && !st.guide.off; }
+function shownConcerns(){
+ if(!firstFrame()) return CIDS;
+ const act = activeConcerns();
+ return CIDS.filter(ci => act[ci]);
+}
+
 /* ---------- state ---------- */
 const st = { val:{}, added:{}, sel:null, hot:null, expand:false, foc:null, focVia:'select',
              fam:{}, panels:{},
              // what the guide has seen you do; 'off' once it is finished with
-             guide:{ mark:0, open:0, follow:0, off:0 } };
+             guide:{ mark:0, open:0, follow:0, off:0 },
+             // 1 once the whole map has been asked for, or earned
+             reveal:0 };
 PANELS_ALL.forEach(p => { if(p.default) st.panels[p.id] = 1; });   // val: slug -> -1|0|1
 PANELS_ALL.forEach(p => p.slugs.forEach(sl => { st.val[sl] = 0; }));
 try{ const raw = localStorage.getItem('v3.state');
@@ -538,10 +550,12 @@ try{ const raw = localStorage.getItem('v3.state');
        Object.keys(o.val||{}).forEach(k=>{ if(k in st.val) st.val[k]=o.val[k]; });
        Object.keys(o.added||{}).forEach(k=>{ st.added[k]=1; });
        if(o.panels && Object.keys(o.panels).length){ st.panels = {}; Object.keys(o.panels).forEach(k=>{ st.panels[k]=1; }); }
-       if(o.guide) Object.keys(st.guide).forEach(k=>{ st.guide[k] = o.guide[k] ? 1 : 0; }); } }catch(e){}
+       if(o.guide) Object.keys(st.guide).forEach(k=>{ st.guide[k] = o.guide[k] ? 1 : 0; });
+       st.reveal = o.reveal ? 1 : 0; } }catch(e){}
 refreshSlugs();
 const save = () => { try{ localStorage.setItem('v3.state',
-  JSON.stringify({val:st.val, added:st.added, panels:st.panels, guide:st.guide})); }catch(e){} };
+  JSON.stringify({val:st.val, added:st.added, panels:st.panels,
+                  guide:st.guide, reveal:st.reveal})); }catch(e){} };
 
 const flagged = () => SLUGS.filter(s => st.val[s] !== 0);
 function activeConcerns(){
@@ -615,7 +629,12 @@ function buildLayout(){
  // the same type size and the marker column has to know what that size is
  // before it decides how names wrap. Nothing here depends on where a row
  // lands — only on how many rows there are — so it can run first.
- const nUnreach = CIDS.filter(ci => !C[ci].from.some(sl => SLUGS.indexOf(sl) >= 0)).length;
+ const CSHOW = shownConcerns();
+ // The band counts what is out of reach of the whole panel — a fact about your
+ // bloodwork, not about the current selection. It has nothing to divide while
+ // the column is still filling, so it is not drawn then.
+ const nUnreach = firstFrame() ? 0
+   : CIDS.filter(ci => !C[ci].from.some(sl => SLUGS.indexOf(sl) >= 0)).length;
  // The divider is a section header: it wraps to fit the column, and the band
  // is sized from the number of lines so the space above and below is equal.
  const divTxt = nUnreach + ' CONCERNS NO PANEL MARKER CAN REACH';
@@ -624,15 +643,15 @@ function buildLayout(){
  // exactly the gap a column header leaves before its first row, with the rule
  // sitting halfway through it.
  const divPad = 24, divLead = HEADLINE, divGap = 8, divTail = 16;
- const divL = wrap(divTxt, divPer, 0);
- const divLines = divL, divH = divPad + (divL.length - 1) * divLead + divTail;
+ const divL = nUnreach ? wrap(divTxt, divPer, 0) : [];
+ const divLines = divL, divH = nUnreach ? divPad + (divL.length - 1) * divLead + divTail : 0;
  // One size for every label on the map, and one line height. Nothing scales
  // with the window: when a column runs out of room it shows fewer rows, and
  // says how many it is not showing.
  const cPer = Math.max(8, Math.floor((xCend - xC - 52) / (FSZ * 0.6)));
  const cLines = {}, cNeed = {};
  let cTotal = divH;
- CIDS.forEach(ci => {
+ CSHOW.forEach(ci => {
   cLines[ci] = wrap(C[ci].label, cPer, 0);
   cNeed[ci] = ROW(cLines[ci].length);
   cTotal += cNeed[ci];
@@ -696,7 +715,7 @@ function buildLayout(){
 
  // ---- concerns: reachable first, ordered by the mean row of their markers
  const reach = [], unreach = [];
- CIDS.forEach(ci => {
+ CSHOW.forEach(ci => {
   const from = C[ci].from.filter(sl => mk[sl] != null);
   if(from.length){
    let sum = 0; from.forEach(sl => sum += mk[sl]);
@@ -710,9 +729,9 @@ function buildLayout(){
  // pixels for every row, not in proportion to it — an equal share means the
  // gap between one name and the next is a constant down the column.
  const cReach = reach.map(o => o.ci), cUnreach = unreach.map(o => o.ci);
- const cSlack = (cAvail - (cTotal - divH)) / Math.max(1, CIDS.length);
+ const cSlack = (cAvail - (cTotal - divH)) / Math.max(1, CSHOW.length);
  const cH = {};
- CIDS.forEach(ci => { cH[ci] = cNeed[ci] + cSlack; });
+ CSHOW.forEach(ci => { cH[ci] = cNeed[ci] + cSlack; });
 
  const cn = {}; let cy = b.T, divY = 0;
  cReach.forEach(ci => { cn[ci] = cy + cH[ci] / 2; cy += cH[ci]; });
@@ -897,6 +916,11 @@ function draw(){
    +  '<line class="rule dash" x1="'+(L.xC-9).toFixed(1)+'" y1="'+(dLast + L.divGap).toFixed(1)
    +  '" x2="'+L.xCend.toFixed(1)+'" y2="'+(dLast + L.divGap).toFixed(1)+'"/>';
 
+ // The first frame's empty middle column: an instruction where the rows will be.
+ if(!L.cOrder.length)
+  h += '<text class="hint" x="'+(L.xC + 12).toFixed(1)+'" y="'+(b.T + 20).toFixed(1)+'">'
+    +  'Mark a result on the left and what it can point at appears here.</text>';
+
  // ---- concern rows
  // Reserve only what the count chip and the out-dot actually need, so the
  // full concern names fit on one line instead of being cut short.
@@ -964,7 +988,8 @@ function drawColBar(){
  const at = x => (x - (b.L - 16)).toFixed(0) + 'px';
  bar.innerHTML =
    '<span style="left:' + at(b.L) + '">YOUR PANEL &middot; ' + SLUGS.length + '</span>'
- + '<span style="left:' + at(L.xC + 11) + '">CAN POINT AT &middot; ' + CIDS.length + '</span>'
+ + '<span style="left:' + at(L.xC + 11) + '">CAN POINT AT &middot; '
+ + (firstFrame() ? shownConcerns().length + ' OF ' + CIDS.length : CIDS.length) + '</span>'
  + '<span style="left:' + at(L.xT + 11) + '">WOULD FOLLOW UP</span>';
 }
 
@@ -1270,8 +1295,10 @@ function drawGuide(){
   const cls = isDone ? 'done' : (first ? (first = false, 'now') : 'todo');
   return '<li class="'+cls+'"><i>'+(isDone ? '&#10003;' : GUIDE_STEPS.indexOf(s)+1)+'</i>'+esc(s.t)+'</li>';
  }).join('');
- $('gEx').innerHTML = g.mark ? '' : 'No results to hand? Try an example: '
-   + GUIDE_EX.map(e => '<button data-ex="'+e.id+'">'+esc(e.label)+'</button>').join('');
+ $('gEx').innerHTML = (g.mark ? '' : 'No results to hand? Try an example: '
+   + GUIDE_EX.map(e => '<button data-ex="'+e.id+'">'+esc(e.label)+'</button>').join(''))
+   + (firstFrame() ? ' <button data-reveal="1" title="Show every concern, including the '
+       + 'ones no blood test can reach">Show all '+CIDS.length+'</button>' : '');
 }
 
 function render(){ drawGuide(); relayout(); drawColBar(); drawRail(); drawDetail(); drawChrome(); scrollToFocus(); }
@@ -1314,6 +1341,8 @@ document.addEventListener('click', function(e){
    st.sel = (st.sel && st.sel.t==='m' && st.sel.v===s) ? null : {t:'m', v:s};
    st.foc = {c:0, i:Math.max(0, SLUGS.indexOf(s))}; st.focVia = 'select';
    st.expand = false; st.fam = {}; render(); return; }
+ const rv = e.target.closest('[data-reveal]');
+ if(rv){ st.reveal = 1; save(); render(); return; }
  const gx = e.target.closest('[data-ex]');
  if(gx){ const preset = GUIDE_EX.filter(x => x.id === gx.dataset.ex)[0];
    if(preset){ SLUGS.forEach(sl => st.val[sl] = 0);

@@ -5,7 +5,9 @@ npm install jsdom          # once
 node pipeline/tests/run.js
 ```
 
-Renders the built `index.html` (and, for `header-parity`, `catalogue.html`) in jsdom at several window sizes and measures the
+Renders the built `index.html` (and, for `header-parity`, `catalogue.html`) in jsdom.
+The geometry checks seed `localStorage` to skip the first-run frame, so they measure
+the full map — the demanding case. `guide` is the one that exercises the first frame at several window sizes and measures the
 result. A non-zero exit means do not promote.
 
 Every check here is a mistake that shipped once:
@@ -24,7 +26,7 @@ Every check here is a mistake that shipped once:
 | `scrolling-canvas` | canvas grows past the window, 68 markers drawn | content hidden instead of scrolled |
 | `column-band` | titles live in the fixed band, no inline font sizes in the SVG | headings scrolling away |
 | `header-parity` | one 56px header on all four screens; identical `id \| nav \| act` grid shape and nav labels; current marked; every bound id intact; in-place route switch | headers drifting apart, nav pills landing at a different x per screen, or a rebuilt header orphaning the JS that binds to it |
-| `guide` | three steps shown on a first visit, each ticking off the real action, retiring for good when done and remembering it, examples marking real slugs, canvas reserving the strip height | an onboarding strip that lies about progress, comes back after being finished, or hides a row under itself |
+| `guide` | first visit: empty middle column with a prompt, three steps ticking off the real action, examples marking real slugs, Show all as a way out, the whole column back once the steps are done, retiring for good and remembering it, canvas reserving the strip height | an onboarding strip that lies about progress, comes back after being finished, hides a row under itself, or a first frame with no way out of it |
 | `title-band` | band opaque and above the canvas, three titles in it, legend fully removed, counts moved to the header | a background painted with an undefined variable; dead layout reserved for a deleted panel |
 
 The window size is stubbed through `clientWidth` / `clientHeight`, so these are

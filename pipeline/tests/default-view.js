@@ -19,6 +19,8 @@ let i = 0, fail = [];
  const dom = new JSDOM(html, { url: 'http://localhost/', runScripts: 'dangerously', pretendToBeVisual: true,
   beforeParse(w){
    w.matchMedia = q => ({ matches: false, addEventListener(){}, addListener(){} });
+   // The geometry checks want the full map: skip the first frame.
+   try{ w.localStorage.setItem('v3.state', JSON.stringify({reveal:1, guide:{off:1}})); }catch(e){}
    Object.defineProperty(w.HTMLElement.prototype, 'clientWidth',  { get(){ return W; } });
    Object.defineProperty(w.HTMLElement.prototype, 'clientHeight', { get(){ return H; } });
   }});
