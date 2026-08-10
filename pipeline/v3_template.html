@@ -420,12 +420,12 @@ body.gpoint .guide .gcaret{display:block}
 .tutscrim{position:fixed;z-index:18;background:rgba(36,67,77,.22);pointer-events:none;display:none}
 body.gtut .tutring,body.gtut .tutscrim{display:block}
 
-/* the task, said once, at reading size */
-.gnow{flex:0 0 auto;min-width:0}
-.gnow .gk{display:block;font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;
- text-transform:uppercase;color:var(--teal);margin-bottom:4px}
-.gnow .gi{display:block;font-size:16px;line-height:1.3;color:var(--slate);font-weight:600}
-.gnow .gi b{color:var(--accent)}
+/* the task, said once, at reading size, with the way out on the same line */
+.ghd{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.gk{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;
+ text-transform:uppercase;color:var(--teal)}
+.gi{display:block;font-size:16px;line-height:1.3;color:var(--slate);font-weight:600}
+.gi b{color:var(--accent)}
 
 /* what is behind and ahead of it, quietly */
 .gsteps{list-style:none;display:flex;align-items:center;gap:16px;margin:0;padding:0;flex:0 1 auto}
@@ -444,7 +444,7 @@ body.gpoint .gcaret{display:block}
 /* step 1's target is the rail, not the map, so the control itself is ringed */
 body.gstep-mark .railhd .r i{color:var(--teal)}
 .gex{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
-.gskip{align-self:flex-start}
+.gskip{flex:0 0 auto}
 .gex button,.gskip{border:1px solid var(--line);background:#fff;color:var(--slate);font-family:var(--font-sans);
  font-size:12px;font-weight:600;padding:4px 12px;border-radius:16px;white-space:nowrap}
 .gex button:hover,.gskip:hover{border-color:var(--accent);color:var(--accent)}
@@ -476,10 +476,11 @@ body.gstep-mark .railhd .r i{color:var(--teal)}
  <div class="tutring" id="tutRing"></div>
  <div class="guide" id="guide">
   <i class="gcaret" id="gCaret"></i>
-  <span class="gnow" id="gNow"></span>
+  <span class="ghd"><span class="gk" id="gK"></span>
+   <button class="gskip" id="gSkip" title="Hide the guide for this visit">Skip the guide</button></span>
+  <span class="gi" id="gI"></span>
   <ol class="gsteps" id="gSteps"></ol>
   <span class="gex" id="gEx"></span>
-  <button class="gskip" id="gSkip" title="Hide this for good">Skip the guide</button>
  </div>
  <button class="kbdhint" id="kbdHint">? shortcuts</button>
  <div class="kbdwrap" id="kbdWrap"><div class="kbd">
@@ -584,8 +585,11 @@ try{ const raw = localStorage.getItem('v3.state');
        st.reveal = o.reveal ? 1 : 0; } }catch(e){}
 refreshSlugs();
 const save = () => { try{ localStorage.setItem('v3.state',
-  JSON.stringify({val:st.val, added:st.added, panels:st.panels,
-                  guide:st.guide, reveal:st.reveal})); }catch(e){} };
+  JSON.stringify({val:st.val, added:st.added, panels:st.panels})); }catch(e){} };
+/* The guide is deliberately NOT in what gets saved: every visit starts at step 1.
+   Finishing or skipping it lasts for that visit only. It is still read back
+   below, because the regression checks seed it to start from the finished
+   state — nothing in the app ever writes it. */
 
 const flagged = () => SLUGS.filter(s => st.val[s] !== 0);
 function activeConcerns(){
@@ -1319,7 +1323,9 @@ const GUIDE_STEPS = [
 
 function drawGuide(){
  const g = st.guide;
- if(flagged().length) g.mark = 1;
+ // Each step ticks on the action, not on the state. Marks persist between
+ // visits; the tutorial does not, so a refresh always opens at step 1 rather
+ // than resuming from what you happened to have marked last time.
  const done = g.mark && g.open && g.follow;
  // Finished means finished: it does not come back on the next visit.
  if(done && !g.off){ g.off = 1; save(); }
@@ -1329,8 +1335,8 @@ function drawGuide(){
  let now = null;
  GUIDE_STEPS.forEach(function(s){ if(!now && !g[s.k]) now = s; });
  const n = GUIDE_STEPS.indexOf(now) + 1;
- $('gNow').innerHTML = '<span class="gk">Step ' + n + ' of ' + GUIDE_STEPS.length + '</span>'
-   + '<span class="gi">' + now.t + '</span>';
+ $('gK').textContent = 'Step ' + n + ' of ' + GUIDE_STEPS.length;
+ $('gI').innerHTML = now.t;
  $('gSteps').innerHTML = GUIDE_STEPS.map(function(s){
   const isDone = !!g[s.k];
   return '<li class="'+(isDone ? 'done' : (s === now ? 'now' : 'todo'))+'">'
@@ -1437,7 +1443,8 @@ document.addEventListener('click', function(e){
    else g.ids.forEach(id => st.panels[id] = 1);
    refreshSlugs(); st.sel = null; st.foc = null; save(); render(); return; }
  const set = e.target.closest('[data-set]');
- if(set){ st.val[set.dataset.set] = +set.dataset.v; st.focVia = 'select';
+ if(set){ st.guide.mark = 1;
+   st.val[set.dataset.set] = +set.dataset.v; st.focVia = 'select';
    st.foc = {c:0, i:Math.max(0, SLUGS.indexOf(set.dataset.set))};
    save(); render(); return; }
  const add = e.target.closest('[data-add]');

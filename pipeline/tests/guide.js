@@ -34,7 +34,8 @@ setTimeout(() => {
  const ring = () => { const r = d.getElementById('tutRing');
    return { left:num(r.style.left), top:num(r.style.top), w:num(r.style.width), h:num(r.style.height) }; };
  const steps = () => [...d.querySelectorAll('#gSteps li')].map(li => li.className).join(',');
- const task = () => (d.querySelector('#gNow .gi') || {}).textContent || '';
+ const task = () => (d.getElementById('gI') || {}).textContent || '';
+ const kick = () => (d.getElementById('gK') || {}).textContent || '';
 
  // ---- it is an overlay: fixed, above everything, and reserves no layout
  console.log('card position:', /\.guide\{[^}]*position:fixed/.test(css) ? 'fixed' : 'NOT fixed');
@@ -53,7 +54,11 @@ setTimeout(() => {
 
  console.log('step 1:', task());
  if (task().length < 30) fail.push('the task is not spelled out');
- if (!/\.gnow \.gi\{[^}]*font-size:16px/.test(css)) fail.push('the task is not at reading size');
+ if (!/\.gi\{[^}]*font-size:16px/.test(css)) fail.push('the task is not at reading size');
+ console.log('step number:', kick(), '| skip button:', !!d.getElementById('gSkip'),
+             'on the header line:', !!d.querySelector('.ghd #gSkip'));
+ if (!/^Step 1 of 3$/.test(kick())) fail.push('the step number is not stated');
+ if (!d.querySelector('.ghd #gSkip')) fail.push('no Skip button on the card header');
 
  // step 1 rings the rail, and the card sits beside it
  const r1 = ring();
@@ -101,8 +106,11 @@ setTimeout(() => {
   if (d.body.classList.contains('gtut')) fail.push('the highlight outlived the guide');
   if (d.querySelectorAll('.map .row.cnc').length !== D.meta.nConcerns)
    fail.push('finishing did not restore the whole map');
+  // a refresh starts the guide again: nothing about it is written to storage
   const saved = JSON.parse(w.localStorage.getItem('v3.state') || '{}');
-  if (!(saved.guide && saved.guide.off)) fail.push('finishing was not remembered');
+  console.log('saved keys:', Object.keys(saved).join(','));
+  if ('guide' in saved || 'reveal' in saved)
+   fail.push('the guide was persisted, so a refresh would not start at step 1');
  }
 
  console.log(fail.length ? '\nFAIL:\n - ' + fail.join('\n - ') : '\nALL PASS');

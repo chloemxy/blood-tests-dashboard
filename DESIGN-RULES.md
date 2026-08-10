@@ -98,7 +98,12 @@ where the user asked for the growth.
 The first-run tutorial needs no exception at all: it is an **overlay**. The card
 floats, a ring is drawn around the section the current step is about, and the
 rest dims behind it — all `position: fixed`, all measured from the real layout,
-none of it reserving a pixel. When its three steps are done it is gone for good.
+none of it reserving a pixel.
+
+**The guide is per visit.** Every load opens at step 1, and finishing or skipping
+it lasts for that visit only — nothing about it is written to storage. Each step
+ticks on the *action*, never on state left over from last time: marks do persist,
+so inferring step 1 from them would have reopened the tutorial half-finished.
 
 A scrim must never swallow a click. Every part of the overlay except the card
 itself is `pointer-events: none`, so the reader can do anything at any time,

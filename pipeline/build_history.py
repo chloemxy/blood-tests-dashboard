@@ -43,6 +43,25 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F65",
+  "date": "2026-08-05",
+  "who": "Chloe",
+  "title": "Restart at step 1 on refresh, and an obvious Skip",
+  "status": "addressed",
+  "versions": ["v6.6"],
+  "quote": "when refresh, the guide should start from step 1, and also include a skip button",
+  "did": [
+   ("Nothing about the guide is saved", "addressed",
+    "It was remembering that you had finished it, so a refresh showed nothing. Guide state is per visit now \u2014 <code>val</code>, <code>added</code> and <code>panels</code> are all that persist \u2014 and skipping lasts for that visit only."),
+   ("That was not enough on its own", "addressed",
+    "With storage cleared it still opened at <b>step 2</b>: marks persist, and step 1 was being inferred from <i>anything is marked</i> rather than from <i>you marked something</i>. Each step now ticks on the action. A refresh opens at step 1 with your marks intact and the concerns they raise already showing."),
+   ("Skip, on the card header", "addressed",
+    "It existed but sat at the bottom of the card under the examples. It is now on the header line opposite <i>Step 1 of 3</i>, where a way out belongs."),
+   ("Checked with two loads", "addressed",
+    "New <code>guide-restarts</code> check runs the document twice through one localStorage: finishes the guide, reloads, asserts step 1 again; then skips, reloads, asserts it is back. 15 checks pass."),
+  ],
+ },
+ {
   "id": "F64",
   "date": "2026-08-05",
   "who": "Chloe",
@@ -1342,12 +1361,30 @@ FEEDBACK = [
 # ===========================================================================
 VERSIONS = [
  {
+  "id": "v6.6",
+  "file": "v6.6-guide-per-visit.html",
+  "title": "The guide is per visit",
+  "date": "2026-08-05",
+  "source": "index.html",
+  "status": "live",
+  "tag": "v6.6-guide-per-visit",
+  "gitpath": "index.html",
+  "answers": ["F65"],
+  "summary": "Every load opens the tutorial at step 1, Skip sits on the card header, and nothing about the guide is written to storage.",
+  "changes": [
+   "<b>Not persisted</b>: only marks, added concerns and panel selection are saved.",
+   "<b>Steps tick on the action</b>, not on leftover state \u2014 which is what had a refresh opening at step 2.",
+   "<b>Skip the guide</b> moved to the header line, opposite the step number.",
+   "New <code>guide-restarts</code> check: two loads through one localStorage. 15 checks pass.",
+  ],
+ },
+ {
   "id": "v6.5",
   "file": "v6.5-overlay-tutorial.html",
   "title": "The tutorial is an overlay",
   "date": "2026-08-05",
   "source": "index.html",
-  "status": "live",
+  "status": "superseded",
   "tag": "v6.5-overlay-tutorial",
   "gitpath": "index.html",
   "answers": ["F64"],
