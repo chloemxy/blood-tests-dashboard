@@ -95,10 +95,14 @@ with it.
 The other deliberate exception: a section explicitly labelled as expandable,
 where the user asked for the growth.
 
-And one more: the first-run guide strip. It appears once, occupies 48px at the
-bottom of the map — with the canvas reserving that height so no row hides under
-it — and when its three steps are done it is gone for good, remembered across
-visits. Onboarding is allowed to change the layout exactly once.
+The first-run tutorial needs no exception at all: it is an **overlay**. The card
+floats, a ring is drawn around the section the current step is about, and the
+rest dims behind it — all `position: fixed`, all measured from the real layout,
+none of it reserving a pixel. When its three steps are done it is gone for good.
+
+A scrim must never swallow a click. Every part of the overlay except the card
+itself is `pointer-events: none`, so the reader can do anything at any time,
+including ignoring the step they are on.
 
 ## 3. No ambient motion
 

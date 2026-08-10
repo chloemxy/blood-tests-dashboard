@@ -400,12 +400,25 @@ body.guiding .mapnote{display:none}
    Three steps, ticked by what you actually do, gone for good once done. It
    spans the map area between the two panels and never covers a row: the canvas
    carries a matching bottom padding while it is there. */
-.guide{position:absolute;left:var(--railW);right:var(--detW);bottom:0;height:80px;z-index:5;
- background:var(--panel);border-top:1px solid var(--line);
- display:flex;align-items:center;gap:24px;padding:0 16px}
+.guide{position:fixed;z-index:20;width:496px;max-width:calc(100vw - 32px);
+ background:var(--panel);border:1px solid var(--teal);border-radius:14px;padding:16px;
+ display:flex;flex-direction:column;gap:8px}
 body:not(.guiding) .guide{display:none}
-body.guiding .canvas{padding-bottom:80px}
-@media(max-width:1080px){.guide{right:0}}
+/* the card points at the thing it is talking about */
+.guide .gcaret{position:absolute;width:16px;height:8px;background:var(--teal);display:none}
+body.gpoint .guide .gcaret{display:block}
+.guide.up .gcaret{bottom:-8px;clip-path:polygon(0 0,100% 0,50% 100%)}
+.guide.down .gcaret{top:-8px;clip-path:polygon(50% 0,100% 100%,0 100%)}
+.guide.left .gcaret{left:-8px;width:8px;height:16px;clip-path:polygon(100% 0,100% 100%,0 50%)}
+.guide.right .gcaret{right:-8px;width:8px;height:16px;clip-path:polygon(0 0,0 100%,100% 50%)}
+
+/* the section the step is about, ringed; everything else dimmed behind it.
+   The scrim is four rectangles rather than one shape with a hole, and none of
+   them take pointer events — the reader can still do anything at any time. */
+.tutring{position:fixed;z-index:19;border:2px solid var(--teal);border-radius:8px;
+ pointer-events:none;display:none}
+.tutscrim{position:fixed;z-index:18;background:rgba(36,67,77,.22);pointer-events:none;display:none}
+body.gtut .tutring,body.gtut .tutscrim{display:block}
 
 /* the task, said once, at reading size */
 .gnow{flex:0 0 auto;min-width:0}
@@ -429,10 +442,9 @@ body.guiding .canvas{padding-bottom:80px}
 body.gpoint .gcaret{display:block}
 
 /* step 1's target is the rail, not the map, so the control itself is ringed */
-body.gstep-mark .tri{border-color:var(--teal)}
 body.gstep-mark .railhd .r i{color:var(--teal)}
-.gsp{flex:1 1 auto}
-.gex{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);white-space:nowrap}
+.gex{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.gskip{align-self:flex-start}
 .gex button,.gskip{border:1px solid var(--line);background:#fff;color:var(--slate);font-family:var(--font-sans);
  font-size:12px;font-weight:600;padding:4px 12px;border-radius:16px;white-space:nowrap}
 .gex button:hover,.gskip:hover{border-color:var(--accent);color:var(--accent)}
@@ -459,13 +471,15 @@ body.gstep-mark .railhd .r i{color:var(--teal)}
  <div class="colbar" id="colBar"></div>
  <div class="canvas" id="canvas"><svg class="map" id="map" role="img" aria-label="Ripple map: annual panel markers, the concerns they can represent, and the tests that would follow up"></svg></div>
  <p class="mapnote" id="mapNote"></p>
+ <div class="tutscrim" id="tutN"></div><div class="tutscrim" id="tutS"></div>
+ <div class="tutscrim" id="tutW"></div><div class="tutscrim" id="tutE"></div>
+ <div class="tutring" id="tutRing"></div>
  <div class="guide" id="guide">
   <i class="gcaret" id="gCaret"></i>
   <span class="gnow" id="gNow"></span>
   <ol class="gsteps" id="gSteps"></ol>
-  <span class="gsp"></span>
   <span class="gex" id="gEx"></span>
-  <button class="gskip" id="gSkip" title="Hide this for good">Skip</button>
+  <button class="gskip" id="gSkip" title="Hide this for good">Skip the guide</button>
  </div>
  <button class="kbdhint" id="kbdHint">? shortcuts</button>
  <div class="kbdwrap" id="kbdWrap"><div class="kbd">
@@ -1331,20 +1345,82 @@ function drawGuide(){
        + 'ones no blood test can reach">Show all '+CIDS.length+'</button>' : '');
 }
 
-/* The caret sits under the column its step is about. The x comes from the same
-   layout the columns are drawn from, so it cannot drift out of register. */
-function placeCaret(){
- if(!LAYOUT || st.guide.off) return;
- const g = st.guide;
+/* Where the step's target actually is on screen. The rail is a real element;
+   the two map columns are rectangles over the canvas, taken from the same
+   layout the columns are drawn from, so the ring cannot drift out of register. */
+function targetRect(now){
+ const cv = $('canvas'), r = cv.getBoundingClientRect();
+ if(!r.width) return null;                       // nothing laid out yet
+ if(now.at === 'rail'){
+  const el = $('rail'), b = el.getBoundingClientRect();
+  if(!b.width) return null;
+  // the rail is flush to the window edge, so the ring only insets where it can
+  const l = Math.max(0, b.left - 8);
+  return { left:l, top:b.top - 8, width:b.right + 8 - l, height:b.height + 16 };
+ }
+ if(!LAYOUT) return null;
+ const x1 = now.at === 'concern' ? LAYOUT.xC - 16 : LAYOUT.xT - 16;
+ const x2 = now.at === 'concern' ? LAYOUT.xCend + 16 : BOX.R;
+ return { left: r.left + x1, top: r.top + 8, width: x2 - x1, height: r.height - 16 };
+}
+
+/* Ring the target, dim the rest, and put the card beside it. Everything is
+   measured: no offsets to keep in sync with the layout. */
+function placeTutorial(){
+ const card = $('guide'), ring = $('tutRing');
+ document.body.classList.remove('gtut');
+ if(st.guide.off) return;
  let now = null;
- GUIDE_STEPS.forEach(function(s){ if(!now && !g[s.k]) now = s; });
- if(!now || now.at === 'rail') return;
- const x = now.at === 'concern' ? LAYOUT.xC : LAYOUT.xT;
- $('guide').style.setProperty('--gx', (x - (BOX.L - 16)).toFixed(0) + 'px');
+ GUIDE_STEPS.forEach(function(s){ if(!now && !st.guide[s.k]) now = s; });
+ const t = now && targetRect(now);
+ if(!t){                                          // no geometry: centre the card
+  card.className = 'guide';
+  card.style.left = 'calc(50% - 248px)'; card.style.top = '96px';
+  return;
+ }
+ document.body.classList.add('gtut');
+ ring.style.left = t.left + 'px'; ring.style.top = t.top + 'px';
+ ring.style.width = t.width + 'px'; ring.style.height = t.height + 'px';
+ const W = window.innerWidth, H = window.innerHeight;
+ // four rectangles around the hole
+ const set = (id, l, tp, w, h) => { const e = $(id);
+   e.style.left = Math.max(0, l) + 'px'; e.style.top = Math.max(0, tp) + 'px';
+   e.style.width = Math.max(0, w) + 'px'; e.style.height = Math.max(0, h) + 'px'; };
+ set('tutN', 0, 0, W, t.top);
+ set('tutS', 0, t.top + t.height, W, H - (t.top + t.height));
+ set('tutW', 0, t.top, t.left, t.height);
+ set('tutE', t.left + t.width, t.top, W - (t.left + t.width), t.height);
+
+ // the card sits beside the target, clamped to the window
+ const cw = Math.min(496, W - 32), ch = card.offsetHeight || 176;
+ let side, left, top;
+ // A target that is most of the window tall has no room above or below it, so
+ // the card goes beside it — into whichever side has space.
+ const tall = t.height > H * 0.6;
+ if(now.at === 'rail' || (tall && t.left < cw + 32)){
+  side = 'left'; left = t.left + t.width + 16; top = Math.min(H - ch - 16, t.top + 24);
+ } else if(tall){
+  side = 'right'; left = t.left - cw - 16; top = Math.min(H - ch - 16, t.top + 24);
+ } else if(t.top + t.height + 16 + ch < H){
+  side = 'down'; left = t.left; top = t.top + t.height + 16;
+ } else {
+  side = 'up'; left = t.left; top = Math.max(16, t.top - ch - 16);
+ }
+ card.className = 'guide ' + side;
+ card.style.left = Math.max(16, Math.min(W - cw - 16, left)) + 'px';
+ card.style.top = Math.max(16, top) + 'px';
+ // and the caret sits over the middle of the shared edge
+ if(side === 'left' || side === 'right'){
+  $('gCaret').style.left = ''; $('gCaret').style.top = '24px';
+ } else {
+  const cx = Math.min(Math.max(t.left + t.width / 2 - parseFloat(card.style.left), 16), cw - 32);
+  $('gCaret').style.left = cx + 'px'; $('gCaret').style.top = '';
+ }
+ document.body.classList.toggle('gpoint', true);
 }
 
 function render(){ drawGuide(); relayout(); drawColBar(); drawRail(); drawDetail();
-                   drawChrome(); placeCaret(); scrollToFocus(); }
+                   drawChrome(); placeTutorial(); scrollToFocus(); }
 
 /* ---------- events ---------- */
 document.addEventListener('click', function(e){
@@ -1413,7 +1489,7 @@ $('btnReset').addEventListener('click', function(){
 });
 window.addEventListener('resize', function(){
  clearTimeout(window.__rt);
- window.__rt = setTimeout(function(){ relayout(); drawColBar(); }, 100);
+ window.__rt = setTimeout(function(){ relayout(); drawColBar(); placeTutorial(); }, 100);
 });
 /* ---------- keyboard navigation ----------------------------------------
    Three columns, arrow keys move within and between them. Crossing columns

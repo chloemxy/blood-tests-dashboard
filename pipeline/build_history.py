@@ -43,6 +43,25 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F64",
+  "date": "2026-08-05",
+  "who": "Chloe",
+  "title": "Overlay, and highlight the target",
+  "status": "addressed",
+  "versions": ["v6.5"],
+  "quote": "make it overlay, highlight the section/action",
+  "did": [
+   ("An overlay, so it costs nothing", "addressed",
+    "The docked strip took 80px off the map and had to be reserved for. The card is <code>position:fixed</code> now and reserves nothing \u2014 which also retires the layout exception it needed in \u00a72. The tutorial changes no geometry at all."),
+   ("The section is ringed and the rest dims", "addressed",
+    "Step 1 rings the rail\u2019s marker list, step 2 the concern column, step 3 the follow-up column. The two map columns are measured from <code>LAYOUT.xC / xCend / xT</code> against the canvas\u2019s own box, so the ring cannot drift out of register \u2014 the check asserts it to the pixel. Around the ring, four rectangles dim the rest at 22%."),
+   ("The card points at what it is talking about", "addressed",
+    "It sits beside the target with a caret on the shared edge, and picks its side from the space available \u2014 a full-height column gets the card alongside rather than above or below it."),
+   ("The scrim never swallows a click", "addressed",
+    "Every part of the overlay except the card is <code>pointer-events:none</code>, so the reader can do anything at any time, including ignoring the step they are on. That is now a rule, not an implementation detail."),
+  ],
+ },
+ {
   "id": "F63",
   "date": "2026-08-05",
   "who": "Chloe",
@@ -1323,12 +1342,31 @@ FEEDBACK = [
 # ===========================================================================
 VERSIONS = [
  {
+  "id": "v6.5",
+  "file": "v6.5-overlay-tutorial.html",
+  "title": "The tutorial is an overlay",
+  "date": "2026-08-05",
+  "source": "index.html",
+  "status": "live",
+  "tag": "v6.5-overlay-tutorial",
+  "gitpath": "index.html",
+  "answers": ["F64"],
+  "summary": "The guide becomes a floating card that rings the section its step is about and dims the rest \u2014 reserving no layout, blocking no clicks.",
+  "changes": [
+   "<b>Fixed card</b> instead of an 80px docked strip; the \u00a72 layout exception it needed is gone.",
+   "<b>The target is ringed</b>: the rail for step 1, the concern column for step 2, the follow-up column for step 3, measured from the same layout the columns are drawn from.",
+   "<b>The rest dims</b> behind four rectangles at 22%, all <code>pointer-events:none</code>.",
+   "<b>The card picks its side</b> from the space available and carries a caret on the shared edge.",
+   "14 checks pass; <code>guide</code> now asserts the ring geometry to the pixel and that nothing blocks a click.",
+  ],
+ },
+ {
   "id": "v6.4",
   "file": "v6.4-tutorial.html",
   "title": "The guide reads like a tutorial",
   "date": "2026-08-05",
   "source": "index.html",
-  "status": "live",
+  "status": "superseded",
   "tag": "v6.4-tutorial",
   "gitpath": "index.html",
   "answers": ["F63"],

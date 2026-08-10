@@ -26,7 +26,7 @@ Every check here is a mistake that shipped once:
 | `scrolling-canvas` | canvas grows past the window, 68 markers drawn | content hidden instead of scrolled |
 | `column-band` | titles live in the fixed band, no inline font sizes in the SVG | headings scrolling away |
 | `header-parity` | one 56px header on all four screens; identical `id \| nav \| act` grid shape and nav labels; current marked; every bound id intact; in-place route switch | headers drifting apart, nav pills landing at a different x per screen, or a rebuilt header orphaning the JS that binds to it |
-| `guide` | first visit: empty middle column with a prompt, three steps ticking off the real action, examples marking real slugs, Show all as a way out, the whole column back once the steps are done, retiring for good and remembering it, canvas reserving the strip height | an onboarding strip that lies about progress, comes back after being finished, hides a row under itself, or a first frame with no way out of it |
+| `guide` | overlay is `position:fixed` and reserves no canvas height; scrim and ring take no pointer events; ring matches the rail's box and the two map columns to the pixel; one task at 16px; steps tick on the real action; retires for good and is remembered | a tutorial that blocks clicks, drifts out of register with the columns it points at, reserves layout, or comes back after being finished |
 | `title-band` | band opaque and above the canvas, three titles in it, legend fully removed, counts moved to the header | a background painted with an undefined variable; dead layout reserved for a deleted panel |
 
 The window size is stubbed through `clientWidth` / `clientHeight`, so these are
