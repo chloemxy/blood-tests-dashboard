@@ -43,6 +43,25 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F63",
+  "date": "2026-08-05",
+  "who": "Chloe",
+  "title": "Make the task obvious, like a tutorial",
+  "status": "addressed",
+  "versions": ["v6.4"],
+  "quote": "need to make the task more obvious, like a tutorial guide",
+  "did": [
+   ("One task, at reading size", "addressed",
+    "The three steps were three dim 12px lines that named the task without pointing at it. Now the current step is a 16px instruction with <i>Step n of 3</i> above it \u2014 <b>\u201cMark any result low or high using the pills in the panel on the left\u201d</b> \u2014 and the other two sit beside it as small ticked or numbered labels. The words in the instruction are the words on screen: <i>can point at</i>, <i>would follow up</i>."),
+   ("A caret that points at the column", "addressed",
+    "Steps 2 and 3 draw a teal caret under the concern column and the follow-up column, positioned from the same layout the columns are drawn from \u2014 so it cannot drift out of register. Verified against <code>LAYOUT.xC</code> and <code>LAYOUT.xT</code> to the pixel."),
+   ("Step 1 rings its control instead", "addressed",
+    "Its target is the rail, which a caret in the map cannot reach, so the low / norm / high pills are ringed teal and their column header turns teal while that step is current. Static colour, no motion."),
+   ("Still inside the rules", "addressed",
+    "The strip grew from 48px to 80px and the canvas reserves the new height, so nothing hides under it. The caret and the ring change only when the step changes \u2014 a state change, not an animation."),
+  ],
+ },
+ {
   "id": "F62",
   "date": "2026-08-05",
   "who": "Chloe",
@@ -1304,12 +1323,30 @@ FEEDBACK = [
 # ===========================================================================
 VERSIONS = [
  {
+  "id": "v6.4",
+  "file": "v6.4-tutorial.html",
+  "title": "The guide reads like a tutorial",
+  "date": "2026-08-05",
+  "source": "index.html",
+  "status": "live",
+  "tag": "v6.4-tutorial",
+  "gitpath": "index.html",
+  "answers": ["F63"],
+  "summary": "One task at a time, spelled out at 16px with its step number, and a caret pointing at the column it concerns.",
+  "changes": [
+   "<b>Step n of 3</b> plus the instruction at 16px; the other two steps are quiet labels beside it.",
+   "<b>A teal caret</b> under the concern and follow-up columns, placed from the real layout.",
+   "<b>Step 1 rings the low / norm / high pills</b>, since its target is the rail and a caret cannot reach it.",
+   "Strip is 80px and the canvas reserves it. 14 checks pass, including the caret\u2019s position.",
+  ],
+ },
+ {
   "id": "v6.3",
   "file": "v6.3-first-frame.html",
   "title": "One move at a time",
   "date": "2026-08-05",
   "source": "index.html",
-  "status": "live",
+  "status": "superseded",
   "tag": "v6.3-first-frame",
   "gitpath": "index.html",
   "answers": ["F62"],

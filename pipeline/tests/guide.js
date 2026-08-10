@@ -20,6 +20,19 @@ setTimeout(() => {
  if (d.querySelectorAll('#gSteps li').length !== 3) fail.push('expected three steps');
  if (!/now/.test(state())) fail.push('no step is marked as the one to do next');
 
+ // the task is stated once, at reading size, with its number
+ const task = () => (d.querySelector('#gNow .gi') || {}).textContent || '';
+ const kick = () => (d.querySelector('#gNow .gk') || {}).textContent || '';
+ console.log('task:', kick(), '—', task());
+ if (!/^Step 1 of 3$/.test(kick())) fail.push('the step number is not stated');
+ if (task().length < 30) fail.push('the task is not spelled out');
+ const gi = /\.gnow \.gi\{[^}]*font-size:16px/.test([...d.querySelectorAll('style')].map(x=>x.textContent).join(''));
+ if (!gi) fail.push('the task is not at reading size');
+ // step 1's target is the rail, so the control is ringed and no caret is shown
+ console.log('step-1 classes:', [...d.body.classList].filter(c=>c.startsWith('gstep')||c==='gpoint').join(' ') || '(none)');
+ if (!d.body.classList.contains('gstep-mark')) fail.push('step 1 does not mark its target');
+ if (d.body.classList.contains('gpoint')) fail.push('a caret is pointing into the map for a rail step');
+
  const ex = [...d.querySelectorAll('#gEx [data-ex]')];
  console.log('examples offered:', ex.map(b => b.textContent).join(', '));
  if (ex.length !== 3) fail.push(ex.length + ' examples, expected 3');
@@ -45,6 +58,13 @@ setTimeout(() => {
  if (cShown >= D.meta.nConcerns) fail.push('marking revealed the whole column, not just what it raised');
 
  // step 2
+ // step 2 points at the concern column, from the real layout
+ const gx = n => parseFloat(d.getElementById('guide').style.getPropertyValue('--gx'));
+ const L = w.eval('LAYOUT'), B = w.eval('BOX');
+ console.log('caret at', gx(), 'expected', (L.xC - (B.L - 16)).toFixed(0));
+ if (!d.body.classList.contains('gpoint')) fail.push('step 2 does not point at its column');
+ if (Math.abs(gx() - (L.xC - (B.L - 16))) > 1) fail.push('the caret is not under the concern column');
+
  click(d.querySelector('.map [data-cn]'));
  console.log('after opening a concern:', state());
  if (state().split(',')[1] !== 'done') fail.push('step 2 did not tick after opening a concern');
@@ -68,9 +88,9 @@ setTimeout(() => {
 
  // nothing hides under it: the canvas reserves the strip's height while it shows
  const css = [...d.querySelectorAll('style')].map(x => x.textContent).join('');
- const pad = /body\.guiding \.canvas\{padding-bottom:48px\}/.test(css);
- const h = /\.guide\{[^}]*height:48px/.test(css);
- console.log('canvas reserves the strip height:', pad, '| strip is 48px:', h);
+ const pad = /body\.guiding \.canvas\{padding-bottom:80px\}/.test(css);
+ const h = /\.guide\{[^}]*height:80px/.test(css);
+ console.log('canvas reserves the strip height:', pad, '| strip is 80px:', h);
  if (!pad || !h) fail.push('the canvas does not reserve the strip height, so rows can hide under it');
 
  console.log(fail.length ? '\nFAIL:\n - ' + fail.join('\n - ') : '\nALL PASS');
