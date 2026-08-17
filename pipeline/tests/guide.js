@@ -41,7 +41,10 @@ setTimeout(() => {
  console.log('card position:', /\.guide\{[^}]*position:fixed/.test(css) ? 'fixed' : 'NOT fixed');
  if (!/\.guide\{[^}]*position:fixed/.test(css)) fail.push('the card is not an overlay');
  if (/body\.guiding \.canvas\{padding/.test(css)) fail.push('the overlay still reserves canvas height');
- if (!/\.tutscrim\{[^}]*pointer-events:none/.test(css)) fail.push('the scrim would swallow clicks');
+ // the dimming is the ring's own shadow, so it follows the rounded corners
+ if (d.querySelector('.tutscrim')) fail.push('the four-rectangle scrim is still there');
+ if (!/\.tutring\{[^}]*box-shadow:0 0 0 9999px/.test(css)) fail.push('the scrim does not follow the ring');
+ if (!/\.tutring\{[^}]*border-radius:8px/.test(css)) fail.push('the ring lost its radius');
  if (!/\.tutring\{[^}]*pointer-events:none/.test(css)) fail.push('the ring would swallow clicks');
 
  // ---- first visit
@@ -66,11 +69,7 @@ setTimeout(() => {
  if (r1.left !== 0 || Math.abs(r1.h - (RAIL.height + 16)) > 1) fail.push('the ring is not around the rail');
  if (!/\bleft\b/.test(d.getElementById('guide').className)) fail.push('the card does not point at the rail');
 
- // the scrim closes over the whole window around the hole
- const s = id => { const e = d.getElementById(id);
-   return num(e.style.left) + ',' + num(e.style.top) + ' ' + num(e.style.width) + 'x' + num(e.style.height); };
- console.log('scrim:', ['tutN','tutS','tutW','tutE'].map(s).join(' | '));
- if (num(d.getElementById('tutN').style.height) !== r1.top) fail.push('the scrim leaves a gap above the target');
+ console.log('scrim: the ring\'s own shadow, so the hole is rounded like the ring');
 
  // ---- step 2: the concern column, from the real layout
  click(d.querySelector('#gEx [data-ex="iron"]'));

@@ -43,6 +43,36 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F68",
+  "date": "2026-08-05",
+  "who": "Chloe",
+  "title": "White corners around the highlight",
+  "status": "addressed",
+  "versions": ["v6.8"],
+  "quote": "the highlight container has the round radius, remove the extra white sharp corners",
+  "did": [
+   ("Rectangles cannot follow a curve", "addressed",
+    "The ring had an 8px radius but the dimming around it was four rectangles, so at each corner a sharp white notch showed between the curve and the rectangle. The dimming is now the ring\u2019s own outward shadow \u2014 <code>box-shadow:0 0 0 9999px</code> \u2014 which takes the ring\u2019s radius exactly. Four elements and their placement code deleted with it."),
+   ("Not a decoration", "addressed",
+    "\u00a75c bans shadows as atmosphere. Here the shadow <i>is</i> the scrim: it is doing the dimming, not adding depth. It still takes no pointer events, so nothing it covers becomes unclickable."),
+  ],
+ },
+ {
+  "id": "F67",
+  "date": "2026-08-05",
+  "who": "Chloe",
+  "title": "No landing page on arrival",
+  "status": "addressed",
+  "versions": ["v6.8"],
+  "quote": "there should be no landing starting page when you open the site for the first time",
+  "did": [
+   ("The route chooser is retired", "addressed",
+    "<i>Where do you want to start?</i> was the front door of the old site. The atlas is the front door now and the four tabs are the navigation, so a screen whose only job is to ask which way to go has nothing left to do. <code>catalogue.html</code> with no hash opens <b>How you feel</b> directly."),
+   ("Including old bookmarks", "addressed",
+    "<code>#landing</code> resolves to the same view, and <code>setMode(\'landing\')</code> is coerced to <code>feel</code> \u2014 so nothing anywhere in the app can put it back on screen. The new <code>no-landing</code> check loads the page four ways and asserts a real view every time."),
+  ],
+ },
+ {
   "id": "F66",
   "date": "2026-08-05",
   "who": "Chloe",
@@ -1380,12 +1410,29 @@ FEEDBACK = [
 # ===========================================================================
 VERSIONS = [
  {
+  "id": "v6.8",
+  "file": "v6.8-no-landing.html",
+  "title": "No route chooser, one rounded hole",
+  "date": "2026-08-05",
+  "source": "index.html",
+  "status": "live",
+  "tag": "v6.8-no-landing",
+  "gitpath": "index.html",
+  "answers": ["F67", "F68"],
+  "summary": "The catalogue\u2019s landing screen is retired \u2014 every address opens a real view \u2014 and the tutorial\u2019s dimming follows the ring\u2019s rounded corners instead of leaving white notches.",
+  "changes": [
+   "<b>No route chooser</b>: no hash and <code>#landing</code> both open <i>How you feel</i>; <code>setMode(\'landing\')</code> is coerced away.",
+   "<b>One rounded hole</b>: the scrim is the ring\u2019s own shadow, so it takes its 8px radius. Four scrim elements deleted.",
+   "New <code>no-landing</code> check \u2014 17 pass.",
+  ],
+ },
+ {
   "id": "v6.7",
   "file": "v6.7-table-view.html",
   "title": "All tests, in the atlas",
   "date": "2026-08-05",
   "source": "index.html",
-  "status": "live",
+  "status": "superseded",
   "tag": "v6.7-table-view",
   "gitpath": "index.html",
   "answers": ["F66"],

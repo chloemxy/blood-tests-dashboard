@@ -1791,6 +1791,7 @@ const state={picked:new Set(),had:new Set(),result:{},cond:null,from:'cand'};
 
 /* ---------- top-level route ---------- */
 function setMode(m){
+ if(m==='landing') m='feel';          /* the route chooser is retired */
  $('cxRoute').classList.toggle('cx-on',m==='landing');
  $('cxApp').classList.toggle('cx-on',m==='feel');
  const app=$('app'); if(app) app.style.display=(m==='tests')?'grid':'none';
@@ -2154,17 +2155,21 @@ window.addEventListener('popstate',function(e){
 
 drawConcerns();
 (function(){
+ /* No route chooser. The atlas is the front door and the four tabs are the
+    navigation, so an address with no route opens the first real view rather
+    than a screen whose only job is to ask which way to go. #landing does the
+    same, so an old bookmark cannot land on it either. */
  const h=(location.hash||'').replace(/^#/,'').split('/');
- try{ history.replaceState({cx:{m:'landing',s:'home',c:null}},'','#landing'); }catch(err){}
- cxLastKey='landing';
- if(h[0]==='tests'){ if(window.__cxEnsureTests)window.__cxEnsureTests(); setMode('tests'); }
- else if(h[0]==='feel'){
+ const to = (h[0]==='tests'||h[0]==='table') ? 'tests' : 'feel';
+ try{ history.replaceState({cx:{m:to,s:'home',c:null}},'','#'+(h[0]==='table'?'table':to)); }catch(err){}
+ cxLastKey=to;
+ if(to==='tests'){ if(window.__cxEnsureTests)window.__cxEnsureTests(); setMode('tests'); }
+ else{
   setMode('feel');
   if(h[1]==='lens'&&h[2]&&byId(h[2])) openLens(h[2],'browse');
   else if(h[1]==='browse'){ drawBrowse(); show('browse'); }
   else show('home');
  }
- else setMode('landing');
 })();
 })();
 
