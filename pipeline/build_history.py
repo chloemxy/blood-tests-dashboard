@@ -43,6 +43,25 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F66",
+  "date": "2026-08-05",
+  "who": "Chloe",
+  "title": "The table, inside the atlas",
+  "status": "addressed",
+  "versions": ["v6.7"],
+  "quote": "I want to have this table view visible from atlas site, include a tab for it",
+  "did": [
+   ("A view, not a link away", "addressed",
+    "<b>All tests</b> was a link to the 2.9&nbsp;MB catalogue app. It is a view of the atlas now \u2014 same page, same tab, <code>#table</code> in the address bar \u2014 with the filter, the system picker and the source picker from the catalogue\u2019s own table."),
+   ("Fetched, not embedded", "addressed",
+    "The atlas payload is 92 markers; it has never carried the 6,192 rows with their descriptions, sources and links. The table fetches <code>data/catalogue.json</code> the first time it is opened and keeps it in memory, so the front door stays 634&nbsp;KB for anyone who never opens it. The check asserts exactly one fetch, and that it does not happen before the tab is clicked."),
+   ("Two hundred rows at a time, counted", "addressed",
+    "6,192 rows of three-line descriptions is not a DOM worth building. It draws 200 and the control says <i>Show 200 more &middot; 200 of 6,192 shown</i> \u2014 a cap with its true total, per \u00a76. Filtering shows <i>8 of 6,192</i>; source-quoted only shows 216, which matches the data."),
+   ("An honest failure", "open",
+    "Opened from a <code>file://</code> path the fetch cannot work at all. Rather than an empty table it says so and links to the catalogue app, which carries the data inside it. On the deployed site this does not arise."),
+  ],
+ },
+ {
   "id": "F65",
   "date": "2026-08-05",
   "who": "Chloe",
@@ -1361,12 +1380,31 @@ FEEDBACK = [
 # ===========================================================================
 VERSIONS = [
  {
+  "id": "v6.7",
+  "file": "v6.7-table-view.html",
+  "title": "All tests, in the atlas",
+  "date": "2026-08-05",
+  "source": "index.html",
+  "status": "live",
+  "tag": "v6.7-table-view",
+  "gitpath": "index.html",
+  "answers": ["F66"],
+  "summary": "The full 6,192-row table becomes a view of the atlas behind its own tab, fetching the catalogue on first open rather than shipping it.",
+  "changes": [
+   "<b>All tests is an in-page view</b> at <code>#table</code>, with filter, system and source controls.",
+   "<b>The catalogue is fetched once</b> on first open \u2014 index.html stays 634&nbsp;KB.",
+   "<b>200 rows at a time</b>, with the true total on the control and on every filtered count.",
+   "<b>A stated failure</b> for <code>file://</code>, which cannot fetch, linking to the catalogue app instead.",
+   "New <code>table-view</code> check \u2014 16 pass.",
+  ],
+ },
+ {
   "id": "v6.6",
   "file": "v6.6-guide-per-visit.html",
   "title": "The guide is per visit",
   "date": "2026-08-05",
   "source": "index.html",
-  "status": "live",
+  "status": "superseded",
   "tag": "v6.6-guide-per-visit",
   "gitpath": "index.html",
   "answers": ["F65"],

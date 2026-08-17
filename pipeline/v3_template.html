@@ -372,6 +372,46 @@ button{font-family:inherit;cursor:pointer}
 .map .slot{fill:none;stroke:#dfe6e7;stroke-width:1;stroke-dasharray:1.6 2}
 .map .cnt.on{fill:var(--teal)}
 
+/* ---------------- the table view ----------------
+   A second view of the same site, not a second site. It fills the stage; the
+   map, its panels and the tutorial step aside while it is up. */
+.tbl{position:absolute;inset:0;z-index:7;background:var(--paper);overflow-y:auto;
+ scrollbar-gutter:stable;display:none}
+body.view-table .tbl{display:block}
+body.view-table .rail,body.view-table .det,body.view-table .canvas,
+body.view-table .colbar,body.view-table .guide,body.view-table .tutring,
+body.view-table .tutscrim,body.view-table .mapnote,body.view-table .kbdhint{display:none}
+.tbl .wrap{max-width:1440px;margin:0 auto;padding:24px 16px 64px}
+.tbl h1{font-family:var(--font-serif);font-size:20px;color:var(--slate);margin:0 0 8px;font-weight:700}
+.tbl .sub{font-size:12px;color:var(--muted);margin:0 0 16px;max-width:80ch}
+.tbl .ctl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.tbl input,.tbl select{font-family:var(--font-sans);font-size:12px;color:var(--slate);background:#fff;
+ border:1px solid var(--line);border-radius:16px;padding:8px 16px;height:32px}
+.tbl input{flex:1 1 320px;min-width:0}
+.tbl input:focus,.tbl select:focus{outline:none;border-color:var(--teal)}
+.tbl .count{font-family:var(--font-mono);font-size:10px;color:var(--dim);margin:0 0 8px}
+.tbl table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:8px}
+.tbl th{background:var(--slate);color:#fff;font-family:var(--font-sans);font-size:12px;font-weight:600;
+ text-align:left;padding:8px 16px;position:sticky;top:0;z-index:1}
+.tbl td{border-top:1px solid var(--line);padding:8px 16px;font-size:12px;color:var(--muted);
+ vertical-align:top;line-height:1.45}
+.tbl tr:hover td{background:var(--aqua)}
+.tbl .nm{color:var(--slate);font-weight:600}
+.tbl .ab{font-family:var(--font-mono);font-size:10px;color:var(--dim);margin-left:8px}
+.tbl .sys{color:var(--teal)}
+.tbl .who{display:inline-block;font-family:var(--font-mono);font-size:10px;letter-spacing:.04em;
+ text-transform:uppercase;color:var(--slate);background:var(--aqua);border-radius:8px;padding:4px 8px;
+ margin:0 4px 4px 0}
+.tbl .src{font-family:var(--font-mono);font-size:10px;letter-spacing:.04em;text-transform:uppercase;
+ border-radius:8px;padding:4px 8px;margin-left:8px;white-space:nowrap}
+.tbl .src.q{background:var(--aqua);color:var(--teal)}
+.tbl .src.g{background:#fdf1ea;color:var(--accent)}
+.tbl a{color:var(--teal)}
+.tbl .more{margin:16px 0 0;border:1px solid var(--line);background:#fff;border-radius:16px;
+ padding:8px 16px;font-size:12px;font-weight:600;color:var(--slate)}
+.tbl .more:hover{border-color:var(--accent);color:var(--accent)}
+.tbl .note{font-size:12px;color:var(--muted);line-height:1.5;max-width:70ch}
+
 /* ---------------- keyboard help ---------------- */
 .kbdhint{position:absolute;right:16px;bottom:16px;z-index:4;font-family:var(--font-mono);font-size:10px;
  letter-spacing:.06em;text-transform:uppercase;color:#b4c0c2;background:#fff;
@@ -460,7 +500,7 @@ body.gstep-mark .railhd .r i{color:var(--teal)}
 
 <div class="top sitehd">
  <span class="id"><span class="logo">What is your blood telling you<b>?</b></span><span class="stat" id="hdrStat"></span></span>
- <nav><a class="nv on" href="index.html">Atlas</a><a class="nv" href="catalogue.html#feel">How you feel</a><a class="nv" href="catalogue.html#tests">Guided tests</a><a class="nv" href="catalogue.html#table">All tests</a></nav>
+ <nav><a class="nv on" href="#map" data-view2="map">Atlas</a><a class="nv" href="catalogue.html#feel">How you feel</a><a class="nv" href="catalogue.html#tests">Guided tests</a><a class="nv" href="#table" data-view2="table">All tests</a></nav>
  <span class="act">
   <button type="button" class="btn clearall" id="btnReset">Clear all answers</button>
   <a class="fblink" href="mailto:blood@goinvo.com" title="Send feedback to blood@goinvo.com">feedback</a>
@@ -483,6 +523,20 @@ body.gstep-mark .railhd .r i{color:var(--teal)}
   <span class="gex" id="gEx"></span>
  </div>
  <button class="kbdhint" id="kbdHint">? shortcuts</button>
+ <section class="tbl" id="tblView"><div class="wrap">
+  <h1>All tests</h1>
+  <p class="sub">Every test in the catalogue, searchable and sortable. Descriptions marked
+   <i>quoted</i> are verbatim from a named authority with a link to check; the rest are written
+   from the LOINC term name and category, and say so.</p>
+  <div class="ctl">
+   <input id="tqf" type="search" placeholder="Filter by name, abbreviation, description…" autocomplete="off">
+   <select id="tqs"><option value="">All systems</option></select>
+   <select id="tqv"><option value="">All sources</option><option value="1">Source-quoted only</option></select>
+  </div>
+  <p class="count" id="tcount"></p>
+  <div id="tbody"></div>
+ </div></section>
+
  <div class="kbdwrap" id="kbdWrap"><div class="kbd">
   <h3>Keyboard</h3>
   <dl>
@@ -1428,6 +1482,101 @@ function placeTutorial(){
 function render(){ drawGuide(); relayout(); drawColBar(); drawRail(); drawDetail();
                    drawChrome(); placeTutorial(); scrollToFocus(); }
 
+/* ---------- the table view -------------------------------------------
+   The catalogue is not in this page: it is fetched once, on first open, from
+   the same data file the builds read. Until then the atlas is 627 KB. */
+let CAT = null, CATERR = null, TSHOW = 200;
+const TSTEP = 200;
+
+function showView(v, push){
+ st.view = v === 'table' ? 'table' : 'map';
+ document.body.classList.toggle('view-table', st.view === 'table');
+ Array.prototype.forEach.call(document.querySelectorAll('.sitehd [data-view2]'),
+   function(a){ a.classList.toggle('on', a.dataset.view2 === st.view); });
+ if(push){ try{ history.replaceState(null, '', st.view === 'table' ? '#table' : '#map'); }catch(e){} }
+ if(st.view === 'table'){ TSHOW = TSTEP; loadCatalogue(); }
+ else render();
+}
+
+function loadCatalogue(){
+ if(CAT){ drawTable(); return; }
+ if(CATERR){ drawTable(); return; }
+ $('tcount').textContent = 'loading the catalogue…';
+ fetch('data/catalogue.json').then(function(r){
+  if(!r.ok) throw new Error('HTTP ' + r.status);
+  return r.json();
+ }).then(function(j){
+  CAT = j;
+  const sel = $('tqs');
+  sel.innerHTML = '<option value="">All systems</option>'
+   + j.groups.map(function(g, i){ return '<option value="'+i+'">'+esc(g)+'</option>'; }).join('');
+  drawTable();
+ }).catch(function(e){
+  CATERR = e;
+  drawTable();
+ });
+}
+
+function tableRows(){
+ const q = ($('tqf').value || '').toLowerCase().trim();
+ const gsel = $('tqs').value, vsel = $('tqv').value;
+ return CAT.tests.filter(function(t){
+  if(gsel !== '' && t.g !== +gsel) return false;
+  if(vsel === '1' && !t.v) return false;
+  if(!q) return true;
+  return (t.n + ' ' + (t.a || '') + ' ' + (t.q || '') + ' ' + CAT.groups[t.g]).toLowerCase().indexOf(q) >= 0;
+ });
+}
+
+function drawTable(){
+ if(CATERR){
+  $('tcount').textContent = '';
+  $('tbody').innerHTML = '<p class="note">The catalogue could not be loaded from this page '
+   + '(<code>' + esc(String(CATERR.message || CATERR)) + '</code>). A <code>file://</code> page cannot '
+   + 'fetch its own data file — open the site over http, or use '
+   + '<a href="catalogue.html#table">the catalogue app</a>, which carries the data inside it.</p>';
+  return;
+ }
+ if(!CAT) return;
+ const rows = tableRows(), shown = rows.slice(0, TSHOW);
+ $('tcount').textContent = rows.length === CAT.tests.length
+   ? nf(rows.length) + ' tests'
+   : nf(rows.length) + ' of ' + nf(CAT.tests.length) + ' tests';
+ $('tbody').innerHTML =
+   '<table><thead><tr><th>Test</th><th>System</th><th>What it is used for</th>'
+ + '<th>Who it comes up for</th><th>Verify</th></tr></thead><tbody>'
+ + shown.map(function(t){
+    const who = (t.p || []).map(function(i){ return '<span class="who">'+esc(CAT.pills[i])+'</span>'; }).join('');
+    const ref = (t.r || [])[0];
+    return '<tr><td><span class="nm">'+esc(t.n)+'</span>'
+     + (t.a ? '<span class="ab">'+esc(t.a)+'</span>' : '') + '</td>'
+     + '<td class="sys">'+esc(CAT.groups[t.g])+'</td>'
+     + '<td>'+esc(unq(t.q || ''))
+     + '<span class="src '+(t.v?'q':'g')+'">'+(t.v ? 'quoted &middot; ' + esc(t.qs || '') : 'ai-written')+'</span></td>'
+     + '<td>'+(who || '<span class="who">general population</span>')+'</td>'
+     + '<td>'+(ref ? '<a href="'+esc(ref[0])+'" target="_blank" rel="noopener">'+esc(ref[1])+' &#8599;</a>' : '')+'</td></tr>';
+   }).join('')
+ + '</tbody></table>'
+ + (rows.length > shown.length
+     ? '<button class="more" id="tmore">Show ' + nf(Math.min(TSTEP, rows.length - shown.length))
+       + ' more &middot; ' + nf(shown.length) + ' of ' + nf(rows.length) + ' shown</button>'
+     : '');
+}
+
+/* descriptions arrive pre-quoted in the data; the table adds its own marks */
+function unq(t){ return String(t).trim().replace(/^[\u201c\u201d\u2018\u2019"']+|[\u201c\u201d\u2018\u2019"']+$/g, ''); }
+
+['tqf','tqs','tqv'].forEach(function(id){
+ document.addEventListener('input', function(e){
+  if(e.target && e.target.id === id){ TSHOW = TSTEP; drawTable(); }
+ });
+});
+document.addEventListener('click', function(e){
+ if(e.target && e.target.id === 'tmore'){ TSHOW += TSTEP; drawTable(); }
+ const v2 = e.target.closest && e.target.closest('.sitehd [data-view2]');
+ if(v2){ e.preventDefault(); showView(v2.dataset.view2, true); }
+});
+
 /* ---------- events ---------- */
 document.addEventListener('click', function(e){
  const ps = e.target.closest('[data-pset]');
@@ -1612,6 +1761,7 @@ $('kbdHint').addEventListener('click', () => $('kbdWrap').classList.add('on'));
 $('kbdClose').addEventListener('click', () => $('kbdWrap').classList.remove('on'));
 $('kbdWrap').addEventListener('click', e => { if(e.target === $('kbdWrap')) $('kbdWrap').classList.remove('on'); });
 
+showView((location.hash || '').replace(/^#/, '') === 'table' ? 'table' : 'map', false);
 render();
 </script>
 </body>
