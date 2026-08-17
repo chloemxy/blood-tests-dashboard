@@ -43,6 +43,19 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F70",
+  "date": "2026-08-05",
+  "who": "Chloe",
+  "title": "No outline on the highlight",
+  "status": "addressed",
+  "versions": ["v6.10"],
+  "quote": "remove the stroke on the highlight box",
+  "did": [
+   ("The undimmed shape is the highlight", "addressed",
+    "The 2px teal border is gone. What is left is the hole in the dimming, which already says exactly the same thing \u2014 one signal per meaning, the same reason the follow-up rows lost their underline. The 8px radius stays, so the cut-out still reads as a shape rather than a gap."),
+  ],
+ },
+ {
   "id": "F69",
   "date": "2026-08-05",
   "who": "Chloe",
@@ -1425,12 +1438,28 @@ FEEDBACK = [
 # ===========================================================================
 VERSIONS = [
  {
+  "id": "v6.10",
+  "file": "v6.10-no-ring-stroke.html",
+  "title": "The highlight is the hole",
+  "date": "2026-08-05",
+  "source": "index.html",
+  "status": "live",
+  "tag": "v6.10-no-ring-stroke",
+  "gitpath": "index.html",
+  "answers": ["F70"],
+  "summary": "The tutorial highlight loses its teal outline; the undimmed cut-out is the whole signal.",
+  "changes": [
+   "<b>No border</b> on the highlight \u2014 the hole in the dimming carries it, with the 8px radius kept.",
+   "The check asserts no outline creeps back. 17 pass.",
+  ],
+ },
+ {
   "id": "v6.9",
   "file": "v6.9-flush-ring.html",
   "title": "The highlight hugs its section",
   "date": "2026-08-05",
   "source": "index.html",
-  "status": "live",
+  "status": "superseded",
   "tag": "v6.9-flush-ring",
   "gitpath": "index.html",
   "answers": ["F69"],

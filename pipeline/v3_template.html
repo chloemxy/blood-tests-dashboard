@@ -458,7 +458,7 @@ body.gpoint .guide .gcaret{display:block}
    notches where the ring curved. This is not decoration — the shadow IS the
    scrim, and it takes the ring's radius exactly. It takes no pointer events, so
    the reader can still do anything at any time. */
-.tutring{position:fixed;z-index:19;border:2px solid var(--teal);border-radius:8px;
+.tutring{position:fixed;z-index:19;border-radius:8px;
  box-shadow:0 0 0 9999px rgba(36,67,77,.22);pointer-events:none;display:none}
 body.gtut .tutring{display:block}
 
@@ -1424,8 +1424,9 @@ function targetRect(now){
  return { left: r.left + x1, top: r.top, width: x2 - x1, height: r.height };
 }
 
-/* Ring the target, dim the rest, and put the card beside it. Everything is
-   measured: no offsets to keep in sync with the layout. */
+/* Cut the target out of the dimming and put the card beside it. There is no
+   outline: the undimmed shape is the highlight, which is one signal rather than
+   two. Everything is measured — no offsets to keep in sync with the layout. */
 function placeTutorial(){
  const card = $('guide'), ring = $('tutRing');
  document.body.classList.remove('gtut');

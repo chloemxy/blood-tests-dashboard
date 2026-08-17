@@ -45,6 +45,7 @@ setTimeout(() => {
  if (d.querySelector('.tutscrim')) fail.push('the four-rectangle scrim is still there');
  if (!/\.tutring\{[^}]*box-shadow:0 0 0 9999px/.test(css)) fail.push('the scrim does not follow the ring');
  if (!/\.tutring\{[^}]*border-radius:8px/.test(css)) fail.push('the ring lost its radius');
+ if (/\.tutring\{[^}]*border:/.test(css)) fail.push('the highlight still has an outline');
  if (!/\.tutring\{[^}]*pointer-events:none/.test(css)) fail.push('the ring would swallow clicks');
 
  // ---- first visit
