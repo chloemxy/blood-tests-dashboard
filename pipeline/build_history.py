@@ -43,6 +43,21 @@ CONSTRAINTS = [
 # ===========================================================================
 FEEDBACK = [
  {
+  "id": "F69",
+  "date": "2026-08-05",
+  "who": "Chloe",
+  "title": "The ring should hug the section",
+  "status": "addressed",
+  "versions": ["v6.9"],
+  "quote": "the highlights should be flush with the section selected",
+  "did": [
+   ("The halo is gone", "addressed",
+    "The ring was drawn 8px outside its target and the map columns 16px outside theirs, so it read as a box around a gap rather than around the thing. It is flush now: exactly the rail\u2019s own box, and for the two map columns the same edges the rows\u2019 hit areas use, top to bottom of the canvas."),
+   ("Measured, not eyeballed", "addressed",
+    "The check asserts the rail ring equals the rail\u2019s rect on all four sides, and that each column ring matches <code>LAYOUT</code> horizontally and the canvas vertically."),
+  ],
+ },
+ {
   "id": "F68",
   "date": "2026-08-05",
   "who": "Chloe",
@@ -1410,12 +1425,28 @@ FEEDBACK = [
 # ===========================================================================
 VERSIONS = [
  {
+  "id": "v6.9",
+  "file": "v6.9-flush-ring.html",
+  "title": "The highlight hugs its section",
+  "date": "2026-08-05",
+  "source": "index.html",
+  "status": "live",
+  "tag": "v6.9-flush-ring",
+  "gitpath": "index.html",
+  "answers": ["F69"],
+  "summary": "The tutorial ring sits exactly on the section it points at, with no 8px halo around it.",
+  "changes": [
+   "<b>Flush</b>: the rail\u2019s own box; the columns\u2019 own edges, canvas top to bottom.",
+   "The check compares all four sides against the measured rect. 17 pass.",
+  ],
+ },
+ {
   "id": "v6.8",
   "file": "v6.8-no-landing.html",
   "title": "No route chooser, one rounded hole",
   "date": "2026-08-05",
   "source": "index.html",
-  "status": "live",
+  "status": "superseded",
   "tag": "v6.8-no-landing",
   "gitpath": "index.html",
   "answers": ["F67", "F68"],

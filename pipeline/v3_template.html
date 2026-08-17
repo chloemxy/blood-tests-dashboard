@@ -1411,17 +1411,17 @@ function drawGuide(){
 function targetRect(now){
  const cv = $('canvas'), r = cv.getBoundingClientRect();
  if(!r.width) return null;                       // nothing laid out yet
+ // Flush to the section, with no halo: a ring drawn 8px outside its target
+ // reads as a box around a gap rather than around the thing.
  if(now.at === 'rail'){
-  const el = $('rail'), b = el.getBoundingClientRect();
-  if(!b.width) return null;
-  // the rail is flush to the window edge, so the ring only insets where it can
-  const l = Math.max(0, b.left - 8);
-  return { left:l, top:b.top - 8, width:b.right + 8 - l, height:b.height + 16 };
+  const b = $('rail').getBoundingClientRect();
+  return b.width ? { left:b.left, top:b.top, width:b.width, height:b.height } : null;
  }
  if(!LAYOUT) return null;
- const x1 = now.at === 'concern' ? LAYOUT.xC - 16 : LAYOUT.xT - 16;
- const x2 = now.at === 'concern' ? LAYOUT.xCend + 16 : BOX.R;
- return { left: r.left + x1, top: r.top + 8, width: x2 - x1, height: r.height - 16 };
+ // the columns' own bounds — the same edges the rows' hit areas use
+ const x1 = now.at === 'concern' ? LAYOUT.xC - 9 : LAYOUT.xT - 8;
+ const x2 = now.at === 'concern' ? LAYOUT.xCend + 9 : BOX.R;
+ return { left: r.left + x1, top: r.top, width: x2 - x1, height: r.height };
 }
 
 /* Ring the target, dim the rest, and put the card beside it. Everything is

@@ -66,7 +66,10 @@ setTimeout(() => {
  // step 1 rings the rail, and the card sits beside it
  const r1 = ring();
  console.log('ring on the rail:', JSON.stringify(r1), '| card:', d.getElementById('guide').className);
- if (r1.left !== 0 || Math.abs(r1.h - (RAIL.height + 16)) > 1) fail.push('the ring is not around the rail');
+ // flush: exactly the rail's box, no halo
+ if (r1.left !== RAIL.left || r1.top !== RAIL.top
+     || Math.abs(r1.w - RAIL.width) > 1 || Math.abs(r1.h - RAIL.height) > 1)
+  fail.push('the ring is not flush with the rail');
  if (!/\bleft\b/.test(d.getElementById('guide').className)) fail.push('the card does not point at the rail');
 
  console.log('scrim: the ring\'s own shadow, so the hole is rounded like the ring');
@@ -74,9 +77,11 @@ setTimeout(() => {
  // ---- step 2: the concern column, from the real layout
  click(d.querySelector('#gEx [data-ex="iron"]'));
  const L = w.eval('LAYOUT');
- const r2 = ring(), want2 = { left: CANVAS.left + L.xC - 16, w: (L.xCend + 16) - (L.xC - 16) };
+ const r2 = ring(), want2 = { left: CANVAS.left + L.xC - 9, w: (L.xCend + 9) - (L.xC - 9) };
  console.log('step 2:', task());
  console.log('ring on the concern column:', JSON.stringify(r2), 'expected', JSON.stringify(want2));
+ if (r2.top !== CANVAS.top || Math.abs(r2.h - CANVAS.height) > 1)
+  fail.push('the ring is not flush with the canvas vertically');
  if (Math.abs(r2.left - want2.left) > 1 || Math.abs(r2.w - want2.w) > 1)
   fail.push('the ring is not around the concern column');
  if (steps().split(',')[0] !== 'done') fail.push('step 1 did not tick after marking');
@@ -87,7 +92,7 @@ setTimeout(() => {
  // ---- step 3: the follow-up column
  click(d.querySelector('.map [data-cn]'));
  const B = w.eval('BOX');
- const r3 = ring(), want3 = { left: CANVAS.left + L.xT - 16, w: B.R - (L.xT - 16) };
+ const r3 = ring(), want3 = { left: CANVAS.left + L.xT - 8, w: B.R - (L.xT - 8) };
  console.log('step 3:', task());
  console.log('ring on the follow-up column:', JSON.stringify(r3), 'expected', JSON.stringify(want3));
  if (Math.abs(r3.left - want3.left) > 1 || Math.abs(r3.w - want3.w) > 1)
