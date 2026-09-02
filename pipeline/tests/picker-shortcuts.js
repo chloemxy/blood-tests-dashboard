@@ -17,7 +17,7 @@ run(1600,900,(w,d)=>{
  if(!reset.disabled) fail.push('reset should be dim at default');
  all.dispatchEvent(new w.MouseEvent('click',{bubbles:true}));
  const on=[...d.querySelectorAll('#pChips .pchip.on')].length, tot=[...d.querySelectorAll('#pChips .pchip')].length;
- console.log('after select all: chips on',on,'/',tot,'| rail rows',d.querySelectorAll('#rail .mrow').length,
+ console.log('after select all: chips on',on,'/',tot,
              '| map marker labels',d.querySelectorAll('.map .row.mkr').length);
  if(on!==tot) fail.push('select all did not select all');
  if(!d.getElementById('pAll').disabled) fail.push('all should dim when everything is on');
@@ -30,7 +30,7 @@ run(1600,900,(w,d)=>{
  if(minGap<7) fail.push('map labels too tight at 13 panels: '+minGap.toFixed(2));
  d.getElementById('pReset').dispatchEvent(new w.MouseEvent('click',{bubbles:true}));
  const on2=[...d.querySelectorAll('#pChips .pchip.on')].map(c=>c.dataset.pgroup);
- console.log('after annual only:',on2.join(','),'| rail rows',d.querySelectorAll('#rail .mrow').length);
+ console.log('after annual only:',on2.join(','));
  if(on2.join(',')!=='ANNUAL') fail.push('reset did not go back to annual only');
  console.log(fail.length?'FAIL:\n - '+fail.join('\n - '):'ALL PASS'); if(fail.length) process.exitCode = 1;
 });

@@ -17,21 +17,13 @@ setTimeout(()=>{
  if(chips.filter(c=>c.dataset.pgroup==='ANNUAL').length!==1) fail.push('no single ANNUAL chip');
  if(!chips.find(c=>c.dataset.pgroup==='ANNUAL').classList.contains('on')) fail.push('ANNUAL not on by default');
 
- // turn on BMP
+ // turn on BMP — its markers overlap the annual panel already shown, so the
+ // map's own group header (marking now lives on the canvas, not a rail list)
+ // must carry a dup note rather than an empty header with nothing under it
  const bmp=chips.find(c=>c.dataset.pgroup==='BMP');
  bmp.dispatchEvent(new w.MouseEvent('click',{bubbles:true}));
- const heads=[...d.querySelectorAll('#rail .grouphd')];
- console.log('\nrail groups after BMP on:');
- heads.forEach(h=>{
-   let n=0,e=h.nextElementSibling;
-   while(e&&!e.classList.contains('grouphd')){ if(e.classList.contains('mrow'))n++; e=e.nextElementSibling; }
-   console.log('  ',h.textContent.trim(),'-> rows',n);
-   if(n===0&&!h.querySelector('.dup')) fail.push('empty group with no note: '+h.textContent.trim());
- });
- const dupTexts=[...d.querySelectorAll('#rail .grouphd .dup')].map(x=>x.textContent);
- console.log('dup notes:',JSON.stringify(dupTexts));
  const svgdup=[...d.querySelectorAll('.map .grpdup')].map(x=>x.textContent);
- console.log('map dup notes:',JSON.stringify(svgdup));
+ console.log('\nmap dup notes:',JSON.stringify(svgdup));
  if(!svgdup.length) fail.push('map shows no dup note for BMP');
 
  // edges: no width difference between states
@@ -47,9 +39,6 @@ setTimeout(()=>{
  console.log('follow-up li with data-test:',lis.length);
  if(!lis.length) fail.push('no clickable follow-up rows');
  if(/text-decoration:underline/.test(css.match(/\.tlink\{[^}]*\}/)[0])) fail.push('tlink still underlined');
- const selCss=css.match(/\.mrow\.sel\{[^}]*\}/)[0];
- console.log('.mrow.sel ->',selCss);
- if(/border-color:var\(--accent\)/.test(selCss)) fail.push('mrow.sel still has visible border');
 
  console.log('\n'+(fail.length?'FAIL:\n - '+fail.join('\n - '):'ALL PASS')); if(fail.length) process.exitCode = 1;
 },900);

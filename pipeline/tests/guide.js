@@ -5,12 +5,13 @@
  * swallowing a click, tick off the real action, and retire for good — while
  * changing no layout at all, which is the point of it being an overlay.
  *
- * jsdom does no layout, so the two elements the placement measures are given
- * real boxes below and the ring is checked against LAYOUT to the pixel. */
+ * jsdom does no layout, so the canvas element the placement measures from is
+ * given a real box below, and every ring — all three steps target a column
+ * over the canvas now, marking included — is checked against LAYOUT/BOX to
+ * the pixel. */
 const fs = require('fs'), path = require('path'), { JSDOM } = require('jsdom');
 const html = fs.readFileSync(path.join(__dirname, '..', '..', 'index.html'), 'utf8');
 const CANVAS = { left:336, top:96, width:904, height:844, right:1240, bottom:940 };
-const RAIL   = { left:0, top:200, width:320, height:520, right:320, bottom:720 };
 
 const dom = new JSDOM(html, { url: 'http://localhost/', runScripts: 'dangerously', pretendToBeVisual: true,
  beforeParse(w){
@@ -21,7 +22,6 @@ const dom = new JSDOM(html, { url: 'http://localhost/', runScripts: 'dangerously
   Object.defineProperty(w, 'innerHeight', { get(){ return 956; } });
   w.HTMLElement.prototype.getBoundingClientRect = function(){
    if (this.id === 'canvas') return CANVAS;
-   if (this.id === 'rail')   return RAIL;
    return { left:0, top:0, width:0, height:0, right:0, bottom:0 };
   };
  }});
@@ -64,20 +64,23 @@ setTimeout(() => {
  if (!/^Step 1 of 3$/.test(kick())) fail.push('the step number is not stated');
  if (!d.querySelector('.ghd #gSkip')) fail.push('no Skip button on the card header');
 
- // step 1 rings the rail, and the card sits beside it
- const r1 = ring();
- console.log('ring on the rail:', JSON.stringify(r1), '| card:', d.getElementById('guide').className);
- // flush: exactly the rail's box, no halo
- if (r1.left !== RAIL.left || r1.top !== RAIL.top
-     || Math.abs(r1.w - RAIL.width) > 1 || Math.abs(r1.h - RAIL.height) > 1)
-  fail.push('the ring is not flush with the rail');
- if (!/\bleft\b/.test(d.getElementById('guide').className)) fail.push('the card does not point at the rail');
+ // step 1 rings the marker column (low/normal/high cells through the labels),
+ // and the card sits beside it — marking now happens on the canvas itself,
+ // there is no separate rail control to ring.
+ const L = w.eval('LAYOUT'), B = w.eval('BOX');
+ const r1 = ring(), want1 = { left: CANVAS.left + B.L, w: (L.xM + 8) - B.L };
+ console.log('ring on the marker column:', JSON.stringify(r1), 'expected', JSON.stringify(want1),
+             '| card:', d.getElementById('guide').className);
+ if (r1.top !== CANVAS.top || Math.abs(r1.h - CANVAS.height) > 1)
+  fail.push('the ring is not flush with the canvas vertically');
+ if (Math.abs(r1.left - want1.left) > 1 || Math.abs(r1.w - want1.w) > 1)
+  fail.push('the ring is not around the marker column');
+ if (!/\bleft\b/.test(d.getElementById('guide').className)) fail.push('the card does not sit beside the marker column');
 
  console.log('scrim: the ring\'s own shadow, so the hole is rounded like the ring');
 
  // ---- step 2: the concern column, from the real layout
  click(d.querySelector('#gEx [data-ex="iron"]'));
- const L = w.eval('LAYOUT');
  const r2 = ring(), want2 = { left: CANVAS.left + L.xC - 9, w: (L.xCend + 9) - (L.xC - 9) };
  console.log('step 2:', task());
  console.log('ring on the concern column:', JSON.stringify(r2), 'expected', JSON.stringify(want2));
@@ -92,7 +95,6 @@ setTimeout(() => {
 
  // ---- step 3: the follow-up column
  click(d.querySelector('.map [data-cn]'));
- const B = w.eval('BOX');
  const r3 = ring(), want3 = { left: CANVAS.left + L.xT - 8, w: B.R - (L.xT - 8) };
  console.log('step 3:', task());
  console.log('ring on the follow-up column:', JSON.stringify(r3), 'expected', JSON.stringify(want3));

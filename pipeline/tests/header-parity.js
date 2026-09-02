@@ -1,10 +1,12 @@
-/* The four screens must wear the same header, and every one of them must be
- * able to reach the other two. This checks both documents at once: the atlas
- * and all three catalogue screens.
+/* The atlas is the front door now: "How you feel" and "Guided tests" were
+ * dropped from its nav, and "All tests" became "Database". catalogue.html is
+ * no longer linked from there — it keeps its own older header shape, reachable
+ * only by a direct URL — so the two documents are checked against separate
+ * expectations rather than asserted to be identical.
  *
- * It also guards the risky half of that change — the catalogue header was
- * rebuilt around JS that binds a dozen ids, so every one of them is asserted
- * to still exist, and the in-place route switch is exercised for real.
+ * This still guards the risky half of the catalogue header — it was built
+ * around JS that binds a dozen ids, so every one of them is asserted to still
+ * exist, and the in-place route switch is exercised for real.
  */
 const fs=require('fs'),path=require('path'),{JSDOM,VirtualConsole}=require('jsdom');
 const R = path.join(__dirname, '..', '..') + path.sep;
@@ -18,7 +20,8 @@ function shape(bar){
  const labels = [...bar.querySelectorAll('.nv')].map(a => a.textContent).join('>');
  return kids.join('|') + ' :: ' + labels;
 }
-const SHAPE = 'id|nav|act :: Atlas>How you feel>Guided tests>All tests';
+const ATLAS_SHAPE = 'id|nav|act :: Atlas>Database';
+const CATALOGUE_SHAPE = 'id|nav|act :: Atlas>How you feel>Guided tests>All tests';
 
 function load(file, cb){
  const errs=[];
@@ -42,8 +45,8 @@ load('index.html',(w,d,errs)=>{
  console.log('   actions:', [...d.querySelectorAll('.sitehd .act button')].map(b=>b.textContent).join(' , '));
  const sh=shape(hd);
  console.log('   shape:', sh);
- if(sh!==SHAPE) fail.push('atlas: header shape is "'+sh+'", expected "'+SHAPE+'"');
- if(nv.length!==4) fail.push('atlas: '+nv.length+' nav items');
+ if(sh!==ATLAS_SHAPE) fail.push('atlas: header shape is "'+sh+'", expected "'+ATLAS_SHAPE+'"');
+ if(nv.length!==2) fail.push('atlas: '+nv.length+' nav items');
  if(!/Atlas\*/.test(nv.join())) fail.push('atlas: current screen not marked');
  load('catalogue.html',(w2,d2,errs2)=>{
   console.log('\n== catalogue.html');
@@ -58,7 +61,7 @@ load('index.html',(w,d,errs)=>{
    console.log('     bar '+(i+1)+' tag "'+tag+'" nav: '+nv2.join(' , '));
    if(nv2.length!==4) fail.push('catalogue bar '+(i+1)+': '+nv2.length+' nav items');
    const sh2=shape(b);
-   if(sh2!==SHAPE) fail.push('catalogue bar '+(i+1)+' shape is "'+sh2+'", expected "'+SHAPE+'"');
+   if(sh2!==CATALOGUE_SHAPE) fail.push('catalogue bar '+(i+1)+' shape is "'+sh2+'", expected "'+CATALOGUE_SHAPE+'"');
    console.log('       shape: '+sh2);
   });
   // ids the existing JS binds to must survive
@@ -75,12 +78,14 @@ load('index.html',(w,d,errs)=>{
   console.log('   feedback pills: atlas', fbAtlas, '+ catalogue', fb, '| "i" buttons:', d2.querySelectorAll('.discbtn').length);
   if(fbAtlas !== 1) fail.push('atlas: '+fbAtlas+' feedback pills, expected 1');
   if(fb !== 3) fail.push('catalogue: '+fb+' feedback pills, expected one per screen');
-  // the same two actions, in the same order, on every screen
+  // the atlas carries an extra About action; the (unlinked) catalogue screens
+  // keep their original two, in the same order, on every screen
   const acts = b => [...b.querySelectorAll('.act > *')].map(x => x.textContent.trim()).join(' > ');
+  const ATLAS_WANT = 'About > Clear all answers > feedback';
   const WANT = 'Clear all answers > feedback';
   const aAtlas = acts(d.querySelector('.sitehd'));
   console.log('   atlas actions:', JSON.stringify(aAtlas));
-  if(aAtlas !== WANT) fail.push('atlas actions are "'+aAtlas+'", expected "'+WANT+'"');
+  if(aAtlas !== ATLAS_WANT) fail.push('atlas actions are "'+aAtlas+'", expected "'+ATLAS_WANT+'"');
   bars.forEach((b,i)=>{
    const got = acts(b);
    console.log('   bar '+(i+1)+' actions:', JSON.stringify(got));

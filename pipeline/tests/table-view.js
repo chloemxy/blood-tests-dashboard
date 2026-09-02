@@ -1,6 +1,6 @@
 /* The full catalogue as a view of the atlas.
  *
- * The 6,192-row catalogue is not in index.html — the table fetches
+ * The 6,193-row catalogue is not in index.html — the table fetches
  * data/catalogue.json on first open. This check feeds it the real file, then
  * asserts the tab switches views in place, the counts are the true totals, the
  * paging control states how much it is not showing, the filters work, and the
@@ -41,14 +41,18 @@ setTimeout(() => {
   if (fetched !== 1) fail.push('expected exactly one fetch, got ' + fetched);
   if (!d.body.classList.contains('view-table')) fail.push('the tab did not switch to the table');
 
-  const rows = () => d.querySelectorAll('#tbody tbody tr').length;
+  // Each catalogue row now carries a second, hidden <tr> beside it — the
+  // nested sourcing detail toggled open by clicking the row. Only the
+  // visible `.trow` rows count as "drawn"; the paired `.tdet` rows are not
+  // a second page of results.
+  const rows = () => d.querySelectorAll('#tbody tbody tr.trow').length;
   const count = () => d.getElementById('tcount').textContent;
   console.log('count:', count(), '| rows drawn:', rows());
-  if (!/^6,192 tests$/.test(count())) fail.push('the count is not the true total: ' + count());
+  if (!/^6,193 tests$/.test(count())) fail.push('the count is not the true total: ' + count());
   if (rows() !== 200) fail.push(rows() + ' rows drawn, expected the first 200');
   const more = d.getElementById('tmore');
   console.log('paging:', more && more.textContent);
-  if (!more || !/of 6,192 shown/.test(more.textContent))
+  if (!more || !/of 6,193 shown/.test(more.textContent))
    fail.push('the paging control does not state the true total');
   click(more);
   console.log('after Show more:', rows());
@@ -64,7 +68,7 @@ setTimeout(() => {
   const f = d.getElementById('tqf');
   f.value = 'ferritin'; f.dispatchEvent(new w.Event('input', { bubbles:true }));
   console.log('filter "ferritin":', count(), '| rows', rows());
-  if (!/of 6,192 tests$/.test(count())) fail.push('a filtered count does not state the total');
+  if (!/of 6,193 tests$/.test(count())) fail.push('a filtered count does not state the total');
   if (!rows()) fail.push('the name filter found nothing');
   f.value = ''; const v = d.getElementById('tqv');
   v.value = '1'; v.dispatchEvent(new w.Event('input', { bubbles:true }));

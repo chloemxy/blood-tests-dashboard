@@ -79,7 +79,7 @@ PANEL_DEFS = [
   "comp":[("WBC","Leukocytes"),("RBC","Erythrocytes"),
           ("Hemoglobin","Hemoglobin"),("Hematocrit","Hematocrit"),
           ("MCV, MCH, MCHC","Red Blood Cell indices"),
-          ("RDW",None),
+          ("RDW","Erythrocyte distribution width"),
           ("Platelet Count","Platelet count")]},
 
  {"id":"MYDIFF", "name":"Differential", "short":"Differential", "src":MINE, "default":1, "grp":"ANNUAL",
