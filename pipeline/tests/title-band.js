@@ -37,9 +37,10 @@ setTimeout(() => {
  if(d.querySelector('.pnl.foot')) fail.push('the legend panel is still there');
  if(/--footH/.test(css)) fail.push('--footH is still reserved for a panel that no longer exists');
 
- const stat = (d.getElementById('hdrStat') || {}).textContent || '';
- console.log('header counts line:', JSON.stringify(stat.slice(0, 70)));
- if(!stat.trim()) fail.push('the counts sentence did not move to the header');
+ // The header counts line (panels/markers/reachable) was removed outright —
+ // it duplicated what the map itself already shows, not moved anywhere.
+ console.log('header counts line present:', !!d.getElementById('hdrStat'));
+ if(d.getElementById('hdrStat')) fail.push('the counts line is still in the header');
 
  console.log(fail.length ? '\nFAIL:\n - ' + fail.join('\n - ') : '\nALL PASS');
  if(fail.length) process.exitCode = 1;

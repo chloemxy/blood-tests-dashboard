@@ -70,22 +70,9 @@ button{font-family:inherit;cursor:pointer}
 .sitehd .act .clearall:hover{background:#fdf1ea}
 
 
-/* the counts read as one quiet line, not as a scoreboard */
-.sitehd .stat,.sitehd #rollup .stat{font-family:var(--font-mono);font-size:10px;color:var(--dim);
- white-space:nowrap;display:flex;align-items:baseline;gap:4px;padding:0;border:none;cursor:help}
-.sitehd #rollup{flex:0 1 auto;min-width:0;margin:0}
-.sitehd #rollup .rollrow{display:flex;align-items:center;gap:16px}
-.sitehd #rollup .rollgrid{display:flex;align-items:baseline;gap:16px;flex-wrap:nowrap}
-.sitehd #rollup .stat .num{font-family:var(--font-mono);font-size:10px;line-height:1.4;
- font-weight:600;color:var(--slate)}
-.sitehd #rollup .stat .num small{font-family:var(--font-mono);font-size:10px;font-weight:400}
-.sitehd #rollup .stat .lab,.sitehd #rollup .stat span:not(.num){font-family:var(--font-mono);font-size:10px;
- color:var(--dim);text-transform:none;letter-spacing:.04em}
 .sitehd #sysbarwrap{display:none}
 .sitehd .viewtog{display:none}   /* the two tabs are this control now */
           /* a colour ribbon is decoration; §5c */
-/* Narrow: the counts go, the navigation stays. Hidden, never clipped. */
-@media(max-width:1200px){.sitehd .stat,.sitehd #rollup{display:none}}
 
 /* ---------------- chrome ---------------- */
 .top{position:absolute;top:0;left:0;right:0;height:56px;display:flex;align-items:center;gap:16px;
@@ -94,12 +81,10 @@ button{font-family:inherit;cursor:pointer}
 .top .logo b{color:var(--teal)}
 .top .tag{font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:.04em}
 .top .sp{flex:1}
-.top .stat{font-family:var(--font-mono);font-size:10px;color:var(--dim);white-space:nowrap}
 .top .btn{border:1px solid var(--line);background:#fff;color:var(--slate);font-size:12px;font-weight:600;
  padding:4px 12px;border-radius:16px;text-decoration:none;line-height:20px;display:inline-block}
 .top .btn:hover{border-color:var(--accent);color:var(--accent)}
 .top .btn.on{border-color:var(--teal);background:var(--aqua);color:var(--teal)}
-@media(max-width:1000px){.top .stat{display:none}}
 
 .stage{position:absolute;top:56px;left:0;right:0;bottom:0;overflow:hidden}
 /* The map is the only thing that scrolls. The panels are its siblings, not its
@@ -169,10 +154,10 @@ button{font-family:inherit;cursor:pointer}
 
 /* ---------------- right detail ---------------- */
 .det{top:0;right:0;bottom:0;width:var(--detW);border-radius:0;border-right:none;border-top:none}
-.dhead{flex:0 0 auto;padding:16px;border-bottom:1px solid var(--line);min-height:96px;
- display:flex;flex-direction:column;justify-content:flex-start;gap:4px}
+.dhead{flex:0 0 auto;padding:10px 16px;border-bottom:1px solid var(--line);
+ display:flex;flex-direction:column;justify-content:center}
 .dhead .k{font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
-.dhead h2{font-family:var(--font-serif);font-size:18px;color:var(--slate);margin:0;line-height:1.3}
+.dhead h2{font-family:var(--font-serif);font-size:15px;color:var(--slate);margin:0;line-height:1.3}
 .dhead .s{font-size:12px;color:var(--muted);line-height:1.5;padding-bottom:4px}
 .slot{flex:0 0 auto;border-bottom:1px solid var(--line);display:flex;flex-direction:column}
 .slot[hidden]{display:none}
@@ -335,7 +320,7 @@ body.view-table .kbdhint{display:none}
  vertical-align:top;line-height:1.45}
 .tbl tr:hover td{background:var(--aqua)}
 .tbl .nm{color:var(--slate);font-weight:600}
-.tbl .ab{font-family:var(--font-mono);font-size:10px;color:var(--dim);margin-left:8px}
+.tbl .tabbr{font-family:var(--font-mono);font-size:10px;color:var(--dim);margin-left:8px}
 .tbl .sys{color:var(--teal)}
 .tbl .who{display:inline-block;font-family:var(--font-mono);font-size:10px;letter-spacing:.04em;
  text-transform:uppercase;color:var(--slate);background:var(--aqua);border-radius:8px;padding:4px 8px;
@@ -527,7 +512,7 @@ body.rail-shut .railspine:hover{color:var(--accent)}
 </div></div>
 
 <div class="top sitehd">
- <span class="id"><span class="logo">What is your blood telling you<b>?</b></span><span class="stat" id="hdrStat"></span></span>
+ <span class="id"><span class="logo">What is your blood telling you<b>?</b></span></span>
  <nav><a class="nv on" href="#map" data-view2="map">Atlas</a><a class="nv" href="#table" data-view2="table">Database</a></nav>
  <span class="act">
   <button type="button" class="btn" id="btnAbout" title="What this project is, and who made it">About</button>
@@ -1243,10 +1228,10 @@ function drawDetail(){
  }
 
  if(sel.t === 'm'){
-  const s = sel.v, m = M[s], v = st.val[s];
-  $('dHead').innerHTML = '<span class="k">annual panel marker &middot; '+esc(m.grp)+'</span>'
-   + '<h2>'+esc(m.name.split('[')[0].trim())+'</h2>'
-   + '<span class="s">'+(v<0?'marked low':v>0?'marked high':'not marked abnormal')+' &middot; '+esc(m.abbr)+'</span>';
+  const s = sel.v, m = M[s];
+  // Just the name: the kicker and abnormal/abbr line only restated facts
+  // already visible on the map itself.
+  $('dHead').innerHTML = '<h2>'+esc(m.name.split('[')[0].trim())+'</h2>';
   $('whyH').textContent = 'what this measures';
   $('why').innerHTML = (m.q
    ? '<q style="font-family:var(--font-serif);font-size:12px;color:var(--slate);font-style:italic">'+esc(m.q)+'</q>'
@@ -1268,11 +1253,8 @@ function drawDetail(){
   const pc = C[sel.v], t = (pc.next || [])[sel.i];
   if(t){
    $('nextSlot').classList.remove('exp');
-   $('dHead').innerHTML = '<span class="k">follow-up test &middot; '+esc(t.g)+'</span>'
-    + '<h2>'+esc(t.n)+'</h2>'
-    + '<span class="s">'+(t.a?esc(t.a)+' &middot; ':'')
-    + (t.nv>1 ? nf(t.nv)+' LOINC codes' : '1 LOINC code')
-    + ' &middot; '+(t.v?'source-quoted':'AI-written')+'</span>';
+   // Just the name, same as a marker or a concern header.
+   $('dHead').innerHTML = '<h2>'+esc(t.n)+'</h2>';
 
    const cs = (t.cs || []).filter(x => C[x]);
    $('whyH').innerHTML = 'what this measures <b>&middot; back to <button class="backlink" data-cn="'
@@ -1292,23 +1274,12 @@ function drawDetail(){
   }
  }
 
- const ci = +sel.v, c = C[ci], from = act[ci] || [];
- $('dHead').innerHTML = '<span class="k">concern &middot; '+esc(c.grp)+(st.added[ci]?' &middot; you added this':'')+'</span>'
-  + '<h2>'+esc(c.label)+'</h2>'
-  + '<span class="s">'+nf(c.nDistinct)+' markers outside your panel &middot; '+nf(c.nOutside)+' LOINC rows</span>';
- // What raised this concern is a fact about the header, not a panel of its own.
+ const ci = +sel.v, c = C[ci];
+ // Just the name: the header's job is to say what is selected, not to
+ // restate facts that belong to the follow-up list below it — the whole
+ // point of picking a concern is to get to that list.
+ $('dHead').innerHTML = '<h2>'+esc(c.label)+'</h2>';
  whySlot.hidden = true;
- if(from.length){
-  $('dHead').innerHTML += '<span class="s">raised by ' + from.map(s =>
-   esc(M[s].name.split('[')[0].trim()) + ' (' + (st.val[s]<0?'low':'high') + ')').join(', ')
-   + '</span>';
- } else if(st.added[ci]){
-  $('dHead').innerHTML += '<span class="s">you added this &middot; '+(c.from.length
-    ? c.from.length+' of your panel markers relate to it, none marked abnormal'
-    : 'no marker in a routine annual panel points at it')+'</span>';
- } else {
-  $('dHead').innerHTML += '<span class="s">not currently raised by anything you have marked</span>';
- }
  drawNextList(ci, -1);
 }
 
@@ -1322,21 +1293,6 @@ function condsHTML(cids){
   + cids.map(function(ci){
       return C[ci] ? '<button class="cbtn" data-cn="'+ci+'">'+esc(C[ci].label)+'</button>' : ''; }).join('')
   + '</div>';
-}
-
-/* ---------- chrome ---------- */
-function reachableNow(){
- const r = {}; SLUGS.forEach(sl => (M[sl].k || []).forEach(ci => r[ci] = 1));
- return Object.keys(r).length;
-}
-function drawChrome(){
- const act = activeConcerns(), nFlag = flagged().length;
- const reachable = reachableNow();
- const nOn = Object.keys(act).length;
- // Counts, not prose. The header is 56px; a sentence does not belong in it.
- $('hdrStat').textContent = activePanels().length+' of '+PANELS_ALL.length+' panels · '
-  + SLUGS.length+' markers · ' + reachable+' of '+META.nConcerns+' reachable'
-  + (nFlag ? ' · '+nFlag+' marked → '+nOn : '');
 }
 
 /* The map is drawn before the detail panel, so on the first paint there is no
@@ -1471,7 +1427,7 @@ function placeTutorial(){
 }
 
 function render(){ drawGuide(); relayout(); drawColBar(); drawRail(); drawDetail();
-                   drawChrome(); placeTutorial(); scrollToFocus(); applySlots(); }
+                   placeTutorial(); scrollToFocus(); applySlots(); }
 
 /* ---------- the table view -------------------------------------------
    The catalogue is not in this page: it is fetched once, on first open, from
@@ -1542,7 +1498,7 @@ function drawTable(){
     // Provenance is not spelled out on every row any more — a small badge here,
     // the full citation nested one click away, for whoever wants to check it.
     return '<tr class="trow" data-tr="'+i+'"><td><span class="nm">'+esc(t.n)+'</span>'
-     + (t.a ? '<span class="ab">'+esc(t.a)+'</span>' : '') + '</td>'
+     + (t.a ? '<span class="tabbr">'+esc(t.a)+'</span>' : '') + '</td>'
      + '<td class="sys">'+esc(CAT.groups[t.g])+'</td>'
      + '<td>'+esc(unq(t.q || ''))
      + '<span class="src '+(t.v?'q':'g')+'">'+(t.v ? 'quoted' : 'ai-written')+'</span></td>'
@@ -1600,7 +1556,13 @@ document.addEventListener('click', function(e){
  const add = e.target.closest('[data-add]');
  if(add){ const ci = add.dataset.add;
    if(st.added[ci]) delete st.added[ci]; else st.added[ci] = 1;
-   st.sel = st.added[ci] ? {t:'c', v:ci} : null; save(); render(); return; }
+   st.sel = st.added[ci] ? {t:'c', v:ci} : null;
+   // A concern added from the rail can land anywhere in the middle column —
+   // often well below the fold — so focus it the same way a keyboard move
+   // would, and the render below scrolls it into view.
+   if(st.sel){ relayout(); const at = LAYOUT.cOrder.indexOf(+ci);
+     if(at >= 0){ st.foc = {c:1, i:at}; st.focVia = 'select'; } }
+   save(); render(); return; }
  const ex = e.target.closest('[data-expand]');
  if(ex){ st.expand = !st.expand; st.fam = {}; drawDetail(); return; }
  const ft = e.target.closest('[data-fam]');
