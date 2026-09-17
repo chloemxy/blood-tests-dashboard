@@ -7,17 +7,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
 <style>
-:root{
- --font-serif:Georgia,"Times New Roman",serif;
- --font-sans:"Open Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
- --font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Consolas,monospace;
- --teal:#007385;--slate:#24434D;--accent:#B84A0E;--warm:#F09A57;
- --aqua:#EAF7F8;--paper:#F7F9F9;--ink:#1D1B1A;--muted:#5A6B70;
- --line:#D7E1E2;--panel:#fff;--dim:#8B9799;
- --ok:#2E7D5B;--warn:#B8860B;--info:#0E8496;--drawerW:460px;
-}
-*{box-sizing:border-box;}
+/* Fonts, the colour palette (incl. dark mode) and box-sizing all live in
+   shared.css now, linked in <head> — this page used to carry its own, older
+   palette (orange accent, different teal/slate); it now matches index.html's
+   so a change to either only has to happen in one place. Extras this page
+   still needs on top of the shared palette stay here. */
+:root{--warn:#B8860B;--info:#0E8496;--drawerW:460px;}
 html,body{margin:0;padding:0;height:100%;}
 body{background:var(--paper);color:var(--ink);font-family:var(--font-sans);font-size:15px;line-height:1.5;overflow:hidden;}
 button,input{font-family:inherit;cursor:pointer;}
@@ -321,45 +318,8 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
 @media(max-width:1100px){ .rollgrid{grid-template-columns:repeat(2,1fr);} .covwrap{grid-template-columns:1fr;} }
 
 
-/* ===== site header: one component, every screen =========================
-   56px, one row, always in the same order: identity, where you are, the
-   counts, the three ways out, then whatever that page can do. Same rules in
-   index.html and catalogue.html — if this block changes, it changes in both. */
-.sitehd{display:grid!important;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
- align-items:center;gap:16px;height:56px;padding:0 16px!important;
- border-bottom:1px solid var(--line);background:var(--panel);z-index:6}
-/* Identity left, actions right, navigation dead centre. The nav is identical on
-   every screen, so an equal share either side of it puts it at the same x on
-   every screen — no offset to keep in sync, and columns cannot overlap. */
-.sitehd .id{display:flex;align-items:center;gap:16px;min-width:0;overflow:hidden}
-.sitehd .act{justify-self:end}
-.sitehd .logo{font-family:var(--font-serif);font-size:18px;color:var(--slate);font-weight:700;
- white-space:nowrap;text-decoration:none;flex:0 0 auto}
-.sitehd .logo b{color:var(--teal)}
-.sitehd .sp{display:none}          /* the grid does the spacing now */
-.sitehd nav{display:flex;gap:8px;flex:0 0 auto}
-.sitehd .nv{border:1px solid var(--line);background:#fff;color:var(--slate);font-size:12px;font-weight:600;
- padding:4px 12px;border-radius:16px;text-decoration:none;line-height:20px;white-space:nowrap;
- font-family:var(--font-sans);cursor:pointer}
-.sitehd .nv:hover{border-color:var(--accent);color:var(--accent)}
-/* where you are is a state, so it is carried by colour — never by size */
-.sitehd .nv.on{border-color:var(--teal);background:var(--aqua);color:var(--teal)}
-.sitehd .act{display:flex;gap:8px;align-items:center;flex:0 0 auto;justify-self:end}
-/* Page actions are pills, whatever they were before: the catalogue's two
-   underlined links and its round "i" are the same component as the atlas's
-   Reset. One header, one button. */
-.sitehd .act .resetlink,.sitehd .act .fblink,.sitehd .act .discbtn,.sitehd .act .cxmenu{
- border:1px solid var(--line);background:#fff;color:var(--slate);font-family:var(--font-sans);
- font-size:12px;font-weight:600;padding:4px 12px;border-radius:16px;line-height:20px;
- text-decoration:none;white-space:nowrap;display:inline-block;cursor:pointer}
-.sitehd .act .resetlink:hover,.sitehd .act .fblink:hover,.sitehd .act .discbtn:hover,
-.sitehd .act .cxmenu:hover{border-color:var(--accent);color:var(--accent)}
-.sitehd .act .discbtn{padding:4px 0;width:28px;text-align:center;font-family:var(--font-mono)}
-/* Clear is destructive, so it carries the accent; feedback is ordinary. Both
-   are the same pill in the same order on every screen. */
-.sitehd .act .clearall{border-color:var(--accent);color:var(--accent)}
-.sitehd .act .clearall:hover{background:#fdf1ea}
-
+/* .sitehd itself (the header component) lives in shared.css now — this page
+   only adds the #rollup counts on top of it. */
 
 /* the counts read as one quiet line, not as a scoreboard */
 .sitehd .stat,.sitehd #rollup .stat{font-family:var(--font-mono);font-size:10px;color:var(--dim);
@@ -372,9 +332,6 @@ table.tbl .infobtn:hover,table.tbl .infobtn:focus{background:var(--teal);color:#
 .sitehd #rollup .stat .num small{font-family:var(--font-mono);font-size:10px;font-weight:400}
 .sitehd #rollup .stat .lab,.sitehd #rollup .stat span:not(.num){font-family:var(--font-mono);font-size:10px;
  color:var(--dim);text-transform:none;letter-spacing:.04em}
-.sitehd #sysbarwrap{display:none}
-.sitehd .viewtog{display:none}   /* the two tabs are this control now */
-          /* a colour ribbon is decoration; §5c */
 /* Narrow: the counts go, the navigation stays. Hidden, never clipped. */
 @media(max-width:1200px){.sitehd .stat,.sitehd #rollup{display:none}}
 

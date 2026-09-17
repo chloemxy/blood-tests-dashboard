@@ -1,0 +1,102 @@
+:root{
+ --font-serif:Georgia,"Times New Roman",serif;
+ --font-sans:"Open Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+ --font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Consolas,monospace;
+ /* Indigo / rose / amber, on the blue-yellow axis rather than red-green: the
+    protanopia/deuteranopia confusion lines run through red-green, not
+    blue-yellow, so this reads as three distinct hues even under full
+    red-green colour blindness. Every state that leans on colour (low/high/
+    ok/added) also carries a distinct shape — arrow direction, dash pattern,
+    or icon — so colour is reinforcement, never the only signal. */
+ --teal:#4338CA;--slate:#17303A;--accent:#9D174D;--warm:#92400E;
+ --aqua:#EEF2FF;--paper:#FAF8F5;--ink:#14181A;--muted:#57534E;
+ --line:#E6DFD8;--panel:#fff;--dim:#5E7173;--ok:#1E7A4C;
+ /* low and high used to sit right on top of --teal and --accent — a marker
+    reading "high" was literally the same colour as a selected/added row.
+    Giving each its own hue keeps the semantics (marker state) and the UI
+    chrome (interactive/selection state) visually separate. */
+ --low:#1565A8;--high:#A33A26;
+ /* Pale tints and hairlines that used to be one-off hex values scattered
+    through the rules below — named here so dark mode can override the whole
+    palette in one place instead of hunting through every selector. */
+ --tint-accent:#FDF2F8;--tint-ok:#EAF5EF;--tint-low:#DBE9F5;--tint-high:#F3E0DC;
+ --tint-warm:#FEF3E2;--border-ok:#B9DDC9;--hairline:#EEF2F2;
+ --faint:#A9B6B8;--lbmut:#93A2A4;--edge:#E3EAEB;
+ --dot-line:#C6D0D1;--dot-line2:#DFE6E7;--dot-on:#B7B6E8;--dot-added:#DD9AA7;
+ /* Fixed regardless of theme: white text sits directly on these, so they stay
+    a guaranteed-dark indigo/rose/blue/rust rather than brightening for dark
+    mode the way --accent/--low/--high do everywhere they are used as text or
+    a stroke instead of a solid fill. */
+ --headerbar:#312E81;--accent-solid:#9D174D;--low-solid:#1565A8;--high-solid:#A33A26;
+}
+/* Dark mode: follows the OS by default; a page's own theme toggle can
+   override that with data-theme, which it remembers in localStorage. Every
+   colour that carries meaning (teal/accent/warm/ok/low/high) is brightened
+   here so it still reads as text and strokes against a dark surface, not
+   just re-tinted. */
+@media(prefers-color-scheme:dark){
+ :root:not([data-theme="light"]){
+  --teal:#818CF8;--slate:#E8EEF0;--accent:#F472B6;--warm:#FDE68A;
+  --aqua:#221F44;--paper:#0F1216;--ink:#F4F6F6;--muted:#9CA3AF;
+  --line:#2C3D41;--panel:#1D2529;--dim:#7E9296;--ok:#34B57A;
+  --low:#4A93D6;--high:#C25B42;
+  --tint-accent:#27121C;--tint-ok:#11311F;--tint-low:#122A3A;--tint-high:#33201A;
+  --tint-warm:#3A2A12;--border-ok:#2C5A41;--hairline:#1F2A2D;
+  --faint:#5B6D70;--lbmut:#67797C;--edge:#293A3D;
+  --dot-line:#3C5054;--dot-line2:#2C3F43;--dot-on:#5B5A9E;--dot-added:#7C3D47;
+ }
+}
+:root[data-theme="dark"]{
+ --teal:#818CF8;--slate:#E8EEF0;--accent:#F472B6;--warm:#FDE68A;
+ --aqua:#221F44;--paper:#0F1216;--ink:#F4F6F6;--muted:#9CA3AF;
+ --line:#2C3D41;--panel:#1D2529;--dim:#7E9296;--ok:#34B57A;
+ --low:#4A93D6;--high:#C25B42;
+ --tint-accent:#27121C;--tint-ok:#11311F;--tint-low:#122A3A;--tint-high:#33201A;
+ --tint-warm:#3A2A12;--border-ok:#2C5A41;--hairline:#1F2A2D;
+ --faint:#5B6D70;--lbmut:#67797C;--edge:#293A3D;
+ --dot-line:#3C5054;--dot-line2:#2C3F43;--dot-on:#5B5A9E;--dot-added:#7C3D47;
+}
+*{box-sizing:border-box}
+
+/* ===== site header: one component, every screen =========================
+   56px, one row, always in the same order: identity, where you are, the
+   counts, the three ways out, then whatever that page can do. Lives here,
+   not copied per page — index.html and catalogue.html both link this file,
+   so a change here changes both at once. Each page keeps whatever it adds
+   on top (catalogue's #rollup counts, index's responsive label-shedding). */
+.sitehd{display:grid!important;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+ align-items:center;gap:16px;height:56px;padding:0 16px!important;
+ border-bottom:1px solid var(--line);background:var(--panel);z-index:6}
+/* Identity left, actions right, navigation dead centre. The nav is identical on
+   every screen, so an equal share either side of it puts it at the same x on
+   every screen — no offset to keep in sync, and columns cannot overlap. */
+.sitehd .id{display:flex;align-items:center;gap:16px;min-width:0;overflow:hidden}
+.sitehd .act{justify-self:end}
+.sitehd .logo{font-family:var(--font-serif);font-size:18px;color:var(--slate);font-weight:700;
+ white-space:nowrap;text-decoration:none;flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.sitehd .logo b{color:var(--teal)}
+.sitehd .sp{display:none}          /* the grid does the spacing now */
+.sitehd nav{display:flex;gap:8px;flex:0 0 auto}
+.sitehd .nv{border:1px solid var(--line);background:var(--panel);color:var(--slate);font-size:12px;font-weight:600;
+ padding:4px 12px;border-radius:16px;text-decoration:none;line-height:20px;white-space:nowrap;
+ font-family:var(--font-sans);cursor:pointer}
+.sitehd .nv:hover{border-color:var(--accent);color:var(--accent)}
+/* where you are is a state, so it is carried by colour — never by size */
+.sitehd .nv.on{border-color:var(--teal);background:var(--aqua);color:var(--teal)}
+.sitehd .act{display:flex;gap:8px;align-items:center;flex:0 0 auto;justify-self:end}
+/* Page actions are pills, whatever they were before: the catalogue's two
+   underlined links and its round "i" are the same component as the atlas's
+   Reset. One header, one button. */
+.sitehd .act .resetlink,.sitehd .act .fblink,.sitehd .act .discbtn,.sitehd .act .cxmenu{
+ border:1px solid var(--line);background:var(--panel);color:var(--slate);font-family:var(--font-sans);
+ font-size:12px;font-weight:600;padding:4px 12px;border-radius:16px;line-height:20px;
+ text-decoration:none;white-space:nowrap;display:inline-block;cursor:pointer}
+.sitehd .act .resetlink:hover,.sitehd .act .fblink:hover,.sitehd .act .discbtn:hover,
+.sitehd .act .cxmenu:hover{border-color:var(--accent);color:var(--accent)}
+.sitehd .act .discbtn{padding:4px 0;width:28px;text-align:center;font-family:var(--font-mono)}
+/* Clear is destructive, so it carries the accent; feedback is ordinary. Both
+   are the same pill in the same order on every screen. */
+.sitehd .act .clearall{border-color:var(--accent);color:var(--accent)}
+.sitehd .act .clearall:hover{background:var(--tint-accent)}
+.sitehd #sysbarwrap{display:none}
+.sitehd .viewtog{display:none}   /* the two tabs are this control now */
