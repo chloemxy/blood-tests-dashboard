@@ -1,8 +1,9 @@
-/* The atlas is the front door now: "How you feel" and "Guided tests" were
- * dropped from its nav, and "All tests" became "Database". catalogue.html is
- * no longer linked from there — it keeps its own older header shape, reachable
- * only by a direct URL — so the two documents are checked against separate
- * expectations rather than asserted to be identical.
+/* The atlas is the front door now: there is no nav left to speak of — the
+ * logo is the way back to the map, and "Database" moved out to the secondary
+ * actions since it is reference material, not a primary tab. catalogue.html
+ * is no longer linked from there — it keeps its own older header shape,
+ * reachable only by a direct URL — so the two documents are checked against
+ * separate expectations rather than asserted to be identical.
  *
  * This still guards the risky half of the catalogue header — it was built
  * around JS that binds a dozen ids, so every one of them is asserted to still
@@ -20,7 +21,9 @@ function shape(bar){
  const labels = [...bar.querySelectorAll('.nv')].map(a => a.textContent).join('>');
  return kids.join('|') + ' :: ' + labels;
 }
-const ATLAS_SHAPE = 'id|nav|act :: Atlas>Database';
+// The atlas nav is empty now — the logo (data-view2="map") is the only way
+// back to the map, so "current screen" is read off [data-view2].on instead.
+const ATLAS_SHAPE = 'id|nav|act :: ';
 const CATALOGUE_SHAPE = 'id|nav|act :: Atlas>How you feel>Guided tests>All tests';
 
 function load(file, cb){
@@ -46,8 +49,12 @@ load('index.html',(w,d,errs)=>{
  const sh=shape(hd);
  console.log('   shape:', sh);
  if(sh!==ATLAS_SHAPE) fail.push('atlas: header shape is "'+sh+'", expected "'+ATLAS_SHAPE+'"');
- if(nv.length!==2) fail.push('atlas: '+nv.length+' nav items');
- if(!/Atlas\*/.test(nv.join())) fail.push('atlas: current screen not marked');
+ if(nv.length!==0) fail.push('atlas: '+nv.length+' nav items, expected the nav to be empty');
+ // current screen is marked on whichever [data-view2] element matches the
+ // live view — the logo doubles as the map tab, Database as the table one
+ const cur=[...d.querySelectorAll('.sitehd [data-view2]')].filter(el=>el.classList.contains('on'));
+ console.log('   current screen marked on:', cur.map(el=>el.dataset.view2).join(','));
+ if(cur.length!==1 || cur[0].dataset.view2!=='map') fail.push('atlas: current screen (map) not marked via [data-view2].on');
  load('catalogue.html',(w2,d2,errs2)=>{
   console.log('\n== catalogue.html');
   console.log('   js errors:', errs2.length?errs2.join(' | '):'none');
@@ -72,16 +79,28 @@ load('index.html',(w,d,errs)=>{
   ['viewTog','rollup','rollgrid','sysbar','hdrTag','resetBtn','app','cxRoute','cxApp']
    .forEach(id=>{ if(!d2.getElementById(id)) fail.push('catalogue: #'+id+' was removed'); });
   console.log('   all bound ids present:', !fail.some(f=>f.includes('was removed')));
-  // feedback on every screen, and the "i" gone from all of them
-  const fb = [...d2.querySelectorAll('.sitehd .act .fblink')].length;
-  const fbAtlas = d.querySelectorAll('.sitehd .act .fblink').length;
+  // feedback on every screen, and the "i" gone from all of them. atlas moved
+  // its feedback link out of the header entirely, into the corner hint that
+  // used to open keyboard shortcuts (shortcuts are still reachable via "?"),
+  // so it is checked page-wide there rather than scoped to .sitehd .act.
+  const fb = [...d2.querySelectorAll('.sitehd .act a[href^="mailto:"]')].length;
+  const fbAtlas = d.querySelectorAll('a[href^="mailto:"]').length;
   console.log('   feedback pills: atlas', fbAtlas, '+ catalogue', fb, '| "i" buttons:', d2.querySelectorAll('.discbtn').length);
-  if(fbAtlas !== 1) fail.push('atlas: '+fbAtlas+' feedback pills, expected 1');
+  // one in the corner hint, one in the About modal's own copy
+  if(fbAtlas !== 2) fail.push('atlas: '+fbAtlas+' feedback links, expected 2');
   if(fb !== 3) fail.push('catalogue: '+fb+' feedback pills, expected one per screen');
-  // the atlas carries an extra About action; the (unlinked) catalogue screens
-  // keep their original two, in the same order, on every screen
+  console.log('   shortcuts corner hint replaced by feedback:', !d.getElementById('kbdHint'), '| feedback hint present:', !!d.getElementById('feedbackHint'));
+  if(d.getElementById('kbdHint')) fail.push('atlas: the old shortcuts corner button is still there');
+  if(!d.getElementById('feedbackHint')) fail.push('atlas: no feedback link in the corner hint');
+  // Upload lives in the centred nav now. Clear moved out of the header
+  // entirely, down into the map's own column-3 toolbar next to Edit — so
+  // .act is just About and Database as plain text links, then the (iconic,
+  // textless) theme toggle. The (unlinked) catalogue screens keep their
+  // original two, in the same order, on every screen. Button text includes
+  // both the full and short label spans (jsdom does not evaluate the CSS
+  // that picks between them).
   const acts = b => [...b.querySelectorAll('.act > *')].map(x => x.textContent.trim()).join(' > ');
-  const ATLAS_WANT = 'About > Clear all answers > feedback';
+  const ATLAS_WANT = 'About > Database > ';
   const WANT = 'Clear all answers > feedback';
   const aAtlas = acts(d.querySelector('.sitehd'));
   console.log('   atlas actions:', JSON.stringify(aAtlas));

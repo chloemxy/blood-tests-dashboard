@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """
-Builds index.html — the ripple atlas, the front door of the site.
+Regenerates the data embedded in index.html — the ripple atlas, the front
+door of the site — from data/catalogue.json.
 
-Reads the catalogue payload out of data/catalogue.json and emits a compact standalone
-build (no 6,192-row table), so the file stays small and fast.
+index.html is hand-edited directly (markup, CSS, JS all live there); this
+script only ever rewrites its one generated line, "const D = {...};", in
+place. There is no separate template file to keep in sync — index.html is
+both the source and the build target for everything except that one line.
 
 Flow:  annual panel marker -> concerns it can represent -> tests that would
        follow it up, with sourced relationship notes on how markers connect.
@@ -494,8 +497,17 @@ PAY = {
  },
 }
 
-TPL = io.open(os.path.join(ROOT, "pipeline", "v3_template.html"), encoding="utf8").read()
-out = TPL.replace("__PAYLOAD__", json.dumps(PAY, ensure_ascii=False, separators=(",", ":")))
+# index.html is itself the template: the shell (markup/CSS/JS) is hand-edited
+# in place, and this script only ever replaces its one generated line, "const
+# D = {...};" — so there is no second copy of the shell to fall out of sync.
+CUR = io.open(DST, encoding="utf8").read()
+PREFIX = "const D = "
+start = CUR.index(PREFIX)
+line_end = CUR.index("\n", start)
+old_line = CUR[start:line_end]
+assert old_line.rstrip().endswith("};"), "index.html's \"const D = ...\" line isn't shaped as expected"
+new_line = PREFIX + json.dumps(PAY, ensure_ascii=False, separators=(",", ":")) + ";"
+out = CUR[:start] + new_line + CUR[line_end:]
 io.open(DST, "w", encoding="utf8").write(out)
 
 m = PAY["meta"]

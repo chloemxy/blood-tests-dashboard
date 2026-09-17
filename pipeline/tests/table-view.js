@@ -77,11 +77,12 @@ setTimeout(() => {
   if (count().indexOf(String(quoted).replace(/\B(?=(\d{3})+(?!\d))/g, ',')) !== 0)
    fail.push('the quoted-only count does not match the data');
 
-  // and back
+  // and back — the map starts with no panel active, so "it came back" is
+  // checked by the always-drawn concerns column, not by markers
   click(d.querySelector('.sitehd [data-view2="map"]'));
-  console.log('back to the map: markers', d.querySelectorAll('.map .row.mkr').length);
-  if (d.body.classList.contains('view-table')) fail.push('the Atlas tab did not switch back');
-  if (!d.querySelectorAll('.map .row.mkr').length) fail.push('the map did not come back');
+  console.log('back to the map: concerns', d.querySelectorAll('.map .row.cnc').length);
+  if (d.body.classList.contains('view-table')) fail.push('the logo/Atlas link did not switch back');
+  if (!d.querySelectorAll('.map .row.cnc').length) fail.push('the map did not come back');
 
   console.log(fail.length ? '\nFAIL:\n - ' + fail.join('\n - ') : '\nALL PASS');
   if (fail.length) process.exitCode = 1;

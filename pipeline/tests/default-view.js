@@ -1,6 +1,7 @@
-/* The default view must draw every marker in your annual panel and every
- * concern, at every window size. Nothing rolled up, nothing dropped: this is
- * the first thing anyone sees.
+/* Your annual panel is on from a true first visit — no localStorage, no
+ * picking, no upload — and that default view must draw every one of its
+ * markers and every concern, at every window size. Nothing rolled up,
+ * nothing dropped.
  *
  * The expected counts come from the build's own payload, not from constants —
  * the panel definition changes, the invariant does not. */
@@ -19,8 +20,6 @@ let i = 0, fail = [];
  const dom = new JSDOM(html, { url: 'http://localhost/', runScripts: 'dangerously', pretendToBeVisual: true,
   beforeParse(w){
    w.matchMedia = q => ({ matches: false, addEventListener(){}, addListener(){} });
-   // The geometry checks want the full map: skip the first frame.
-   try{ w.localStorage.setItem('v3.state', JSON.stringify({reveal:1, guide:{off:1}})); }catch(e){}
    Object.defineProperty(w.HTMLElement.prototype, 'clientWidth',  { get(){ return W; } });
    Object.defineProperty(w.HTMLElement.prototype, 'clientHeight', { get(){ return H; } });
   }});

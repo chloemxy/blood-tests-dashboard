@@ -27,7 +27,9 @@ setTimeout(() => {
  console.log('z-index: band', zBand, '> canvas', zCanvas);
  if(zBand <= zCanvas) fail.push('band is not above the canvas');
 
- const titles = d.querySelectorAll('#colBar span').length;
+ // Two of the three column titles are pickers (buttons) now, not plain
+ // spans — count everything in the bar except the edit/revert cluster.
+ const titles = d.querySelectorAll('#colBar > *:not(.coltools)').length;
  console.log('titles in the band:', titles);
  if(titles !== 3) fail.push(titles + ' titles in the band, expected 3');
 

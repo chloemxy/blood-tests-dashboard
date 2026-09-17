@@ -5,8 +5,7 @@ const sizes=[[1280,720],[1600,900],[1920,1080]];let i=0,fail=[];
  const [W,H]=sizes[i++];
  const dom=new JSDOM(html,{url:'http://localhost/',runScripts:'dangerously',pretendToBeVisual:true,beforeParse(w){
   w.matchMedia=q=>({matches:false,addEventListener(){},addListener(){}});
-   // The geometry checks want the full map: skip the first frame.
-   try{ w.localStorage.setItem('v3.state', JSON.stringify({reveal:1, guide:{off:1}})); }catch(e){}
+   // Your annual panel is on from a true first visit — nothing to seed.
   Object.defineProperty(w.HTMLElement.prototype,'clientWidth',{get(){return W}});
   Object.defineProperty(w.HTMLElement.prototype,'clientHeight',{get(){return H}});}});
  setTimeout(()=>{const w=dom.window,d=w.document,D=w.eval('D');
@@ -18,7 +17,13 @@ const sizes=[[1280,720],[1600,900],[1920,1080]];let i=0,fail=[];
   console.log(W+'x'+H,'default: markers',mk(),'concerns',cn(),'canvas height',svgH());
   if(mk()!==nDef) fail.push(W+'x'+H+' default draws '+mk()+' markers, expected '+nDef);
   if(cn()!==D.meta.nConcerns) fail.push(W+'x'+H+' default draws '+cn()+' concerns, expected '+D.meta.nConcerns);
-  d.getElementById('pAll').dispatchEvent(new w.MouseEvent('click',{bubbles:true}));
+  // switch every panel on — the densest case — via the column-1 picker's
+  // panel chips rather than a rail "select all" shortcut, which is gone.
+  // Each click redraws the popover, so the next chip must be re-queried
+  // rather than clicked off a stale NodeList snapshot.
+  d.querySelector('[data-pick="markers"]').dispatchEvent(new w.MouseEvent('click',{bubbles:true}));
+  let next;
+  while((next = d.querySelector('#pickPop .pchip:not(.on)'))) next.dispatchEvent(new w.MouseEvent('click',{bubbles:true}));
   console.log('   all panels: markers',mk(),'concerns',cn(),'canvas height',svgH(),'(window',H-56,')');
   if(mk()!==nAll) fail.push(W+'x'+H+' all-panels draws '+mk()+' markers, expected '+nAll);
   if(svgH() < nAll*16) fail.push(W+'x'+H+' canvas did not grow for '+nAll+' rows');

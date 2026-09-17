@@ -1,16 +1,16 @@
 const fs=require('fs'),{JSDOM}=require('jsdom');
 const html=fs.readFileSync(require('path').join(__dirname,'..','..','index.html'),'utf8');
+const D0 = JSON.parse(html.slice(html.indexOf('const D = ') + 10, html.indexOf('\n', html.indexOf('const D = ')) - 1));
+const ALL_PANELS = {}; D0.panels.forEach(p => ALL_PANELS[p.id] = 1);   // densest case
 const sizes=[[1280,720],[1600,900],[1920,1080]];let i=0,fail=[];
 (function go(){ if(i>=sizes.length){console.log(fail.length?'\nFAIL:\n - '+fail.join('\n - '):'\nALL PASS'); if(fail.length) process.exitCode = 1;return;}
  const [W,H]=sizes[i++];
  const dom=new JSDOM(html,{url:'http://localhost/',runScripts:'dangerously',pretendToBeVisual:true,beforeParse(w){
   w.matchMedia=q=>({matches:false,addEventListener(){},addListener(){}});
-   // The geometry checks want the full map: skip the first frame.
-   try{ w.localStorage.setItem('v3.state', JSON.stringify({reveal:1, guide:{off:1}})); }catch(e){}
+   try{ w.localStorage.setItem('v3.state', JSON.stringify({panels: ALL_PANELS})); }catch(e){}
   Object.defineProperty(w.HTMLElement.prototype,'clientWidth',{get(){return W}});
   Object.defineProperty(w.HTMLElement.prototype,'clientHeight',{get(){return H}});}});
  setTimeout(()=>{const w=dom.window,d=w.document;
-  d.getElementById('pAll').dispatchEvent(new w.MouseEvent('click',{bubbles:true}));   // densest case
   d.querySelector('[data-cn]').dispatchEvent(new w.MouseEvent('click',{bubbles:true}));
   [['marker','.map .row.mkr'],['concern','.map .row.cnc'],['follow-up','.map .row.tst']].forEach(([nm,sel])=>{
    const boxes=[...d.querySelectorAll(sel+' .hitbox')].map(r=>({t:+r.getAttribute('y'),h:+r.getAttribute('height')}))

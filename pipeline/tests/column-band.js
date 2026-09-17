@@ -11,7 +11,9 @@ const sizes=[[1280,720],[1440,900],[1600,900],[1920,1080]];let i=0,fail=[];
   Object.defineProperty(w.HTMLElement.prototype,'clientHeight',{get(){return H}});}});
  setTimeout(()=>{const w=dom.window,d=w.document;
   const cnc=d.querySelectorAll('.map .row.cnc').length;
-  const bar=[...d.querySelectorAll('#colBar span')].map(x=>x.textContent);
+  // Two of the three column titles are pickers (buttons) now, not plain
+  // spans — count everything in the bar except the edit/revert cluster.
+  const bar=[...d.querySelectorAll('#colBar > *:not(.coltools)')].map(x=>x.textContent);
   const inline=[...d.querySelectorAll('.map [style*="font-size"]')].length;
   console.log(W+'x'+H,'concerns drawn',cnc,'| titles in band',bar.length,'| inline font-size in svg',inline);
   if(cnc!==47) fail.push(W+'x'+H+': '+cnc+' concerns drawn, expected all 47');
