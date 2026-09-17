@@ -96,7 +96,11 @@ button{font-family:inherit;cursor:pointer}
 
 /* ---------------- right detail ---------------- */
 .det{top:0;right:0;bottom:0;width:var(--detW);border-radius:0;border-right:none;border-top:none}
-.dhead{flex:0 0 auto;padding:8px 16px;border-bottom:1px solid var(--line);
+/* Pinned to the same 40px as #colBar (box-sizing so the border counts toward
+   it) rather than sized to its one line of content — content alone landed a
+   few px short, leaving a visible kink where its border met colBar's right
+   at the panel edge. */
+.dhead{flex:0 0 auto;height:40px;box-sizing:border-box;padding:8px 16px;border-bottom:1px solid var(--line);
  display:flex;flex-direction:column;justify-content:center}
 .dhead h2{font-family:var(--font-serif);font-size:15px;color:var(--slate);margin:0;line-height:1.3}
 .slot{flex:0 0 auto;border-bottom:1px solid var(--line);display:flex;flex-direction:column}
@@ -327,9 +331,9 @@ body.view-table .colbar,body.view-table .kbdhint{display:none}
 
 /* ---------------- keyboard help ---------------- */
 .kbdhint{position:absolute;right:16px;bottom:16px;z-index:4;font-family:var(--font-mono);font-size:10px;
- letter-spacing:.06em;text-transform:uppercase;color:var(--faint);background:var(--panel);
- border:1px solid var(--line);border-radius:8px;padding:4px 8px;cursor:pointer}
-.kbdhint:hover{color:var(--teal);border-color:var(--teal)}
+ letter-spacing:.06em;text-transform:uppercase;color:var(--teal);background:var(--aqua);
+ border:1px solid var(--teal);border-radius:8px;padding:4px 8px;cursor:pointer}
+.kbdhint:hover{color:var(--accent);border-color:var(--accent);background:var(--tint-accent)}
 .kbdwrap{position:absolute;inset:0;z-index:9;background:rgba(24,44,50,.34);display:none;
  align-items:center;justify-content:center}
 .kbdwrap.on{display:flex}
