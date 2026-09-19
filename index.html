@@ -175,8 +175,6 @@ button{font-family:inherit;cursor:pointer}
  border-radius:12px;white-space:nowrap}
 .tagchip:hover{border-color:var(--teal);color:var(--teal)}
 .tagchip.inp{border-color:var(--border-ok);background:var(--tint-ok);color:var(--ok)}
-.nl .n i.nv{font-style:normal;font-family:var(--font-mono);font-size:10px;color:var(--faint);margin-left:8px;
- border:1px solid var(--line);border-radius:8px;padding:0 4px;cursor:help}
 
 
 /* ---------------- map ----------------
@@ -1931,7 +1929,6 @@ function drawNextList(ci, selIdx){
    '<li'+(i===selIdx?' class="on"':'')+' data-test="'+ci+'" data-ti="'+i+'" role="button" tabindex="-1"><span class="n">'
    + '<span class="tlink">'+esc(t.n)+'</span>'
    + (t.a?'<em>'+esc(t.a)+'</em>':'')
-   + (t.nv>1?'<i class="nv" title="'+t.nv+' LOINC codes for this marker — different units, specimens or methods">&times;'+t.nv+'</i>':'')
    + '</span></li>';
 
  let h = '';
