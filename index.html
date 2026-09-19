@@ -41,10 +41,9 @@ button{font-family:inherit;cursor:pointer}
 /* Light/dark toggle: an icon, not another pill — the header already has
    enough of those. Sun/moon drawn inline rather than as an image so it
    themes for free via currentColor, same as every other icon in the map. */
-.iconbtn{width:28px;height:28px;flex:0 0 auto;border-radius:50%;border:1px solid var(--line);
- background:var(--panel);color:var(--dim);display:flex;align-items:center;justify-content:center;
- padding:0;cursor:pointer}
-.iconbtn:hover{border-color:var(--accent);color:var(--accent)}
+.iconbtn{width:28px;height:28px;flex:0 0 auto;border:none;background:none;color:var(--dim);
+ display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
+.iconbtn:hover{color:var(--accent)}
 .iconbtn svg{width:14px;height:14px;display:block}
 /* About and Database read as secondary, so they are plain text now rather
    than another pill next to Clear — a header can carry one pill of weight
@@ -297,7 +296,7 @@ button{font-family:inherit;cursor:pointer}
  scrollbar-gutter:stable;display:none}
 body.view-table .tbl{display:block}
 body.view-table .det,body.view-table .canvas,
-body.view-table .colbar,body.view-table .kbdhint{display:none}
+body.view-table .colbar{display:none}
 .tbl .wrap{max-width:1440px;margin:0 auto;padding:24px 16px 64px}
 .tbl h1{font-family:var(--font-serif);font-size:20px;color:var(--slate);margin:0 0 8px;font-weight:700}
 .tbl .sub{font-size:12px;color:var(--muted);margin:0 0 16px;max-width:80ch}
@@ -330,10 +329,6 @@ body.view-table .colbar,body.view-table .kbdhint{display:none}
 .tbl .note{font-size:12px;color:var(--muted);line-height:1.5;max-width:70ch}
 
 /* ---------------- keyboard help ---------------- */
-.kbdhint{position:absolute;right:16px;bottom:16px;z-index:4;font-family:var(--font-mono);font-size:10px;
- letter-spacing:.06em;text-transform:uppercase;color:var(--teal);background:var(--aqua);
- border:1px solid var(--teal);border-radius:8px;padding:4px 8px;cursor:pointer}
-.kbdhint:hover{color:var(--accent);border-color:var(--accent);background:var(--tint-accent)}
 .kbdwrap{position:absolute;inset:0;z-index:9;background:rgba(24,44,50,.34);display:none;
  align-items:center;justify-content:center}
 .kbdwrap.on{display:flex}
@@ -364,7 +359,7 @@ body.view-table .colbar,body.view-table .kbdhint{display:none}
    selected, and a scrim behind it makes clear the map beneath is not
    interactive while it is open. */
 @media(max-width:1080px){
- .det{display:flex;right:0;width:min(var(--detW),calc(100vw - 32px));
+ .det{display:flex;right:0;width:calc(100vw - 32px);
   transform:translateX(100%);transition:transform .18s ease;
   box-shadow:-8px 0 24px rgba(24,44,50,.18)}
  body.det-open .det{transform:translateX(0)}
@@ -1207,6 +1202,12 @@ window.addEventListener('load', function(){
  <span class="act">
   <button type="button" class="plainlink" id="btnAbout" title="What this project is, and who made it">About</button>
   <a class="plainlink" href="#table" data-view2="table" title="Every test in the catalogue, searchable and sortable">Database</a>
+  <a class="iconbtn" href="mailto:blood@goinvo.com" title="Send feedback to blood@goinvo.com">
+   <svg viewBox="0 0 16 16" width="14" height="14">
+    <rect x="1" y="3" width="14" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.2"/>
+    <path d="M1.5 4l6.5 5 6.5-5" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+   </svg>
+  </a>
   <button type="button" class="iconbtn" id="btnTheme" aria-pressed="false"></button>
  </span>
 </div>
@@ -1216,11 +1217,6 @@ window.addEventListener('load', function(){
  <div class="canvas" id="canvas"><svg class="map" id="map" role="img" aria-label="Ripple map: annual panel markers, the concerns they can represent, and the tests that would follow up"></svg></div>
  <div class="pickpop" id="pickPop" hidden></div>
  <div class="scrim" id="scrim"></div>
- <a class="kbdhint" id="feedbackHint" href="mailto:blood@goinvo.com" title="Send feedback to blood@goinvo.com">
-  <svg viewBox="0 0 16 16" width="11" height="11" style="vertical-align:-1px;margin-right:4px">
-   <rect x="1" y="3" width="14" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.2"/>
-   <path d="M1.5 4l6.5 5 6.5-5" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>feedback</a>
  <section class="tbl" id="tblView"><div class="wrap">
   <h1>Database</h1>
   <p class="sub">Every test in the catalogue, searchable and sortable. Descriptions marked
@@ -1638,9 +1634,7 @@ function draw(){
 
  // ---- column headers
  // Column titles are drawn in the band above, not here — see drawColBar().
- if(L.open === null){
-  h += '<line class="rule dash" x1="'+L.xT.toFixed(1)+'" y1="'+(b.T+4).toFixed(1)+'" x2="'+L.xT.toFixed(1)+'" y2="'+(b.B-4).toFixed(1)+'"/>';
- } else {
+ if(L.open !== null){
   // a tick on the anchor row makes the centring legible
   h += '<line class="rule" x1="'+(L.xT-7).toFixed(1)+'" y1="'+L.cn[L.open].toFixed(1)
     +  '" x2="'+(L.xT+7).toFixed(1)+'" y2="'+L.cn[L.open].toFixed(1)+'" opacity=".45"/>';
@@ -2209,8 +2203,13 @@ document.addEventListener('click', function(e){
    refreshSlugs(); st.sel = null; st.foc = null; save(); render(); return; }
  const set = e.target.closest('[data-set]');
  if(set){
-   st.val[set.dataset.set] = +set.dataset.v; st.focVia = 'select';
-   st.foc = {c:0, i:Math.max(0, SLUGS.indexOf(set.dataset.set))};
+   const sl = set.dataset.set, vv = +set.dataset.v;
+   // Clicking the arrow that is already active clears just this marker, back
+   // to what the upload carried — the only way to undo one mark used to be
+   // reverting every edit at once.
+   st.val[sl] = st.val[sl] === vv ? (st.uploaded[sl] || 0) : vv;
+   st.focVia = 'select';
+   st.foc = {c:0, i:Math.max(0, SLUGS.indexOf(sl))};
    save(); render(); return; }
  const add = e.target.closest('[data-add]');
  if(add){ const ci = add.dataset.add;
