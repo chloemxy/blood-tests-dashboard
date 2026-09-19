@@ -240,6 +240,7 @@ button{font-family:inherit;cursor:pointer}
  border-radius:8px;padding:4px 8px;cursor:pointer;white-space:nowrap}
 .coledit:hover,.colrevert:hover,.colclear:hover{border-color:var(--accent);color:var(--accent)}
 .coledit.on{background:var(--aqua);border-color:var(--teal);color:var(--slate)}
+.colrevert:disabled{opacity:.4;cursor:default;color:var(--teal);border-color:var(--line)}
 .map .fold .lb{fill:var(--dim)}
 .map .foldn{font-family:var(--font-mono);font-size:10px;fill:var(--faint)}
 .map .grpdup{font-family:var(--font-mono);font-size:10px;fill:var(--faint)}
@@ -431,6 +432,7 @@ body.view-table .colbar{display:none}
 .uppaste{width:100%;box-sizing:border-box;min-height:100px;border:1px solid var(--line);
  border-radius:8px;padding:8px;font-family:var(--font-sans);font-size:12px;color:var(--slate);
  margin:0 0 12px;resize:vertical}
+.upfilename{font-family:var(--font-mono);font-size:11px;letter-spacing:.03em;color:var(--dim);margin:0 0 12px}
 .upstatus{font-size:12px;color:var(--muted);margin:0 0 8px;line-height:1.5}
 .upstatus.err{color:var(--high)}
 .upresults{max-height:220px;overflow-y:auto;border:1px solid var(--line);border-radius:8px;margin:0 0 12px}
@@ -1164,21 +1166,20 @@ window.addEventListener('load', function(){
  <div id="upPickerView">
   <span class="k">upload your test results</span>
   <h2>Read your results from a PDF</h2>
-  <p>Give this atlas a lab report — a PDF exported from a patient portal like MyChart —
-   and it finds which results came back low or high for you, instead of you marking
-   each one by hand. Parsing happens on your device; the file is never sent anywhere.</p>
+  <p>Give this atlas a lab report. Parsing happens on your device; the file is never sent anywhere.</p>
   <div class="upzone">
    <input type="file" id="upFile" accept="application/pdf,.pdf" hidden>
    <button type="button" class="uploadbtn" id="upPick">Choose a PDF</button>
    <button type="button" class="uplink" id="upPasteToggle">paste text instead</button>
   </div>
+  <div class="upfilename" id="upFileName" hidden></div>
   <textarea id="upPaste" class="uppaste" hidden placeholder="Paste the text of your lab report here…"></textarea>
   <button type="button" class="uploadbtn" id="upParsePaste" hidden>Read this text</button>
   <div class="upstatus" id="upStatus"></div>
   <div class="upresults" id="upResults" hidden></div>
   <button type="button" class="uploadbtn" id="upApply" hidden>Apply to your bloodwork</button>
   <p>You can also mark each result yourself using the <b>low / normal / high</b> pills
-   next to it on the map — manual marking will always stay an option.</p>
+   next to it on the map.</p>
   <button class="close" id="upClose">Got it</button>
  </div>
  <div id="upDoneView" hidden>
@@ -1326,6 +1327,9 @@ const st = { val:{}, added:{}, sel:null, hot:null, expand:false, foc:null, focVi
              // default, so opening the map is a read of your results, not an
              // invitation to edit them
              editMode:false,
+             // one entry per hand-marked edit, {slug, prev} — the back arrow pops
+             // the last one, so undoing repeatedly walks back to the upload
+             editHistory:[],
              // "what would follow it up" can be collapsed on its own
              slots:{next:1},
              // which column-header picker popover is open: 'markers' | 'concerns' | null
@@ -1816,7 +1820,8 @@ function drawColBar(){
  // edit state (one button or two).
  + '<span class="coltools" style="left:' + at(L.xT) + ';width:' + (b.R + 16 - L.xT - 8).toFixed(0) + 'px">'
  +   '<button type="button" class="colclear" data-clear-all="1" title="Clear all your answers">Clear</button>'
- +   (st.editMode ? '<button type="button" class="colrevert" data-revert="1" title="Revert to your test results, discarding any edits">&#8634;</button>' : '')
+ +   (st.editMode ? '<button type="button" class="colrevert" data-undo="1"' + (st.editHistory.length ? '' : ' disabled')
+     + ' title="' + (st.editHistory.length ? 'Undo your last edit' : 'Nothing to undo — back to your uploaded results') + '">&#8592;</button>' : '')
  +   '<button type="button" class="coledit' + (st.editMode ? ' on' : '') + '" data-edit-toggle="1" title="' + (st.editMode ? 'Done editing' : 'Edit low/high marks by hand') + '">'
  +   (st.editMode ? 'Done' : 'Edit') + '</button>'
  + '</span>';
@@ -2196,12 +2201,12 @@ document.addEventListener('click', function(e){
    st.pickFilter = ''; drawColBar(); drawPicker(); return; }
  const et = e.target.closest('[data-edit-toggle]');
  if(et){ st.editMode = !st.editMode; render(); return; }
- const rv = e.target.closest('[data-revert]');
- if(rv){ SLUGS.forEach(sl => { st.val[sl] = st.uploaded[sl] || 0; });
-   save(); render(); return; }
+ const un = e.target.closest('[data-undo]');
+ if(un){ if(st.editHistory.length){ const last = st.editHistory.pop(); st.val[last.slug] = last.prev;
+     save(); render(); } return; }
  const ca = e.target.closest('[data-clear-all]');
  if(ca){ SLUGS.forEach(s => st.val[s] = 0); st.added = {}; st.pinM = {}; st.uploaded = {}; st.sel = null;
-   refreshSlugs(); save(); render(); return; }
+   st.editHistory = []; refreshSlugs(); save(); render(); return; }
  const pk = e.target.closest('[data-pgroup]');
  if(pk){ const g = PICKER_GROUPS.find(x => x.key === pk.dataset.pgroup);
    if(!g) return;
@@ -2213,9 +2218,12 @@ document.addEventListener('click', function(e){
  if(set){
    const sl = set.dataset.set, vv = +set.dataset.v;
    // Clicking the arrow that is already active clears just this marker, back
-   // to what the upload carried — the only way to undo one mark used to be
-   // reverting every edit at once.
-   st.val[sl] = st.val[sl] === vv ? (st.uploaded[sl] || 0) : vv;
+   // to what the upload carried. Either way, the previous value goes on the
+   // undo stack so the back arrow can step through these one at a time.
+   const prev = st.val[sl];
+   const next = prev === vv ? (st.uploaded[sl] || 0) : vv;
+   if(next !== prev) st.editHistory.push({slug: sl, prev: prev});
+   st.val[sl] = next;
    st.focVia = 'select';
    st.foc = {c:0, i:Math.max(0, SLUGS.indexOf(sl))};
    save(); render(); return; }
@@ -2393,7 +2401,7 @@ document.addEventListener('keydown', function(e){
  if(low === 'e' && st.sel && st.sel.t === 'c'){ st.expand = !st.expand; drawDetail(); return; }
  if(low === 'r'){
   SLUGS.forEach(sl => st.val[sl] = 0); st.added = {}; st.pinM = {}; st.uploaded = {}; st.sel = null; st.expand = false;
-  refreshSlugs(); save(); render(); return;
+  st.editHistory = []; refreshSlugs(); save(); render(); return;
  }
 });
 $('kbdClose').addEventListener('click', () => $('kbdWrap').classList.remove('on'));
@@ -2624,6 +2632,11 @@ document.addEventListener('keydown', function(e){
  function setStatus(msg, isErr){
   const s = $('upStatus'); s.textContent = msg; s.className = 'upstatus' + (isErr ? ' err' : '');
  }
+ function updateFileName(label){
+  const el = $('upFileName');
+  if(label){ el.textContent = 'Reading from: ' + label; el.hidden = false; }
+  else el.hidden = true;
+ }
  /* Applying used to silently reset this dialog back to the picker, with only
     a small status line above it to say anything happened — easy to read as
     "the upload didn't work" rather than "it's done". A confirmation screen
@@ -2633,6 +2646,7 @@ document.addEventListener('keydown', function(e){
   LAST = []; $('upFile').value = ''; $('upPaste').value = '';
   $('upPaste').hidden = true; $('upParsePaste').hidden = true;
   setStatus(lastLoaded ? 'Last loaded: ' + lastLoaded.label + ' — choose a file or paste text to replace it.' : '');
+  updateFileName(lastLoaded ? lastLoaded.label : null);
   renderResults();
  }
  function showUpDone(msg){
@@ -2658,6 +2672,7 @@ document.addEventListener('keydown', function(e){
   const f = e.target.files && e.target.files[0];
   if(!f) return;
   lastLoaded = {label: f.name};
+  updateFileName(lastLoaded.label);
   setStatus('Reading ' + f.name + '…'); LAST = []; renderResults();
   if(typeof pdfjsLib === 'undefined'){
    setStatus('The PDF reader didn’t load (check your connection and reload the page), or try pasting the text instead.', true);
@@ -2677,6 +2692,7 @@ document.addEventListener('keydown', function(e){
   const t = $('upPaste').value;
   if(!t.trim()){ setStatus('Paste the report text first.', true); return; }
   lastLoaded = {label: 'pasted text'};
+  updateFileName(lastLoaded.label);
   handleParsed(t);
  });
  $('upApply').addEventListener('click', function(){
@@ -2688,6 +2704,7 @@ document.addEventListener('keydown', function(e){
    const p = M[r.slug].panels.find(id => ANNUAL_IDS.indexOf(id) >= 0) || M[r.slug].panels[0];
    if(p) st.panels[p] = 1;
   });
+  st.editHistory = [];
   refreshSlugs(); st.sel = null; st.foc = null; save(); render();
 
   // The map only marks low/high, so an all-normal upload leaves it looking
