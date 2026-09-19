@@ -1920,7 +1920,11 @@ function drawNextList(ci, selIdx){
 
  // Grouped by family. A family shows its commonly-ordered markers by default —
  // the catalogue's own ordering tier — and opens to the rest on demand. The
- // count on the header is the true total, not what is carried.
+ // count on the header is what this concern actually carries (mine.length),
+ // not the catalogue-wide family total in f.n — the pipeline only ships the
+ // top 40 markers per concern, so a family's true size can be well past what
+ // ever reaches the browser, and "open to see all N" has to promise a number
+ // opening can actually deliver.
  // The source badge (quoted / AI-written) is not shown here — it appears once, in
  // the detail panel, when this specific test is opened.
  const row = (t, i) =>
@@ -1939,11 +1943,11 @@ function drawNextList(ci, selIdx){
   h += '<div class="famhd"><button class="famtog" data-fam="'+esc(f.g)+'">'
      + '<span class="fx">'+(open ? '\u2212' : '+')+'</span>'
      + '<span class="fn">'+esc(f.g)+'</span>'
-     + '<span class="fc">'+nf(f.n)+'</span></button></div>';
+     + '<span class="fc">'+nf(mine.length)+'</span></button></div>';
   if(pick.length) h += '<ul class="nl">'+pick.map(o => row(o.t, o.i)).join('')+'</ul>';
-  else h += '<p class="empty" style="margin:0 0 8px">none commonly ordered \u2014 open to see all '+nf(f.n)+'</p>';
-  if(open && mine.length < f.n)
-   h += '<p class="empty" style="margin:0 0 8px">showing '+mine.length+' of '+nf(f.n)+' carried for this family</p>';
+  else h += '<p class="empty" style="margin:0 0 8px">'+(mine.length
+    ? 'none commonly ordered \u2014 open to see all '+nf(mine.length)
+    : 'none carried for this concern')+'</p>';
  });
 
  $('next').innerHTML = h;
